@@ -9,14 +9,15 @@
 #include "youku.h"
 #include "bt.h"
 #include <signal.h>
+#include <regex.h>
 
 #define SER "irc.freenode.net"
 #define PORT 6667
 #define NICK "NICK smbot\r\n"
 #define USER "USER smbot sbmot irc.freenode.net :smbot\r\n"
-#define JOIN "JOIN #linuxba\r\n"
+#define JOIN "JOIN #debian_cn\r\n"
 #define MSG "PRIVMSG "
-#define CHANNEL "#linuxba"
+#define CHANNEL "#debian_cn"
 
 int sockfd;
 pid_t pid;
@@ -25,5 +26,7 @@ void msgto(int sockfd,const char *channel,const char *nick,
 		const char *msg);
 
 char *get_nick(char *msg);
+
+char *get_arg(char *buf,char *prg,char *des);
 
 #endif

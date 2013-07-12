@@ -11,6 +11,7 @@
 #include <errno.h>
 #include <netinet/in.h>
 #include <unistd.h>
+#include <regex.h>
 
 #define MEM_SIZE 80
 

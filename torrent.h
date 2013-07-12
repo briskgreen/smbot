@@ -5,6 +5,4 @@
 
 char *torrent(char *msg);
 
-char *get_magnet(char *url);
-
 #endif

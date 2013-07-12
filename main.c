@@ -1,5 +1,36 @@
 #include "smbot.h"
 
+#define null_continue() \
+{\
+	if(temp == NULL)\
+	{\
+		free(buf);\
+		continue;\
+	}\
+}
+
+#define no_arg_continue(msg) \
+{\
+	if(strstr(temp,msg))\
+	{\
+		msgto(sockfd,CHANNEL,nick,temp);\
+		free(buf);\
+		free(nick);\
+		continue;\
+	}\
+}
+
+#define no_result_continue(msg) \
+{\
+	if(strstr(t,msg))\
+	{\
+		msgto(sockfd,CHANNEL,nick,t);\
+		free(buf);\
+		free(nick);\
+		continue;\
+	}\
+}
+
 void quit_irc(int signum)
 {
 	kill(pid,SIGKILL);
@@ -13,6 +44,7 @@ int main(int argc,char **argv)
 {
 	char *buf;
 	char *temp;
+	char *t;
 	char *nick;
 	int ret;
 	fd_set reads;
@@ -45,39 +77,36 @@ int main(int argc,char **argv)
 		{
 			printf("%s\n",buf);
 			
-			temp=get_man_url(buf);
+			temp=get_arg(buf,"\\!man","!man <target> 或者 !man [0-9] <target>\r\n");
+			null_continue();
 			nick=get_nick(buf);
-			msgto(sockfd,CHANNEL,nick,temp);
-
-			if(strstr(temp,"man <target>") || strstr(temp,"参数错误") || strstr(temp,"Sorry"))
-			{
-				free(buf);
-				free(nick);
-				continue;
-			}
-
+			no_arg_continue("!man");
+			t=get_man_url(temp);
 			free(temp);
+			no_result_continue("Sorry");
+			msgto(sockfd,CHANNEL,nick,t);
+
+			free(t);
 			free(nick);
+			continue;
 		}
 
 		if(strstr(buf,"!ip") && strstr(buf,"PRIVMSG"))
 		{
 			printf("%s\n",buf);
 
-			temp=query_ip(buf);
+			temp=get_arg(buf,"\\!ip","!ip <target>\r\n");
+			null_continue();
 			nick=get_nick(buf);
-
-			msgto(sockfd,CHANNEL,nick,temp);
-
-			if(strstr(temp,"创建管道") || strstr(temp,"ip <ip add"))
-			{
-				free(buf);
-				free(nick);
-				continue;
-			}
-
+			no_arg_continue("!ip");
+			t=query_ip(temp);
 			free(temp);
+
+			msgto(sockfd,CHANNEL,nick,t);
+
+			free(t);
 			free(nick);
+			continue;
 		}
 
 		if(strstr(buf,"!time") && strstr(buf,"PRIVMSG"))
@@ -95,19 +124,18 @@ int main(int argc,char **argv)
 		{
 			printf("%s\n",buf);
 
-			temp=dict(buf);
+			temp=get_arg(buf,"\\!dict","!dict <target>\r\n");
+			null_continue();
 			nick=get_nick(buf);
-			msgto(sockfd,CHANNEL,nick,temp);
-
-			if(strstr(temp,"dict <wor") || strstr(temp,"Sorry"))
-			{
-				free(buf);
-				free(nick);
-				continue;
-			}
-
+			no_arg_continue("!dict");
+			t=dict(temp);
 			free(temp);
+			no_result_continue("Sorry,no result");
+			msgto(sockfd,CHANNEL,nick,t);
+
+			free(t);
 			free(nick);
+			continue;
 		}
 
 		if(strstr(buf,"!torrent") && strstr(buf,"PRIVMSG"))
@@ -117,30 +145,18 @@ int main(int argc,char **argv)
 			printf("%s\n",buf);
 
 			msgto(sockfd,CHANNEL,get_nick(buf),"该搜索可能会比较慢，请耐心等待，在此期间也希望不要再呼叫我!\r\n");
-			temp=torrent(buf);
+			temp=get_arg(buf,"\\!torrent","!torrent <target>\r\n");
+			null_continue();
 			nick=get_nick(buf);
-			if(strstr(temp,"Sorry") || strstr(temp,"torrent"))
-			{
-				msgto(sockfd,CHANNEL,nick,temp);
-
-				free(buf);
-				free(nick);
-				continue;
-			}
-
-			t=get_magnet(temp);
-			msgto(sockfd,CHANNEL,nick,t);
-			if(strstr(t,"Sorry"))
-			{
-				free(buf);
-				free(nick);
-				free(temp);
-				continue;
-			}
-
-			free(nick);
-			free(t);
+			no_arg_continue("!torrent");
+			t=torrent(temp);
 			free(temp);
+			no_result_continue("Sorry");
+			msgto(sockfd,CHANNEL,nick,t);
+
+			free(t);
+			free(nick);
+			continue;
 			//msgto(sockfd,CHANNEL,get_nick(buf),"由于无法连接到torrentkitty，所以暂时关闭该功能!\r\n");
 		}
 
@@ -148,38 +164,36 @@ int main(int argc,char **argv)
 		{
 			printf("%s\n",buf);
 
+			temp=get_arg(buf,"\\!youku","!youku <target>\r\n");
+			null_continue();
 			nick=get_nick(buf);
-			temp=get_youku_url(buf);
-			msgto(sockfd,CHANNEL,nick,temp);
-
-			if(strstr(temp,"Sorry") || strstr(buf,"youku"))
-			{
-				free(buf);
-				free(nick);
-				continue;
-			}
-
-			free(nick);
+			no_arg_continue("!youku");
+			t=get_youku_url(temp);
 			free(temp);
+			no_result_continue("Sorry,no result");
+			msgto(sockfd,CHANNEL,nick,t);
+
+			free(t);
+			free(nick);
+			continue;
 		}
 
 		if(strstr(buf,"!bt") && strstr(buf,"PRIVMSG"))
 		{
 			printf("%s\n",buf);
 
+			temp=get_arg(buf,"\\!bt","!bt <target>\r\n");
+			null_continue();
 			nick=get_nick(buf);
-			temp=get_bt_magnet(buf);
-			msgto(sockfd,CHANNEL,nick,temp);
-
-			if(strstr(temp,"bt"))
-			{
-				free(buf);
-				free(nick);
-				continue;
-			}
-
+			no_arg_continue("!bt");
+			t=get_bt_magnet(temp);
 			free(temp);
+			no_result_continue("Sorry");
+			msgto(sockfd,CHANNEL,nick,t);
+
+			free(t);
 			free(nick);
+			continue;
 		}
 
 		if(strstr(buf,"!list") && strstr(buf,"PRIVMSG"))
