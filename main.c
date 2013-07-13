@@ -215,7 +215,7 @@ int main(int argc,char **argv)
 		}
 
 		if(strstr(buf,"PING"))
-			send(sockfd,buf,sizeof(buf),0);
+			pong_ser(sockfd,buf);
 
 		free(buf);
 		buf=NULL;

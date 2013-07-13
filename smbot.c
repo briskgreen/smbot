@@ -7,16 +7,16 @@ void msgto(int sockfd,const char *channel,const char *nick,const char *msg)
 	fd_set writes;
 
 	if(nick == NULL)
-		len=strlen("PRIVMSG ")+strlen(channel)+strlen(msg)+3;
+		len=strlen(MSG)+strlen(channel)+strlen(msg)+3;
 	else
-		len=strlen("PRIVMSG ")+strlen(channel)+strlen(nick)+strlen(msg)+5;
+		len=strlen(MSG)+strlen(channel)+strlen(nick)+strlen(msg)+5;
 	buf=malloc(len);
 	buf[len]='\0';
 
 	if(nick != NULL)
-		sprintf(buf,"PRIVMSG %s :%s: %s",channel,nick,msg);
+		sprintf(buf,"%s%s :%s: %s",MSG,channel,nick,msg);
 	else
-		sprintf(buf,"PRIVMSG %s :%s",channel,msg);
+		sprintf(buf,"%s%s :%s",MSG,channel,msg);
 
 	FD_ZERO(&writes);
 	FD_SET(sockfd,&writes);
@@ -79,5 +79,11 @@ char *get_arg(char *buf,char *prg,char *des)
 	strncpy(res,buf+pmatch[0].rm_eo+1,len);
 
 	return res;
+}
+
+void pong_ser(int sockfd,char *msg)
+{
+	msg[1]='O';
+	send(sockfd,msg,strlen(msg),0);
 }
 

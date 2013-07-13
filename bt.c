@@ -21,10 +21,10 @@ char *get_bt_magnet(char *buf)
 	close(pipefd[1]);
 
 	read(pipefd[0],res,sizeof(res));
-	temp=malloc(strlen(res)+3);
-	bzero(temp,strlen(res)+3);
+	temp=malloc(strlen(res)+2);
+	bzero(temp,strlen(res)+2);
 	strncpy(temp,res,strlen(res));
-	strncat(temp,"\r\n",strlen("\r\n"));
+	strncat(temp,"\n",strlen("\n"));
 
 	return temp;
 }

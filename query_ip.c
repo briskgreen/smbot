@@ -8,7 +8,7 @@ char *query_ip(char *ip)
 	int i,j;
 
 	if(pipe(pipefd) == -1)
-		return "创建管道失败!\r\n";
+		return "创建管道失败!\n";
 
 	if(fork() == 0)
 	{
@@ -23,9 +23,9 @@ char *query_ip(char *ip)
 	close(pipefd[1]);
 
 	read(pipefd[0],temp,sizeof(temp));
-	buf=malloc(strlen(temp)+3);
-	bzero(buf,strlen(temp)+3);
-	sprintf(buf,"%s\r\n",temp);
+	buf=malloc(strlen(temp)+2);
+	bzero(buf,strlen(temp)+2);
+	sprintf(buf,"%s\n",temp);
 
 	return buf;
 }
