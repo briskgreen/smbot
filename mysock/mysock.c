@@ -81,7 +81,7 @@ char *read_line(int sockfd)
 
 	while(1)
 	{
-		if(recv(sockfd,&temp,sizeof(char),0) <= 0)
+		if(recv(sockfd,&temp,sizeof(char),0) == -1)
 		{
 			++k;
 

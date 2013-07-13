@@ -13,9 +13,9 @@
 
 #define SER "irc.freenode.net"
 #define PORT 6667
-#define NICK "NICK smbot\r\n"
-#define USER "USER smbot sbmot irc.freenode.net :smbot\r\n"
-#define JOIN "JOIN #debian_cn\r\n"
+#define NICK "NICK test_bot\n"
+#define USER "USER smbot sbmot irc.freenode.net :smbot\n"
+#define JOIN "JOIN #debian_cn\n"
 #define MSG "PRIVMSG "
 #define CHANNEL "#debian_cn"
 

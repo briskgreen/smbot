@@ -33,9 +33,9 @@
 
 void quit_irc(int signum)
 {
-	kill(pid,SIGKILL);
+	//kill(pid,SIGKILL);
 
-	send(sockfd,"QUIT\r\n",strlen("QUIT\r\n"),0);
+	send(sockfd,"QUIT\n",strlen("QUIT\n"),0);
 	close(sockfd);
 	exit(0);
 }
@@ -71,13 +71,13 @@ int main(int argc,char **argv)
 			continue;
 
 		buf=read_line(sockfd);
-		//printf("%s",buf);
+		printf("%s",buf);
 
 		if(strstr(buf,"!man") && strstr(buf,"PRIVMSG"))
 		{
 			printf("%s\n",buf);
 			
-			temp=get_arg(buf,"\\!man","!man <target> 或者 !man [0-9] <target>\r\n");
+			temp=get_arg(buf,"\\!man","!man <target> 或者 !man [0-9] <target>\n");
 			null_continue();
 			nick=get_nick(buf);
 			no_arg_continue("!man");
@@ -95,7 +95,7 @@ int main(int argc,char **argv)
 		{
 			printf("%s\n",buf);
 
-			temp=get_arg(buf,"\\!ip","!ip <target>\r\n");
+			temp=get_arg(buf,"\\!ip","!ip <target>\n");
 			null_continue();
 			nick=get_nick(buf);
 			no_arg_continue("!ip");
@@ -105,6 +105,7 @@ int main(int argc,char **argv)
 			msgto(sockfd,CHANNEL,nick,t);
 
 			free(t);
+			free(buf);
 			free(nick);
 			continue;
 		}
@@ -118,13 +119,15 @@ int main(int argc,char **argv)
 			msgto(sockfd,CHANNEL,nick,temp);
 
 			free(nick);
+			free(buf);
+			continue;
 		}
 
 		if(strstr(buf,"!dict") && strstr(buf,"PRIVMSG"))
 		{
 			printf("%s\n",buf);
 
-			temp=get_arg(buf,"\\!dict","!dict <target>\r\n");
+			temp=get_arg(buf,"\\!dict","!dict <target>\n");
 			null_continue();
 			nick=get_nick(buf);
 			no_arg_continue("!dict");
@@ -135,6 +138,7 @@ int main(int argc,char **argv)
 
 			free(t);
 			free(nick);
+			free(buf);
 			continue;
 		}
 
@@ -144,8 +148,8 @@ int main(int argc,char **argv)
 
 			printf("%s\n",buf);
 
-			msgto(sockfd,CHANNEL,get_nick(buf),"该搜索可能会比较慢，请耐心等待，在此期间也希望不要再呼叫我!\r\n");
-			temp=get_arg(buf,"\\!torrent","!torrent <target>\r\n");
+			msgto(sockfd,CHANNEL,get_nick(buf),"该搜索可能会比较慢，请耐心等待，在此期间也希望不要再呼叫我!\n");
+			temp=get_arg(buf,"\\!torrent","!torrent <target>\n");
 			null_continue();
 			nick=get_nick(buf);
 			no_arg_continue("!torrent");
@@ -155,6 +159,7 @@ int main(int argc,char **argv)
 			msgto(sockfd,CHANNEL,nick,t);
 
 			free(t);
+			free(buf);
 			free(nick);
 			continue;
 			//msgto(sockfd,CHANNEL,get_nick(buf),"由于无法连接到torrentkitty，所以暂时关闭该功能!\r\n");
@@ -164,7 +169,7 @@ int main(int argc,char **argv)
 		{
 			printf("%s\n",buf);
 
-			temp=get_arg(buf,"\\!youku","!youku <target>\r\n");
+			temp=get_arg(buf,"\\!youku","!youku <target>\n");
 			null_continue();
 			nick=get_nick(buf);
 			no_arg_continue("!youku");
@@ -174,6 +179,7 @@ int main(int argc,char **argv)
 			msgto(sockfd,CHANNEL,nick,t);
 
 			free(t);
+			free(buf);
 			free(nick);
 			continue;
 		}
@@ -182,7 +188,7 @@ int main(int argc,char **argv)
 		{
 			printf("%s\n",buf);
 
-			temp=get_arg(buf,"\\!bt","!bt <target>\r\n");
+			temp=get_arg(buf,"\\!bt","!bt <target>\n");
 			null_continue();
 			nick=get_nick(buf);
 			no_arg_continue("!bt");
@@ -192,6 +198,7 @@ int main(int argc,char **argv)
 			msgto(sockfd,CHANNEL,nick,t);
 
 			free(t);
+			free(buf);
 			free(nick);
 			continue;
 		}
@@ -202,7 +209,7 @@ int main(int argc,char **argv)
 
 			nick=get_nick(buf);
 			msgto(sockfd,CHANNEL,nick,
-					"man、ip、time、dict、torrent、youku、bt、list\r\n");
+					"man、ip、time、dict、torrent、youku、bt、list\n");
 
 			free(nick);
 		}

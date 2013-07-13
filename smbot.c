@@ -4,23 +4,32 @@ void msgto(int sockfd,const char *channel,const char *nick,const char *msg)
 {
 	int len;
 	char *buf;
+	fd_set writes;
 
 	if(nick == NULL)
-		len=strlen(MSG)+strlen(channel)+strlen(msg)+3;
+		len=strlen("PRIVMSG ")+strlen(channel)+strlen(msg)+3;
 	else
-		len=strlen(MSG)+strlen(channel)+strlen(nick)+strlen(msg)+5;
+		len=strlen("PRIVMSG ")+strlen(channel)+strlen(nick)+strlen(msg)+5;
 	buf=malloc(len);
-	bzero(buf,len);
+	buf[len]='\0';
 
 	if(nick != NULL)
-		sprintf(buf,"%s%s :%s: %s",MSG,channel,nick,msg);
+		sprintf(buf,"PRIVMSG %s :%s: %s",channel,nick,msg);
 	else
-		sprintf(buf,"%s%s :%s",MSG,channel,msg);
+		sprintf(buf,"PRIVMSG %s :%s",channel,msg);
 
-	send(sockfd,buf,len-1,0);
+	FD_ZERO(&writes);
+	FD_SET(sockfd,&writes);
+	len=select(sockfd+1,NULL,&writes,NULL,NULL);
+	if(len == -1)
+	{
+		printf("Error send\n");
+		return;
+	}
+
+	send(sockfd,buf,strlen(buf),0);
 
 	free(buf);
-	buf=NULL;
 }
 
 char *get_nick(char *msg)
@@ -33,7 +42,6 @@ char *get_nick(char *msg)
 			break;
 		else
 			buf[j]=msg[i];
-
 	buf[j]='\0';
 
 	return buf;
