@@ -75,7 +75,7 @@ int main(int argc,char **argv)
 
 		if(strstr(buf,"!man") && strstr(buf,"PRIVMSG"))
 		{
-			printf("%s\n",buf);
+			//printf("%s\n",buf);
 			
 			temp=get_arg(buf,"\\!man","!man <target> 或者 !man [0-9] <target>\n");
 			null_continue();
@@ -93,7 +93,7 @@ int main(int argc,char **argv)
 
 		if(strstr(buf,"!ip") && strstr(buf,"PRIVMSG"))
 		{
-			printf("%s\n",buf);
+			//printf("%s\n",buf);
 
 			temp=get_arg(buf,"\\!ip","!ip <target>\n");
 			null_continue();
@@ -104,15 +104,15 @@ int main(int argc,char **argv)
 
 			msgto(sockfd,CHANNEL,nick,t);
 
+			free(nick);
 			free(t);
 			free(buf);
-			free(nick);
 			continue;
 		}
 
 		if(strstr(buf,"!time") && strstr(buf,"PRIVMSG"))
 		{
-			printf("%s\n",buf);
+			//printf("%s\n",buf);
 
 			temp=get_time();
 			nick=get_nick(buf);
@@ -125,7 +125,7 @@ int main(int argc,char **argv)
 
 		if(strstr(buf,"!dict") && strstr(buf,"PRIVMSG"))
 		{
-			printf("%s\n",buf);
+			//printf("%s\n",buf);
 
 			temp=get_arg(buf,"\\!dict","!dict <target>\n");
 			null_continue();
@@ -146,7 +146,7 @@ int main(int argc,char **argv)
 		{
 			char *t;
 
-			printf("%s\n",buf);
+			//printf("%s\n",buf);
 
 			msgto(sockfd,CHANNEL,get_nick(buf),"该搜索可能会比较慢，请耐心等待，在此期间也希望不要再呼叫我!\n");
 			temp=get_arg(buf,"\\!torrent","!torrent <target>\n");
@@ -167,7 +167,7 @@ int main(int argc,char **argv)
 
 		if(strstr(buf,"!youku") && strstr(buf,"PRIVMSG"))
 		{
-			printf("%s\n",buf);
+			//printf("%s\n",buf);
 
 			temp=get_arg(buf,"\\!youku","!youku <target>\n");
 			null_continue();
@@ -186,7 +186,7 @@ int main(int argc,char **argv)
 
 		if(strstr(buf,"!bt") && strstr(buf,"PRIVMSG"))
 		{
-			printf("%s\n",buf);
+			//printf("%s\n",buf);
 
 			temp=get_arg(buf,"\\!bt","!bt <target>\n");
 			null_continue();
@@ -203,13 +203,46 @@ int main(int argc,char **argv)
 			continue;
 		}
 
+		if(strstr(buf,"!yb") && strstr(buf,"PRIVMSG"))
+		{
+			temp=get_arg(buf,"\\!yb","!yb <target>\n");
+			null_continue();
+			nick=get_nick(buf);
+			no_arg_continue("!yb");
+			t=get_yb_code(temp);
+			free(temp);
+
+			msgto(sockfd,CHANNEL,nick,t);
+
+			free(t);
+			free(buf);
+			free(nick);
+			continue;
+		}
+
+		if(strstr(buf,"!weather") && strstr(buf,"PRIVMSG"))
+		{
+			temp=get_arg(buf,"\\!weather","!weather <target>\n");
+			null_continue();
+			nick=get_nick(buf);
+			no_arg_continue("!weather");
+			t=get_weather(temp);
+			free(temp);
+			msgto(sockfd,CHANNEL,nick,t);
+
+			free(t);
+			free(buf);
+			free(nick);
+			continue;
+		}
+
 		if(strstr(buf,"!list") && strstr(buf,"PRIVMSG"))
 		{
-			printf("%s\n",buf);
+			//printf("%s\n",buf);
 
 			nick=get_nick(buf);
 			msgto(sockfd,CHANNEL,nick,
-					"man、ip、time、dict、torrent、youku、bt、list\n");
+					"man、ip、time、dict、torrent、youku、bt、yb、weather、list\n");
 
 			free(nick);
 		}
@@ -218,7 +251,6 @@ int main(int argc,char **argv)
 			pong_ser(sockfd,buf);
 
 		free(buf);
-		buf=NULL;
 	}
 
 	close(sockfd);

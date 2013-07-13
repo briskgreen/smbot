@@ -8,16 +8,18 @@
 #include "torrent.h"
 #include "youku.h"
 #include "bt.h"
+#include "yb.h"
+#include "weather.h"
 #include <signal.h>
 #include <regex.h>
 
 #define SER "irc.freenode.net"
 #define PORT 6667
-#define NICK "NICK test_bot\n"
+#define NICK "NICK smbot\n"
 #define USER "USER smbot sbmot irc.freenode.net :smbot\n"
-#define JOIN "JOIN #linuxba\n"
+#define JOIN "JOIN #debian_cn\n"
 #define MSG "PRIVMSG "
-#define CHANNEL "#linuxba"
+#define CHANNEL "#debian_cn"
 
 int sockfd;
 pid_t pid;
