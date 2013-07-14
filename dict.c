@@ -27,7 +27,7 @@ char *dict(char *msg)
 	send(sockfd,connection,strlen(connection),0);
 	send(sockfd,content_type,strlen(content_type),0);
 
-	free(buf);
+	safe_free(&buf);
 	buf=NULL;
 
 	while(buf=read_line(sockfd))
@@ -37,7 +37,7 @@ char *dict(char *msg)
 		if(strstr(buf,"dict-en-simplemeans-english"))
 			break;
 
-		free(buf);
+		safe_free(&buf);
 		buf=NULL;
 	}
 
@@ -79,7 +79,7 @@ char *dict(char *msg)
 	}
 	regfree(&reg);
 
-	free(buf);
+	safe_free(&buf);
 	buf=malloc(strlen(temp)+2);
 	bzero(buf,strlen(temp)+2);
 	sprintf(buf,"%s\n",temp);

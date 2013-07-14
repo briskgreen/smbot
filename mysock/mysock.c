@@ -104,7 +104,7 @@ char *read_line(int sockfd)
 					return NULL;
 			}
 			strncpy(t,buf,i);
-			free(buf);
+			safe_free(&buf);
 
 			++j;	
 			while((buf=malloc(MEM_SIZE*j)) == NULL)
@@ -115,7 +115,7 @@ char *read_line(int sockfd)
 					return NULL;
 			}
 			strncpy(buf,t,i);
-			free(t);
+			safe_free(&t);
 		}
 
 		buf[i] = temp;
@@ -157,4 +157,13 @@ char *url_encode(char *string)
 		sprintf(res+j,"%%%02x",(unsigned char)string[i]);
 
 	return res;
+}
+
+void safe_free(void **buf)
+{
+	if(*buf == NULL)
+		return;
+
+	free(*buf);
+	*buf=NULL;
 }

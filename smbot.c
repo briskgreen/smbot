@@ -3,7 +3,7 @@
 void msgto(int sockfd,const char *channel,const char *nick,const char *msg)
 {
 	int len;
-	char *buf;
+	char *buf=NULL;
 	fd_set writes;
 
 	if(nick == NULL)
@@ -11,7 +11,7 @@ void msgto(int sockfd,const char *channel,const char *nick,const char *msg)
 	else
 		len=strlen(MSG)+strlen(channel)+strlen(nick)+strlen(msg)+5;
 	buf=malloc(len);
-	buf[len]='\0';
+	buf[len-1]='\0';
 
 	if(nick != NULL)
 		sprintf(buf,"%s%s :%s: %s",MSG,channel,nick,msg);
@@ -29,20 +29,18 @@ void msgto(int sockfd,const char *channel,const char *nick,const char *msg)
 
 	send(sockfd,buf,strlen(buf),0);
 
-	free(buf);
+	safe_free(&buf);
 }
 
 char *get_nick(char *msg)
 {
-	char *buf=malloc(sizeof(int)*30);
-	int i,j;
+	char *buf=NULL;
+	int len;
 
-	for(i=1,j=0;msg[i];++i,++j)
-		if(msg[i] == '!')
-			break;
-		else
-			buf[j]=msg[i];
-	buf[j]='\0';
+	for(len=1;msg[len] != '!';++len);
+	buf=malloc(len);
+	strncpy(buf,msg+1,len-1);
+	buf[len-1]='\0';
 
 	return buf;
 }
@@ -58,7 +56,10 @@ char *get_arg(char *buf,char *prg,char *des)
 	char temp;
 
 	if(regcomp(&preg,prg,0) != 0)
+	{
+		regfree(&preg);
 		return NULL;
+	}
 	if(regexec(&preg,buf,nmatch,pmatch,0) !=0)
 	{
 		regfree(&preg);
@@ -73,10 +74,10 @@ char *get_arg(char *buf,char *prg,char *des)
 	else if(temp != ' ' && temp != '\r')
 		return NULL;
 
-	for(index+=2,len=0;buf[index];++len,++index);
-	res=malloc(len+1);
-	bzero(res,len+1);
-	strncpy(res,buf+pmatch[0].rm_eo+1,len);
+	for(index+=2,len=1;buf[index];++len,++index);
+	res=malloc(len);
+	strncpy(res,buf+pmatch[0].rm_eo+1,len-1);
+	res[len-1]='\0';
 
 	return res;
 }

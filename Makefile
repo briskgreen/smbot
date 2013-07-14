@@ -37,7 +37,7 @@ weather.o:weather.c weather.h mysock/mysock.h
 	gcc -c weather.c
 
 mysock.o:mysock/mysock.c mysock/mysock.h 
-	gcc -c mysock/mysock.c 
+	gcc -c mysock/mysock.c
 
 clean:
 	rm smbot *.o

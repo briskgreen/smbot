@@ -40,4 +40,6 @@ int tcp_conect(char *url,int port);
 
 char *url_encode(char *string);
 
+void safe_free(void **buf);
+
 #endif

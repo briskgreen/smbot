@@ -26,7 +26,7 @@ char *torrent(char *msg)
 	send(sockfd,content_type,strlen(content_type),0);
 	send(sockfd,connection,strlen(connection),0);
 
-	free(buf);
+	safe_free(&buf);
 	buf=NULL;
 
 	while(buf=read_line(sockfd))
@@ -34,7 +34,7 @@ char *torrent(char *msg)
 		if(strstr(buf,"<tr><td class=\"name\">"))
 			break;
 
-		free(buf);
+		safe_free(&buf);
 		buf=NULL;
 	}
 	close(sockfd);
@@ -55,7 +55,7 @@ char *torrent(char *msg)
 
 	regfree(&reg);
 	snprintf(temp,pmatch[0].rm_eo-pmatch[0].rm_so+1,"%s\n",buf+pmatch[0].rm_so);
-	free(buf);
+	safe_free(&buf);
 	buf=NULL;
 
 	buf=malloc(strlen(temp)+1);

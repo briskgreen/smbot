@@ -13,7 +13,7 @@
 #include <signal.h>
 #include <regex.h>
 
-#define SER "irc.freenode.net"
+#define SER "irc.freenode.org"
 #define PORT 6667
 #define NICK "NICK smbot\n"
 #define USER "USER smbot sbmot irc.freenode.net :smbot\n"

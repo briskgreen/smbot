@@ -11,12 +11,14 @@ char *get_youku_url(char *msg)
 	char *accept="Accept: */*\n";
 	char *connection="Connection: close\n\n";
 	char *buf;
+	char *prg="http://*.[^\"]*";
+	int flags=0;
 	int len;
 
 	buf=url_encode(msg);
 	sprintf(temp,"%s",buf);
 	len=strlen(get)+strlen(buf)+strlen(" HTTP/1.1\n");
-	free(buf);
+	safe_free(&buf);
 
 	buf=malloc(len+1);
 	bzero(buf,len+1);
@@ -31,19 +33,27 @@ char *get_youku_url(char *msg)
 	send(sockfd,accept,strlen(accept),0);
 	send(sockfd,connection,strlen(connection),0);
 
-	free(buf);
+	safe_free(&buf);
 
 	while(buf=read_line(sockfd))
 	{
 		if(strstr(buf,"<a title="))
 			break;
+		if(strstr(buf,"<div class=\"sk-not-match"))
+		{
+			flags=1;
+			break;
+		}
 
-		free(buf);
+		safe_free(&buf);
 	}
+	close(sockfd);
 
 	if(buf == NULL)
 		return "Sorry,no result found!\n";
-	if(regcomp(&reg,"http://*.[^\"]*",0) != 0)
+	if(flags)
+		prg=">.[^<]*";
+	if(regcomp(&reg,prg,0) != 0)
 	{
 		regfree(&reg);
 		return "Sorry,no result found!\n";
@@ -57,7 +67,7 @@ char *get_youku_url(char *msg)
 	regfree(&reg);
 	bzero(temp,sizeof(temp));
 	snprintf(temp,pmatch[0].rm_eo-pmatch[0].rm_so+1,"%s",buf+pmatch[0].rm_so);
-	free(buf);
+	safe_free(&buf);
 	buf=malloc(strlen(temp)+2);
 	bzero(buf,strlen(temp)+2);
 	sprintf(buf,"%s\n",temp);

@@ -46,7 +46,7 @@ char *get_man_url(char *msg)
 	send(sockfd,content_length,strlen(content_length),0);
 	send(sockfd,buf,len+1,0);
 
-	free(buf);
+	safe_free(&buf);
 
 	while(buf=read_line(sockfd))
 	{
@@ -54,11 +54,11 @@ char *get_man_url(char *msg)
 			break;
 		if(strstr(buf,"Sorry"))
 		{
-			free(buf);
+			safe_free(&buf);
 			return "Sorry,no result found!\n";
 		}
 
-		free(buf);
+		safe_free(&buf);
 	}
 	
 	close(sockfd);
@@ -69,7 +69,7 @@ char *get_man_url(char *msg)
 	bzero(res,len);
 	sprintf(res,"http://www.linuxmanpages.com%s\n",buf+10);
 
-	free(buf);
+	safe_free(&buf);
 	return res;
 }
 
