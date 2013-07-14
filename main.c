@@ -13,9 +13,10 @@
 {\
 	if(strstr(temp,msg))\
 	{\
-		msgto(sockfd,CHANNEL,nick,temp);\
+		msgto(sockfd,channel,nick,temp);\
 		safe_free(&buf);\
 		safe_free(&nick);\
+		safe_free(&channel);\
 		goto start;\
 	}\
 }
@@ -24,9 +25,10 @@
 {\
 	if(strstr(t,msg))\
 	{\
-		msgto(sockfd,CHANNEL,nick,t);\
+		msgto(sockfd,channel,nick,t);\
 		safe_free(&buf);\
 		safe_free(&nick);\
+		safe_free(&channel);\
 		goto start;\
 	}\
 }
@@ -46,6 +48,7 @@ int main(int argc,char **argv)
 	char *temp=NULL;
 	char *t=NULL;
 	char *nick=NULL;
+	char *channel=NULL;
 	int ret;
 	fd_set reads;
 	struct sigaction act,old;
@@ -60,7 +63,10 @@ int main(int argc,char **argv)
 
 	send(sockfd,NICK,strlen(NICK),0);
 	send(sockfd,USER,strlen(USER),0);
-	send(sockfd,JOIN,strlen(JOIN),0);
+	send(sockfd,JOIN_DEBIAN_CN,strlen(JOIN_DEBIAN_CN),0);
+	send(sockfd,JOIN_LINUXBA,strlen(JOIN_LINUXBA),0);
+	send(sockfd,JOIN_LINUXBAR,strlen(JOIN_LINUXBAR),0);
+	send(sockfd,JOIN_LINUKSO,strlen(JOIN_LINUKSO),0);
 
 	while(1)
 	{
@@ -83,14 +89,16 @@ start:
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!man","!man <target> 或者 !man [0-9] <target>\n");
 			null_continue();
 			nick=get_nick(buf);
+			channel=get_channel(buf);
 			no_arg_continue("!man");
 			t=get_man_url(temp);
 			safe_free(&temp);
 			no_result_continue("Sorry");
-			msgto(sockfd,CHANNEL,nick,t);
+			msgto(sockfd,channel,nick,t);
 
 			safe_free(&t);
 			safe_free(&nick);
+			safe_free(&channel);
 			goto start;
 		}
 
@@ -101,14 +109,16 @@ start:
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!ip","!ip <target>\n");
 			null_continue();
 			nick=get_nick(buf);
+			channel=get_channel(buf);
 			no_arg_continue("!ip");
 			t=query_ip(temp);
 			safe_free(&temp);
 
-			msgto(sockfd,CHANNEL,nick,t);
+			msgto(sockfd,channel,nick,t);
 
 			safe_free(&nick);
 			safe_free(&t);
+			safe_free(&channel);
 			safe_free(&buf);
 			goto start;
 		}
@@ -119,10 +129,12 @@ start:
 
 			temp=get_time();
 			nick=get_nick(buf);
-			msgto(sockfd,CHANNEL,nick,temp);
+			channel=get_channel(buf);
+			msgto(sockfd,channel,nick,temp);
 
 			safe_free(&nick);
 			safe_free(&buf);
+			safe_free(&channel);
 			goto start;
 		}
 
@@ -133,15 +145,17 @@ start:
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!dict","!dict <target>\n");
 			null_continue();
 			nick=get_nick(buf);
+			channel=get_channel(buf);
 			no_arg_continue("!dict");
 			t=dict(temp);
 			safe_free(&temp);
 			no_result_continue("Sorry,no result");
-			msgto(sockfd,CHANNEL,nick,t);
+			msgto(sockfd,channel,nick,t);
 
 			safe_free(&t);
 			safe_free(&nick);
 			safe_free(&buf);
+			safe_free(&channel);
 			goto start;
 		}
 
@@ -155,15 +169,17 @@ start:
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!torrent","!torrent <target>\n");
 			null_continue();
 			nick=get_nick(buf);
+			channel=get_channel(buf);
 			no_arg_continue("!torrent");
 			t=torrent(temp);
 			safe_free(&temp);
 			no_result_continue("Sorry");
-			msgto(sockfd,CHANNEL,nick,t);
+			msgto(sockfd,channel,nick,t);
 
 			safe_free(&t);
 			safe_free(&buf);
 			safe_free(&nick);
+			safe_free(&channel);
 			goto start;
 			//msgto(sockfd,CHANNEL,get_nick(buf),"由于无法连接到torrentkitty，所以暂时关闭该功能!\r\n");
 		}
@@ -175,15 +191,17 @@ start:
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!youku","!youku <target>\n");
 			null_continue();
 			nick=get_nick(buf);
+			channel=get_channel(buf);
 			no_arg_continue("!youku");
 			t=get_youku_url(temp);
 			safe_free(&temp);
 			no_result_continue("Sorry,no result");
-			msgto(sockfd,CHANNEL,nick,t);
+			msgto(sockfd,channel,nick,t);
 
 			safe_free(&t);
 			safe_free(&buf);
 			safe_free(&nick);
+			safe_free(&channel);
 			goto start;
 		}
 
@@ -194,15 +212,17 @@ start:
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!bt","!bt <target>\n");
 			null_continue();
 			nick=get_nick(buf);
+			channel=get_channel(buf);
 			no_arg_continue("!bt");
 			t=get_bt_magnet(temp);
 			safe_free(&temp);
 			no_result_continue("Sorry");
-			msgto(sockfd,CHANNEL,nick,t);
+			msgto(sockfd,channel,nick,t);
 
 			safe_free(&t);
 			safe_free(&buf);
 			safe_free(&nick);
+			safe_free(&channel);
 			goto start;
 		}
 
@@ -211,15 +231,17 @@ start:
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!yb","!yb <target>\n");
 			null_continue();
 			nick=get_nick(buf);
+			channel=get_channel(buf);
 			no_arg_continue("!yb");
 			t=get_yb_code(temp);
 			safe_free(&temp);
 
-			msgto(sockfd,CHANNEL,nick,t);
+			msgto(sockfd,channel,nick,t);
 
 			safe_free(&t);
 			safe_free(&buf);
 			safe_free(&nick);
+			safe_free(&channel);
 			goto start;
 		}
 
@@ -228,14 +250,16 @@ start:
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!weather","!weather <target>\n");
 			null_continue();
 			nick=get_nick(buf);
+			channel=get_channel(buf);
 			no_arg_continue("!weather");
 			t=get_weather(temp);
 			safe_free(&temp);
-			msgto(sockfd,CHANNEL,nick,t);
+			msgto(sockfd,channel,nick,t);
 
 			safe_free(&t);
 			safe_free(&buf);
 			safe_free(&nick);
+			safe_free(&channel);
 			goto start;
 		}
 
@@ -244,10 +268,12 @@ start:
 			//printf("%s\n",buf);
 
 			nick=get_nick(buf);
-			msgto(sockfd,CHANNEL,nick,
+			channel=get_channel(buf);
+			msgto(sockfd,channel,nick,
 					"man、ip、time、dict、torrent、youku、bt、yb、weather、list\n");
 
 			safe_free(&nick);
+			safe_free(&channel);
 		}
 
 		if(strstr(buf,"PING") && !strstr(buf,"PRIVMSG"))

@@ -6,6 +6,8 @@ void msgto(int sockfd,const char *channel,const char *nick,const char *msg)
 	char *buf=NULL;
 	fd_set writes;
 
+	if(channel == NULL)
+		return;
 	if(nick == NULL)
 		len=strlen(MSG)+strlen(channel)+strlen(msg)+3;
 	else
@@ -88,3 +90,31 @@ void pong_ser(int sockfd,char *msg)
 	send(sockfd,msg,strlen(msg),0);
 }
 
+char *get_channel(char *msg)
+{
+	char *buf;
+	regex_t reg;
+	regmatch_t pmatch[1];
+	int len;
+
+	if(regcomp(&reg,"#.[^ ]*",0) != 0)
+	{
+		regfree(&reg);
+
+		return NULL;
+	}
+	if(regexec(&reg,msg,1,pmatch,0) != 0)
+	{
+		regfree(&reg);
+
+		return NULL;
+	}
+	regfree(&reg);
+
+	len=pmatch[0].rm_eo-pmatch[0].rm_so+1;
+	buf=malloc(len);
+	strncpy(buf,msg+pmatch[0].rm_so,len-1);
+	buf[len-1]='\0';
+
+	return buf;
+}

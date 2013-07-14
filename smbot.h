@@ -17,9 +17,11 @@
 #define PORT 6667
 #define NICK "NICK smbot\n"
 #define USER "USER smbot sbmot irc.freenode.net :smbot\n"
-#define JOIN "JOIN #debian_cn\n"
+#define JOIN_DEBIAN_CN "JOIN #debian_cn\n"
+#define JOIN_LINUXBA "JOIN #linuxba\n"
+#define JOIN_LINUXBAR "JOIN #linuxbar\n"
+#define JOIN_LINUKSO "JOIN #linukso\n"
 #define MSG "PRIVMSG "
-#define CHANNEL "#debian_cn"
 
 int sockfd;
 pid_t pid;
@@ -28,6 +30,8 @@ void msgto(int sockfd,const char *channel,const char *nick,
 		const char *msg);
 
 char *get_nick(char *msg);
+
+char *get_channel(char *msg);
 
 char *get_arg(char *buf,char *prg,char *des);
 
