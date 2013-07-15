@@ -11,6 +11,8 @@
 #include "yb.h"
 #include "weather.h"
 #include "stack.h"
+#include "id.h"
+#include "checkid.h"
 #include <signal.h>
 #include <regex.h>
 
