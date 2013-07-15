@@ -23,8 +23,7 @@ char *get_bt_magnet(char *buf)
 	read(pipefd[0],res,sizeof(res));
 	temp=malloc(strlen(res)+2);
 	bzero(temp,strlen(res)+2);
-	strncpy(temp,res,strlen(res));
-	strncat(temp,"\n",strlen("\n"));
+	sprintf(temp,"%s\n",res);
 
 	return temp;
 }
