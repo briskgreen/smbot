@@ -42,4 +42,6 @@ char *url_encode(char *string);
 
 void safe_free(void **buf);
 
+unsigned char *url_decode(char *code);
+
 #endif

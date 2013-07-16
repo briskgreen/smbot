@@ -317,6 +317,42 @@ start:
 			goto start;
 		}
 
+		if(strstr(buf,"!url") && strstr(buf,"PRIVMSG"))
+		{
+			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!url","!url <url>\n");
+			null_continue();
+			nick=get_nick(buf);
+			channel=get_channel(buf);
+			no_arg_continue("!url");
+			t=get_url_encode(temp);
+			safe_free(&temp);
+			msgto(sockfd,channel,nick,t);
+
+			safe_free(&t);
+			safe_free(&buf);
+			safe_free(&nick);
+			safe_free(&channel);
+			goto start;
+		}
+
+		if(strstr(buf,"!deurl") && strstr(buf,"PRIVMSG"))
+		{
+			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!deurl","!deurl <code>\n");
+			null_continue();
+			nick=get_nick(buf);
+			channel=get_channel(buf);
+			no_arg_continue("!deurl");
+			t=get_url_decode(temp);
+			safe_free(&temp);
+			msgto(sockfd,channel,nick,t);
+
+			safe_free(&t);
+			safe_free(&buf);
+			safe_free(&nick);
+			safe_free(&channel);
+			goto start;
+		}
+
 		if(strstr(buf,"!list") && strstr(buf,"PRIVMSG"))
 		{
 			//printf("%s\n",buf);
@@ -324,7 +360,7 @@ start:
 			nick=get_nick(buf);
 			channel=get_channel(buf);
 			msgto(sockfd,channel,nick,
-					"man、ip、time、dict、torrent、youku、bt、yb、weather、stack、id、checkid、list\n");
+					"man、ip、time、dict、torrent、youku、bt、yb、weather、stack、id、checkid、url、deurl、list\n");
 
 			safe_free(&nick);
 			safe_free(&channel);

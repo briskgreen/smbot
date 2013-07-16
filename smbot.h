@@ -13,6 +13,7 @@
 #include "stack.h"
 #include "id.h"
 #include "checkid.h"
+#include "url.h"
 #include <signal.h>
 #include <regex.h>
 

@@ -1,5 +1,8 @@
 #include "mysock.h"
 
+void format_str(char *code);
+int htoi(char *s);
+
 void error_quit(const char *msg)
 {
 	perror(msg);
@@ -167,3 +170,57 @@ void safe_free(void **buf)
 	free(*buf);
 	*buf=NULL;
 }
+
+void format_str(char *code)
+{
+	int i;
+
+	for(i=0;code[i];++i)
+	{
+		if(code[i] == '%')
+			continue;
+		if(code[i] >= 'A' && code[i] <= 'F')
+			code[i]+=32;
+	}
+}
+
+int htoi(char *s)
+{
+	int i;
+	int res;
+
+	for(i=0,res=0;s[i];++i)
+	{
+		res*=16;
+		if(s[i] >= 'a' && s[i] <= 'f')
+			res+=s[i]-87;
+		else
+			res+=s[i]-'0';
+	}
+
+	return res;
+}
+
+unsigned char *url_decode(char *code)
+{
+	unsigned char *res;
+	char temp[3]={0};
+	int i,j,len;
+
+	format_str(code);
+	len=strlen(code)/3;
+	res=malloc(len+1);
+
+	for(i=1,j=0;j < len;i+=3,++j)
+	{
+		snprintf(temp,3,"%s",code+i);
+		temp[2]='\0';
+
+		res[j]=htoi(temp);
+	}
+
+	res[len]='\0';
+
+	return res;
+}
+
