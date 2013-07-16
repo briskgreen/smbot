@@ -14,6 +14,7 @@
 #include "id.h"
 #include "checkid.h"
 #include "url.h"
+#include "joke.h"
 #include <signal.h>
 #include <regex.h>
 
