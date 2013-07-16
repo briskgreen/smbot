@@ -1,4 +1,6 @@
-LIBS=main.o dict.o get_time.o get_man.o query_ip.o smbot.o torrent.o youku.o bt.o yb.o weather.o stack.o id.o checkid.o url.o joke.o mysock.o
+LIBS=main.o dict.o get_time.o get_man.o query_ip.o smbot.o torrent.o \
+youku.o bt.o yb.o weather.o stack.o id.o checkid.o url.o \
+joke.o dream.o mysock.o
 
 smbot:$(LIBS)
 	gcc -o smbot $(LIBS)
@@ -50,6 +52,9 @@ url.o:url.h url.c mysock/mysock.h
 
 joke.o:joke.h joke.c
 	gcc -c joke.c
+
+dream.o:dream.h dream.c
+	gcc -c dream.c
 
 mysock.o:mysock/mysock.c mysock/mysock.h 
 	gcc -c mysock/mysock.c
