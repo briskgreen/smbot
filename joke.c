@@ -24,7 +24,7 @@ char *get_joke(char *word)
 	len=strlen(temp);
 	res=malloc(len+1);
 	bzero(res,len+1);
-	sprintf(res,"%s\n",temp);
+	strcpy(res,temp);
 
 	return res;
 }
