@@ -8,8 +8,8 @@ char *get_url_encode(char *url)
 
 	temp=url_encode(url);
 	len=strlen(temp);
-	res=malloc(len+1);
-	bzero(res,len+1);
+	res=malloc(len+2);
+	bzero(res,len+2);
 	sprintf(res,"%s\n",temp);
 	safe_free(&temp);
 
