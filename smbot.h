@@ -16,6 +16,7 @@
 #include "url.h"
 #include "joke.h"
 #include "dream.h"
+#include "song.h"
 #include <signal.h>
 #include <regex.h>
 

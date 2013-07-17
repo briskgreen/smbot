@@ -389,6 +389,24 @@ start:
 			goto start;
 		}
 
+		if(strstr(buf,"!song") && strstr(buf,"PRIVMSG"))
+		{
+			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!song","!song <song>\n");
+			null_continue();
+			nick=get_nick(buf);
+			channel=get_channel(buf);
+			no_arg_continue("!song");
+			t=get_song_url(temp);
+			safe_free((void **)&temp);
+			msgto(sockfd,channel,nick,t);
+
+			safe_free((void **)&t);
+			safe_free((void **)&buf);
+			safe_free((void **)&nick);
+			safe_free((void **)&channel);
+			goto start;
+		}
+
 		if(strstr(buf,"!list") && strstr(buf,"PRIVMSG"))
 		{
 			//printf("%s\n",buf);
@@ -396,7 +414,7 @@ start:
 			nick=get_nick(buf);
 			channel=get_channel(buf);
 			msgto(sockfd,channel,nick,
-					"man、ip、time、dict、torrent、youku、bt、yb、weather、stack、id、checkid、url、deurl、joke、dream、list\n");
+					"man、ip、time、dict、torrent、youku、bt、yb、weather、stack、id、checkid、url、deurl、joke、dream、song、list\n");
 
 			safe_free((void **)&nick);
 			safe_free((void **)&channel);
