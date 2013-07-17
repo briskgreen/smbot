@@ -8,6 +8,9 @@ char *get_joke(char *word)
 	int len;
 
 	pipe(pipefd);
+	for(len=0;word[len];++len)
+		if(word[len] == ' ')
+			word[len]='+';
 
 	if(fork() == 0)
 	{
@@ -22,9 +25,10 @@ char *get_joke(char *word)
 	close(pipefd[1]);
 	read(pipefd[0],temp,sizeof(temp));
 	len=strlen(temp);
-	res=malloc(len+1);
-	bzero(res,len+1);
-	strcpy(res,temp);
+	res=malloc(len+2);
+	bzero(res,len+2);
+	sprintf(res,"%s\n",temp);
+	//strcpy(res,temp);
 
 	return res;
 }
