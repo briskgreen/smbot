@@ -17,6 +17,7 @@
 #include "joke.h"
 #include "dream.h"
 #include "song.h"
+#include "bing.h"
 #include <signal.h>
 #include <regex.h>
 

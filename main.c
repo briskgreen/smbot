@@ -33,6 +33,15 @@
 	}\
 }
 
+#define safe_free_and_goto() \
+{\
+	safe_free((void **)&t);\
+	safe_free((void **)&buf);\
+	safe_free((void **)&nick);\
+	safe_free((void **)&channel);\
+	goto start;\
+}
+
 void quit_irc(int signum)
 {
 	//kill(pid,SIGKILL);
@@ -96,10 +105,7 @@ start:
 			no_result_continue("Sorry");
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!ip") && strstr(buf,"PRIVMSG"))
@@ -116,11 +122,7 @@ start:
 
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&nick);
-			safe_free((void **)&t);
-			safe_free((void **)&channel);
-			safe_free((void **)&buf);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!time") && strstr(buf,"PRIVMSG"))
@@ -152,11 +154,7 @@ start:
 			no_result_continue("Sorry,no result");
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&nick);
-			safe_free((void **)&buf);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!torrent") && strstr(buf,"PRIVMSG"))
@@ -176,11 +174,7 @@ start:
 			no_result_continue("Sorry");
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 			//msgto(sockfd,CHANNEL,get_nick(buf),"由于无法连接到torrentkitty，所以暂时关闭该功能!\r\n");
 		}
 
@@ -198,11 +192,7 @@ start:
 			no_result_continue("Sorry,no result");
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!bt") && strstr(buf,"PRIVMSG"))
@@ -219,11 +209,7 @@ start:
 			no_result_continue("Sorry");
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!yb") && strstr(buf,"PRIVMSG"))
@@ -238,11 +224,7 @@ start:
 
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!weather") && strstr(buf,"PRIVMSG"))
@@ -256,11 +238,7 @@ start:
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!stack") && strstr(buf,"PRIVMSG"))
@@ -274,11 +252,7 @@ start:
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!id") && strstr(buf,"PRIVMSG"))
@@ -292,11 +266,7 @@ start:
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!checkid") && strstr(buf,"PRIVMSG"))
@@ -310,11 +280,7 @@ start:
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!url") && strstr(buf,"PRIVMSG"))
@@ -328,11 +294,7 @@ start:
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!deurl") && strstr(buf,"PRIVMSG"))
@@ -346,11 +308,7 @@ start:
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!joke") && strstr(buf,"PRIVMSG"))
@@ -364,11 +322,7 @@ start:
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!dream") && strstr(buf,"PRIVMSG"))
@@ -382,11 +336,7 @@ start:
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!song") && strstr(buf,"PRIVMSG"))
@@ -400,11 +350,21 @@ start:
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
 
-			safe_free((void **)&t);
-			safe_free((void **)&buf);
-			safe_free((void **)&nick);
-			safe_free((void **)&channel);
-			goto start;
+			safe_free_and_goto();
+		}
+
+		if(strstr(buf,"!bing") && strstr(buf,"PRIVMSG"))
+		{
+			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!bing","!bing <word>\n");
+			null_continue();
+			nick=get_nick(buf);
+			channel=get_channel(buf);
+			no_arg_continue("!bing");
+			t=get_bing_result(temp);
+			safe_free((void **)&temp);
+			msgto(sockfd,channel,nick,t);
+
+			safe_free_and_goto();
 		}
 
 		if(strstr(buf,"!list") && strstr(buf,"PRIVMSG"))
@@ -414,7 +374,7 @@ start:
 			nick=get_nick(buf);
 			channel=get_channel(buf);
 			msgto(sockfd,channel,nick,
-					"man、ip、time、dict、torrent、youku、bt、yb、weather、stack、id、checkid、url、deurl、joke、dream、song、list\n");
+					"man、ip、time、dict、torrent、youku、bt、yb、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、list\n");
 
 			safe_free((void **)&nick);
 			safe_free((void **)&channel);
