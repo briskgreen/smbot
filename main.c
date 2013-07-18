@@ -42,6 +42,14 @@
 	goto start;\
 }
 
+#define init_and_check(arg) \
+{\
+	null_continue();\
+	nick=get_nick(buf);\
+	channel=get_channel(buf);\
+	no_arg_continue(arg);\
+}
+
 void quit_irc(int signum)
 {
 	//kill(pid,SIGKILL);
@@ -96,10 +104,7 @@ start:
 			//printf("%s\n",buf);
 
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!man","!man <target> 或者 !man [0-9] <target>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!man");
+			init_and_check("!man");
 			t=get_man_url(temp);
 			safe_free((void **)&temp);
 			no_result_continue("Sorry");
@@ -113,10 +118,7 @@ start:
 			//printf("%s\n",buf);
 
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!ip","!ip <target>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!ip");
+			init_and_check("!ip");
 			t=query_ip(temp);
 			safe_free((void **)&temp);
 
@@ -145,10 +147,7 @@ start:
 			//printf("%s\n",buf);
 
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!dict","!dict <target>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!dict");
+			init_and_check("!dict");
 			t=dict(temp);
 			safe_free((void **)&temp);
 			no_result_continue("Sorry,no result");
@@ -165,10 +164,7 @@ start:
 
 			//msgto(sockfd,CHANNEL,get_nick(buf),"该搜索可能会比较慢，请耐心等待，在此期间也希望不要再呼叫我!\n");
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!torrent","!torrent <target>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!torrent");
+			init_and_check("!torrent");
 			t=torrent(temp);
 			safe_free((void **)&temp);
 			no_result_continue("Sorry");
@@ -183,10 +179,7 @@ start:
 			//printf("%s\n",buf);
 
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!youku","!youku <target>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!youku");
+			init_and_check("!youku");
 			t=get_youku_url(temp);
 			safe_free((void **)&temp);
 			no_result_continue("Sorry,no result");
@@ -200,10 +193,7 @@ start:
 			//printf("%s\n",buf);
 
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!bt","!bt <target>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!bt");
+			init_and_check("!bt");
 			t=get_bt_magnet(temp);
 			safe_free((void **)&temp);
 			no_result_continue("Sorry");
@@ -215,10 +205,7 @@ start:
 		if(strstr(buf,"!yb") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!yb","!yb <target>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!yb");
+			init_and_check("!yb");
 			t=get_yb_code(temp);
 			safe_free((void **)&temp);
 
@@ -230,10 +217,7 @@ start:
 		if(strstr(buf,"!weather") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!weather","!weather <target>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!weather");
+			init_and_check("!weather");
 			t=get_weather(temp);
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
@@ -244,10 +228,7 @@ start:
 		if(strstr(buf,"!stack") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!stack","!stack <questions>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!stack");
+			init_and_check("!stack");
 			t=get_stack_over(temp);
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
@@ -258,10 +239,7 @@ start:
 		if(strstr(buf,"!id") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!id","!id <id>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!id");
+			init_and_check("!id");
 			t=get_id_info(temp);
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
@@ -272,10 +250,7 @@ start:
 		if(strstr(buf,"!checkid") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!checkid","!checkid <id>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!checkid");
+			init_and_check("!checkid");
 			t=check_id_card(temp);
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
@@ -286,10 +261,7 @@ start:
 		if(strstr(buf,"!url") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!url","!url <url>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!url");
+			init_and_check("!url");
 			t=get_url_encode(temp);
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
@@ -300,10 +272,7 @@ start:
 		if(strstr(buf,"!deurl") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!deurl","!deurl <code>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!deurl");
+			init_and_check("!deurl");
 			t=get_url_decode(temp);
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
@@ -314,10 +283,7 @@ start:
 		if(strstr(buf,"!joke") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!joke","!joke <word>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!joke");
+			init_and_check("!joke");
 			t=get_joke(temp);
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
@@ -328,10 +294,7 @@ start:
 		if(strstr(buf,"!dream") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!dream","!dream <dream>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!dream");
+			init_and_check("!dream");
 			t=get_dream(temp);
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
@@ -342,10 +305,7 @@ start:
 		if(strstr(buf,"!song") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!song","!song <song>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!song");
+			init_and_check("!song");
 			t=get_song_url(temp);
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
@@ -356,11 +316,19 @@ start:
 		if(strstr(buf,"!bing") && strstr(buf,"PRIVMSG"))
 		{
 			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!bing","!bing <word>\n");
-			null_continue();
-			nick=get_nick(buf);
-			channel=get_channel(buf);
-			no_arg_continue("!bing");
+			init_and_check("!bing");
 			t=get_bing_result(temp);
+			safe_free((void **)&temp);
+			msgto(sockfd,channel,nick,t);
+
+			safe_free_and_goto();
+		}
+
+		if(strstr(buf,"!google") && strstr(buf,"PRIVMSG"))
+		{
+			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!google","!google <word>\n");
+			init_and_check("!google");
+			t=get_google_result(temp);
 			safe_free((void **)&temp);
 			msgto(sockfd,channel,nick,t);
 
@@ -374,7 +342,7 @@ start:
 			nick=get_nick(buf);
 			channel=get_channel(buf);
 			msgto(sockfd,channel,nick,
-					"man、ip、time、dict、torrent、youku、bt、yb、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、list\n");
+					"man、ip、time、dict、torrent、youku、bt、yb、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、list\n");
 
 			safe_free((void **)&nick);
 			safe_free((void **)&channel);
