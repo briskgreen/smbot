@@ -1,11 +1,10 @@
 #include "../mysock/mysock.h"
-#include <iconv.h>
 
 typedef int BOOL;
 
 #define TRUE 1
 #define FALSE 0
-#define H_IPV_4 "ip38.com"
+#define H_IPV_4 "ip.chinaz.com"
 #define H_IPV_6 "ipv6.ipv6home.cn"
 #define PORT 80
 #define error_return(msg)\
@@ -44,9 +43,9 @@ void send_http_get_request(int sockfd,char *ip,BOOL flage)
 	}
 	else
 	{
-		head=malloc(strlen("GET /index.php?ip=")+strlen(ip)+strlen(" HTTP/1.1\n"));
-		strcpy(head,"GET /index.php?ip=");
-		host="Host: ip38.com\n";
+		head=malloc(strlen("GET /?IP=")+strlen(ip)+strlen(" HTTP/1.1\n"));
+		strcpy(head,"GET /?IP=");
+		host="Host: ip.chinaz.com\n";
 	}
 	
 	strncat(head,ip,strlen(ip));
@@ -81,47 +80,26 @@ int parse_ipv6(char *buf)
 	return 0;
 }
 
-void iconv_msg(char *in,int i_len,char *out,int o_len)
-{
-	iconv_t cd;
-
-	cd=iconv_open("UTF-8//","GBK//");
-	iconv(cd,&in,&i_len,&out,&o_len);
-	iconv_close(cd);
-}
-
 int parse_ipv4(char *buf,char *ip)
 {
-	if(strstr(buf,ip) && strstr(buf,"IP"))
+	regex_t reg;
+	regmatch_t pmatch[1];
+
+	if(strstr(buf,"==>>"))
 	{
-		int i;
-		int index;
-		int len;
 		char *t;
-		char res[512];
 
-		for(i=0;buf[i];++i)
-			if(buf[i] == 't' && buf[i+1] == '>')
-				break;
-		if(buf[i] == '\0')
+		if(regcomp(&reg,"==>> [^0-9].*</strong>",0) != 0)
 			return 0;
-
-		index=i+2;
-		for(i=index,len=0;buf[i];++i,++len)
-			if(buf[i] == '<')
-				break;
-		if(buf[i] == '\0')
+		if(regexec(&reg,buf,1,pmatch,0) != 0)
 			return 0;
-		t=malloc(len);
+		regfree(&reg);
 
-		for(i=0;len;--len,++index,++i)
-			t[i]=buf[index];
-		t[i]='\0';
-
-		bzero(res,512);
-		iconv_msg(t,strlen(t),res,512);
-		printf("%s\n",res);
-
+		t=malloc(pmatch[0].rm_eo-pmatch[0].rm_so-11);
+		bzero(t,pmatch[0].rm_eo-pmatch[0].rm_so-11);
+		snprintf(t,pmatch[0].rm_eo-pmatch[0].rm_so-12,"%s",
+				buf+pmatch[0].rm_so+4);
+		printf("%s\n",t);
 		free(t);
 		return 1;
 	}
@@ -170,8 +148,14 @@ int main(int argc,char **argv)
 		error_return(buf);
 
 	while((buf=read_line(sockfd)))
+	{
 		if(parse_and_get_ip_addr(buf,argv[1],flage))
 			break;
+		free(buf);
+	}
+
+	if(buf == NULL)
+		printf("Sorry,No result found!\n");
 
 	close(sockfd);
 }
