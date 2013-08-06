@@ -3,6 +3,9 @@
 void format_str(char *code);
 int htoi(char *s);
 
+SSL_CTX *ssl_ctx;
+int mysock_sockfd;
+
 void error_quit(const char *msg)
 {
 	perror(msg);
@@ -176,7 +179,7 @@ char *read_line(int sockfd)
 	return res;
 }
 
-int tcp_conect(char *url,int port)
+int tcp_connect(const char *url,unsigned int port)
 {
 	SA_IN server_addr;
 	int sockfd;
@@ -267,3 +270,92 @@ unsigned char *url_decode(char *code)
 	return res;
 }
 
+bool tcp_is_established(int sockfd)
+{
+	int optval;
+	int optlen;
+
+	getsockopt(sockfd,SOL_SOCKET,SO_ERROR,(char *)&optval,&optlen);
+
+	switch(optval)
+	{
+		case 0:
+			return TRUE;
+		default:
+			return FALSE;
+	}
+}
+
+SSL *ssl_connect(const char *host,unsigned int port,
+		const char *cafile,const char *capath)
+{
+	SSL *ssl;
+
+	if((mysock_sockfd=tcp_connect(host,port)) == -1)
+		return NULL;
+
+	SSL_library_init();
+	if((ssl_ctx=SSL_CTX_new(SSLv23_client_method())) == NULL)
+		return NULL;
+	if(capath != NULL)
+		if(!SSL_CTX_load_verify_locations(ssl_ctx,cafile,capath))
+			return NULL;
+
+	if((ssl=SSL_new(ssl_ctx)) == NULL)
+		return NULL;
+	if(SSL_set_fd(ssl,mysock_sockfd) == 0)
+		return NULL;
+
+	if(SSL_connect(ssl) <= 0)
+		return NULL;
+
+	return ssl;
+}
+
+void ssl_close(SSL *ssl)
+{
+	SSL_shutdown(ssl);
+	close(mysock_sockfd);
+	SSL_free(ssl);
+	SSL_CTX_free(ssl_ctx);
+}
+
+char *ssl_read_line(SSL *ssl)
+{
+	char *res;
+	char temp;
+	int len=0;
+	int n;
+	int flags=1;
+
+	if((res=malloc(MEM_SIZE+1)) == NULL)
+		return NULL;
+
+	while((n=SSL_read(ssl,&temp,sizeof(char))) > 0)
+	{
+		++len;
+		if(len % MEM_SIZE == 0)
+		{
+			char *temp;
+
+			temp=malloc(len);
+			strncpy(temp,res,len);
+			free(res);
+
+			res=malloc(len+MEM_SIZE);
+			strncpy(res,temp,len);
+			free(temp);
+		}
+
+		res[len-1]=temp;
+		flags=0;
+		if(temp == '\n')
+			break;
+	}
+
+	res[len-1]='\0';
+	if(flags && n <= 0)
+		return NULL;
+
+	return res;
+}

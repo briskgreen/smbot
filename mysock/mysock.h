@@ -12,11 +12,15 @@
 #include <netinet/in.h>
 #include <unistd.h>
 #include <regex.h>
+#include <openssl/ssl.h>
 
 #define MEM_SIZE 512
+#define TRUE 1
+#define FALSE 0
 
 typedef struct sockaddr SA;
 typedef struct sockaddr_in SA_IN;
+typedef unsigned char bool;
 
 void error_quit(const char *msg);
 
@@ -36,12 +40,21 @@ void init_data_with_client(SA_IN *server_addr,char *host,int port);
 
 char *read_line(int sockfd);
 
-int tcp_conect(char *url,int port);
+int tcp_connect(const char *url,unsigned int port);
 
 char *url_encode(char *string);
 
 void safe_free(void **buf);
 
 unsigned char *url_decode(char *code);
+
+bool tcp_is_established(int sockfd);
+
+SSL *ssl_connect(const char *host,unsigned int port,
+		const char *cafile,const char *capath);
+
+void ssl_close(SSL *ssl);
+
+char *ssl_read_line(SSL *ssl);
 
 #endif
