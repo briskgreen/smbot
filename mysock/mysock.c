@@ -169,7 +169,7 @@ char *read_line(int sockfd)
 	}
 
 
-	res[len]='\0';
+	res[len-1]='\0';
 	if(flags && n <= 0)
 		return NULL;
 
