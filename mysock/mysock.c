@@ -71,24 +71,26 @@ void init_data_with_client(SA_IN *server_addr,char *host,int port)
 	server_addr->sin_addr.s_addr=inet_addr(inet_ntoa(*(struct in_addr *)hostname->h_addr_list[0]));
 }
 
-char *read_line(int sockfd)
+/*char *read_line(int sockfd)
 {
 	char *buf;
 	char temp;
 	int k=0;
 	int i=0;
 	int j=1;
+	int len;
 
 	if((buf=malloc(MEM_SIZE)) == NULL)
 		return NULL;
 
 	while(1)
 	{
-		if(recv(sockfd,&temp,sizeof(char),0) <= 0)
+		len=recv(sockfd,&temp,sizeof(char),0);
+		if(len != 1)
 		{
 			++k;
 
-			if(k % 5)
+			if(k % 5 == 0)
 				return NULL;
 			else
 				continue;
@@ -103,7 +105,7 @@ char *read_line(int sockfd)
 			{
 				++k;
 
-				if(k % 5 ==0)
+				if(k % 5 == 0)
 					return NULL;
 			}
 			strncpy(t,buf,i);
@@ -114,7 +116,7 @@ char *read_line(int sockfd)
 			{
 				++k;
 
-				if(k % 5 ==0)
+				if(k % 5 == 0)
 					return NULL;
 			}
 			strncpy(buf,t,i);
@@ -131,6 +133,47 @@ char *read_line(int sockfd)
 	buf[i+1]='\0';
 
 	return buf;
+}*/
+
+char *read_line(int sockfd)
+{
+	char *res;
+	char temp;
+	int len=0;
+	int n;
+	int flags=1;
+
+	if((res=malloc(MEM_SIZE+1)) == NULL)
+		return NULL;
+
+	while((n=recv(sockfd,&temp,sizeof(char),0)) > 0)
+	{
+		++len;
+		if(len % (MEM_SIZE) == 0)
+		{
+			char *temp;
+
+			temp=malloc(len);
+			strncpy(temp,res,len);
+			free(res);
+
+			res=malloc(len+MEM_SIZE);
+			strncpy(res,temp,len);
+			free(temp);
+		}
+
+		res[len-1]=temp;
+		flags=0;
+		if(temp == '\n')
+			break;
+	}
+
+
+	res[len]='\0';
+	if(flags && n <= 0)
+		return NULL;
+
+	return res;
 }
 
 int tcp_conect(char *url,int port)

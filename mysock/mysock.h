@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include <regex.h>
 
-#define MEM_SIZE 80
+#define MEM_SIZE 512
 
 typedef struct sockaddr SA;
 typedef struct sockaddr_in SA_IN;
