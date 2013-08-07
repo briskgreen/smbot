@@ -22,6 +22,12 @@ typedef struct sockaddr SA;
 typedef struct sockaddr_in SA_IN;
 typedef unsigned char bool;
 
+typedef struct http_head
+{
+	char *element;
+	struct http_head *next;
+}HTTP;
+
 void error_quit(const char *msg);
 
 int Socket(int domain,int type,int prot);
@@ -56,5 +62,40 @@ SSL *ssl_connect(const char *host,unsigned int port,
 void ssl_close(SSL *ssl);
 
 char *ssl_read_line(SSL *ssl);
+
+char *read_all(int sockfd);
+
+char *ssl_read_all(SSL *ssl);
+
+HTTP *http_head_init(void);
+
+void http_head_add(HTTP *http,const char *head);
+
+int http_head_replace(HTTP *http,const char *replace,const char *head);
+
+int http_head_out(HTTP *http,const char *out);
+
+void http_head_clean(HTTP *http);
+
+void http_head_destroy(HTTP *http);
+
+void http_send(HTTP *http,int sockfd);
+
+void https_send(HTTP *http,SSL *ssl);
+
+char *http_perform(HTTP *http,const char *host,unsigned int port);
+
+char *https_perform(HTTP *http,const char *host,unsigned int port,
+		const char *cafile,const char *capath);
+
+char *http_get_simple(const char *url,unsigned int port);
+
+char *http_post_simple(const char *url,unsigned int port,
+		const char *data);
+
+char *https_get_simple(const char *url,unsigned int port);
+
+char *https_post_simple(const char *url,unsigned int port,
+		const char *data);
 
 #endif
