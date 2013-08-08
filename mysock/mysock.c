@@ -183,6 +183,7 @@ int tcp_connect(const char *url,unsigned int port)
 {
 	SA_IN server_addr;
 	int sockfd;
+	int i;
 
 	sockfd=Socket(AF_INET,SOCK_STREAM,0);
 	init_data_with_client(&server_addr,url,port);
@@ -582,21 +583,31 @@ char *http_get_simple(const char *url,unsigned int port)
 	for(i=n;url[i];++i,++host_len)
 		if(url[i]=='/')
 			break;
-	host_len+=strlen("Host: ");
-	host=malloc(host_len+2);
-	snprintf(host,host_len+1,"Host: %s\n",
+	host_len+=strlen("Host: ")+2;
+	host=malloc(host_len);
+	snprintf(host,host_len-1,"Host: %s",
 			url+n);
-	host[host_len+1]='\0';
-	head_len=strlen("GET ")+len+strlen(" HTTP/1.1\n")+1;
+	host[host_len-2]='\n';
+	host[host_len-1]='\0';
+	head_len=strlen("GET ")+len-host_len+8-n+strlen(" HTTP/1.1\n")+1;
 	head=malloc(head_len);
-	snprintf(head,head_len-1,"GET %s HTTP/1.1\n",url);
-	head[head_len]='\0';
+	snprintf(head,head_len-1,"GET %s HTTP/1.1",url+n+host_len-8);
+	head[head_len-2]='\n';
+	head[head_len-1]='\0';
 
-	if((sockfd=tcp_connect(host+6,port)) == -1)
+	res=malloc(host_len-7);
+	snprintf(res,host_len-7,"%s",host+6);
+	res[host_len-7]='\0';
+
+	if((sockfd=tcp_connect(res,port)) == -1)
+	{
+		free(res);
 		return NULL;
+	}
+	free(res);
 	
-	send(sockfd,head,head_len-1,0);
-	send(sockfd,host,host_len,0);
+	send(sockfd,head,strlen(head),0);
+	send(sockfd,host,host_len-1,0);
 	send(sockfd,accept,strlen(accept),0);
 	send(sockfd,connection,strlen(connection),0);
 
@@ -693,17 +704,27 @@ char *https_get_simple(const char *url,unsigned int port)
 			break;
 	host_len+=strlen("Host: ")+2;
 	host=malloc(host_len);
-	snprintf(host,head_len-1,"Host: %s\n",url+n);
-	host[head_len]='\0';
-	head_len=strlen("GET ")+len+strlen(" HTTP/1.1\n")+1;
+	snprintf(host,host_len-1,"Host: %s",url+n);
+	host[host_len-2]='\n';
+	host[host_len-1]='\0';
+	head_len=strlen("GET ")+len-host_len+8-n+strlen(" HTTP/1.1\n")+1;
 	head=malloc(head_len);
-	snprintf(head,head_len-1,"GET %s HTTP/1.1\n",url);
-	head[head_len]='\0';
+	snprintf(head,head_len-1,"GET %s HTTP/1.1",url+n+host_len-8);
+	head[head_len-2]='\n';
+	head[head_len-1]='\0';
+
+	res=malloc(host_len-7);
+	strncpy(res,host+6,host_len-8);
+	res[host_len-8]='\0';
 
 	if((ssl=ssl_connect(host+6,port,NULL,NULL)) == NULL)
+	{
+		free(res);
 		return NULL;
+	}
+	free(res);
 
-	SSL_write(ssl,head,head_len-1);
+	SSL_write(ssl,head,strlen(head));
 	SSL_write(ssl,host,host_len-1);
 	SSL_write(ssl,accept,strlen(accept));
 	SSL_write(ssl,connection,strlen(connection));
