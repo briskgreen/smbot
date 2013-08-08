@@ -2,6 +2,7 @@
 
 void format_str(char *code);
 int htoi(char *s);
+unsigned int url_len(char *url);
 
 SSL_CTX *ssl_ctx;
 int mysock_sockfd;
@@ -248,22 +249,56 @@ int htoi(char *s)
 	return res;
 }
 
-unsigned char *url_decode(char *code)
+unsigned int url_len(char *url)
 {
-	unsigned char *res;
+	int len;
+	int i;
+
+	for(i=0,len=0;url[i];++i,++len)
+	{
+		if(url[i] == '%' && url[i+1] != '%' && url[i+2] != '%')
+		{
+
+			if(url[i+1] < '0' || url[i+2] < '0' || url[i+1] > 'f' || url[i+2] > 'f')
+				continue;
+			else
+				i+=2;
+		}
+
+	}
+
+	return len;
+}
+
+char *url_decode(char *code)
+{
+	unsigned int len;
+	char *res;
 	char temp[3]={0};
-	int i,j,len;
+	int i,j;
 
 	format_str(code);
-	len=strlen(code)/3;
+	len=url_len(code);
 	res=malloc(len+1);
 
-	for(i=1,j=0;j < len;i+=3,++j)
+	for(i=0,j=0;code[i];++i,++j)
 	{
-		snprintf(temp,3,"%s",code+i);
-		temp[2]='\0';
+		if(code[i] == '%' && code[i+1] != '%' && code[i+2] != '%')
+		{
+			if(code[i+1] < '0' || code[i+2] < '0' || code[i+1] > 'f' || code[i+2] > 'f')
+			{
+				res[j]=code[i];
+				continue;
+			}
 
-		res[j]=htoi(temp);
+			snprintf(temp,3,"%s",code+i+1);
+			temp[2]='\0';
+			res[j]=htoi(temp);
+			i+=2;
+			continue;
+		}
+
+		res[j]=code[i];
 	}
 
 	res[len]='\0';

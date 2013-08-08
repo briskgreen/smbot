@@ -52,7 +52,7 @@ char *url_encode(char *string);
 
 void safe_free(void **buf);
 
-unsigned char *url_decode(char *code);
+char *url_decode(char *code);
 
 bool tcp_is_established(int sockfd);
 
