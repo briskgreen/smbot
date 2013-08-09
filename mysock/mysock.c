@@ -375,13 +375,18 @@ char *read_all(int sockfd)
 char *ssl_read_all(SSL *ssl)
 {
 	char *res;
+	int size=MEM_SIZE;
 	int len=0;
 	int n;
 	if((res=malloc(MEM_SIZE)) == NULL)
 		return NULL;
-	while((n=SSL_read(ssl,res+len,MEM_SIZE)))
+
+	while((n=SSL_read(ssl,res+len,size)))
 	{
 		len+=n;
+
+		if(n < size)
+			size-=n;
 
 		if(len % MEM_SIZE == 0)
 		{
@@ -394,6 +399,8 @@ char *ssl_read_all(SSL *ssl)
 			res=malloc(len+MEM_SIZE);
 			strncpy(res,temp,len);
 			free(temp);
+
+			size=MEM_SIZE;
 		}
 	}
 
@@ -662,6 +669,7 @@ char *https_get_simple(const char *url,unsigned int port)
 	host=string_add("Host: %s\n",strnstr(url+n,host_len));
 	head=string_add("GET %s HTTP/1.1\n",url+n+host_len);
 	res=strnstr(host+6,-1);
+	printf("%s%s%s",head,host,res);
 
 	if((ssl=ssl_connect(res,port,NULL,NULL)) == NULL)
 	{
