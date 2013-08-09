@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -24,7 +25,7 @@ typedef unsigned char bool;
 
 typedef struct http_head
 {
-	char *element;
+	const char *element;
 	struct http_head *next;
 }HTTP;
 
@@ -40,9 +41,10 @@ int Accept(int sockfd,SA_IN *client_addr,socklen_t *size);
 
 void Connect(int sockfd,SA_IN *server_addr);
 
-void init_data_with_server(SA_IN *server_addr,int port);
+void init_data_with_server(SA_IN *server_addr,unsigned int port);
 
-void init_data_with_client(SA_IN *server_addr,char *host,int port);
+void init_data_with_client(SA_IN *server_addr,
+		const char *host,unsigned int port);
 
 char *read_line(int sockfd);
 
@@ -97,5 +99,9 @@ char *https_get_simple(const char *url,unsigned int port);
 
 char *https_post_simple(const char *url,unsigned int port,
 		const char *data);
+
+char *string_add(const char *format,...);
+
+char *strnstr(const char *str,int len);
 
 #endif
