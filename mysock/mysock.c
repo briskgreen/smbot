@@ -336,14 +336,20 @@ char *ssl_read_line(SSL *ssl)
 char *read_all(int sockfd)
 {
 	char *res;
-	int len=0;
+	int size=MEM_SIZE;
 	int n;
+	int len=0;
 
-	if((res=malloc(MEM_SIZE)) == NULL)
+	res=malloc(MEM_SIZE);
+	if(res == NULL)
 		return NULL;
-	while((n=recv(sockfd,res+len,MEM_SIZE,0)))
+
+	while((n=recv(sockfd,res+len,size,0)))
 	{
 		len+=n;
+
+		if(n < size)
+			size-=n;
 
 		if(len % MEM_SIZE == 0)
 		{
@@ -356,10 +362,13 @@ char *read_all(int sockfd)
 			res=malloc(len+MEM_SIZE);
 			strncpy(res,temp,len);
 			free(temp);
+
+			size=MEM_SIZE;
 		}
 	}
 
 	res[len]='\0';
+
 	return res;
 }
 
