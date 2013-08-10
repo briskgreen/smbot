@@ -54,7 +54,8 @@ void quit_irc(int signum)
 {
 	//kill(pid,SIGKILL);
 
-	send(sockfd,"QUIT\n",strlen("QUIT\n"),0);
+	send(sockfd,"QUIT :如果一切变成了或许，谁还会记得曾经!\n",
+			strlen("QUIT :如果一切变成了或许，谁还会记得曾经!\n"),0);
 	close(sockfd);
 	exit(0);
 }
@@ -70,7 +71,7 @@ int main(int argc,char **argv)
 	fd_set reads;
 	struct sigaction act,old;
 
-	sockfd=tcp_conect(SER,PORT);
+	sockfd=tcp_connect(SER,PORT);
 	if(sockfd == -1)
 		error_quit("Connection");
 
@@ -97,7 +98,7 @@ start:
 		buf=read_line(sockfd);
 		if(buf == NULL)
 			goto start;
-		printf("%s",buf);
+		printf("%s\n",buf);
 
 		if(strstr(buf,"!man") && strstr(buf,"PRIVMSG"))
 		{
@@ -335,6 +336,17 @@ start:
 			safe_free_and_goto();
 		}
 
+		if(strstr(buf,"!image") && strstr(buf,"PRIVMSG"))
+		{
+			temp=get_arg(buf,"PRIVMSG #.[^ ]* :!image","!image 要搜索的关键字\n");
+			init_and_check("!image");
+			t=get_image_result(temp);
+			free(temp);
+			msgto(sockfd,channel,nick,t);
+
+			safe_free_and_goto();
+		}
+
 		if(strstr(buf,"!list") && strstr(buf,"PRIVMSG"))
 		{
 			//printf("%s\n",buf);
@@ -342,7 +354,7 @@ start:
 			nick=get_nick(buf);
 			channel=get_channel(buf);
 			msgto(sockfd,channel,nick,
-					"man、ip、time、dict、torrent、youku、bt、yb、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、list\n");
+					"man、ip、time、dict、torrent、youku、bt、yb、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、image、list\n");
 
 			safe_free((void **)&nick);
 			safe_free((void **)&channel);

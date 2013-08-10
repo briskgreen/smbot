@@ -19,10 +19,11 @@
 #include "song.h"
 #include "bing.h"
 #include "google.h"
+#include "image.h"
 #include <signal.h>
 #include <regex.h>
 
-#define SER "irc.freenode.org"
+#define SER "irc.freenode.net"
 #define PORT 6667
 #define NICK "NICK smbot\n"
 #define USER "USER smbot sbmot irc.freenode.net :smbot\n"
