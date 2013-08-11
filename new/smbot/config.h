@@ -1,7 +1,7 @@
 #ifndef _IFSMBOT_CONFIG_H
 #define _IFSMBOT_CONFIG_H
 
-#include "smbot.h"
+#include "command.h"
 
 #define SMBOT_CONF_PATH ".config"
 

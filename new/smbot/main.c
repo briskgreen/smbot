@@ -2,6 +2,13 @@
 
 bool is_use_ssl=FALSE;
 
+#define parse_arg(reg,des,func,priority) \
+{\
+	parse_and_perform(task,data,reg,des,func,is_use_ssl,priority);\
+	free(data);\
+	continue;\
+}
+
 void quit(int signum)
 {
 	if(is_use_ssl)
@@ -106,7 +113,7 @@ int main(int argc,char **argv)
 			data=read_line(sockfd);
 
 		if(strstr(data,"!man"))
-		{}
+			parse_arg("PRIVMSG #[^ ]* :!man","!man [0-9] <要查询的内容> 功能:返回linuxmanpages连接",get_man_url,5);
 
 		if(strstr(data,"!ip"))
 		{}
@@ -171,7 +178,7 @@ int main(int argc,char **argv)
 		if(strstr(data,"!list"))
 		{}
 
-		if(strstr(data,"!help smbot"))
+		if(strstr(data,"!smbot"))
 		{
 			smbot_help(is_use_ssl);
 			free(data);

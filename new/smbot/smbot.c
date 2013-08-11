@@ -142,3 +142,56 @@ void smbot_help(bool is_use_ssl)
 	else
 		send(sockfd,msg,strlen(msg),0);
 }
+
+void parse_and_perform(TASK_FACTORY *task,char *msg,char *reg,
+		char *des,task_callback func,bool is_use_ssl,
+		unsigned int priority)
+{
+	SMBOT_DATA *data;
+
+	data=malloc(sizeof(SMBOT_DATA));
+	data->nick=get_nick(msg);
+	data->channel=get_channel(msg);
+	data->arg=get_arg(msg,reg,des);
+	data->is_use_ssl=is_use_ssl;
+	task_factory_add(task,func,data,priority);
+}
+
+char *match_string(char *reg,char *data)
+{
+	regex_t preg;
+	regmatch_t pmatch[1];
+	char *res;
+
+	if(regcomp(&preg,reg,0) != 0)
+	{
+		regfree(&preg);
+		return NULL;
+	}
+	if(regexec(&preg,data,1,pmatch,0) != 0)
+	{
+		regfree(&preg);
+		return NULL;
+	}
+	regfree(&preg);
+
+	res=strnstr(data+pmatch[0].rm_so,pmatch[0].rm_eo-pmatch[0].rm_so);
+
+	return res;
+}
+
+void smbot_destory(SMBOT_DATA *data)
+{
+	null_no_free(data->nick);
+	null_no_free(data->channel);
+	null_no_free(data->arg);
+	safe_free((void **)&data);
+}
+
+void null_no_free(char *p)
+{
+	if(p == NULL)
+		return;
+	else
+		free(p);
+}

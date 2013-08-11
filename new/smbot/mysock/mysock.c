@@ -599,6 +599,7 @@ char *http_post_simple(const char *url,unsigned int port,
 	char *head;
 	char *host;
 	char *accept="Accept: */*\n";
+	char *content_type="Content-Type: application/x-www-form-urlencoded\n";
 	char *connection="Connection: close\n";
 	char *content_length;
 	int host_len=0;
@@ -632,6 +633,7 @@ char *http_post_simple(const char *url,unsigned int port,
 	send(sockfd,head,strlen(head),0);
 	send(sockfd,host,strlen(host),0);
 	send(sockfd,accept,strlen(accept),0);
+	send(sockfd,content_type,strlen(content_type),0);
 	send(sockfd,connection,strlen(connection),0);
 	send(sockfd,content_length,strlen(content_length),0);
 	send(sockfd,data,strlen(data),0);
