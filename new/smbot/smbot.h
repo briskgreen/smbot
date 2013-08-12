@@ -4,11 +4,14 @@
 #include "TaskFactory/taskfactory.h"
 #include "mysock/mysock.h"
 #include <signal.h>
+#include <time.h>
 
 #define QUIT_MSG "如果一切都变成了或许，谁还会记得曾经\n"
 
 int sockfd;
 SSL *ssl;
+
+typedef HTTP CHANNEL;
 
 typedef struct
 {
@@ -32,7 +35,9 @@ void pong_server(char *msg,bool is_use_ssl);
 
 char *get_channel(char *msg);
 
-void smbot_help(bool is_use_ssl);
+void smbot_list(const char *msg,bool is_use_ssl);
+
+void smbot_help(const char *msg,bool is_use_ssl);
 
 void parse_and_perform(TASK_FACTORY *task,char *msg,char *reg,
 		char *des,task_callback func,bool is_use_ssl,
@@ -43,5 +48,7 @@ char *match_string(char *reg,char *data);
 void smbot_destory(SMBOT_DATA *data);
 
 void null_no_free(char *p);
+
+void time_keeping(CHANNEL *channel,bool is_use_ssl);
 
 #endif

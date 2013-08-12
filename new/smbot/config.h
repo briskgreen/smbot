@@ -5,8 +5,6 @@
 
 #define SMBOT_CONF_PATH ".config"
 
-typedef HTTP CHANNEL;
-
 typedef struct
 {
 	FILE *fp;

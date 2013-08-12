@@ -47,7 +47,7 @@ void get_man_url(SMBOT_DATA *data)
 void msg_send(const char *msg,SMBOT_DATA *data)
 {
 	if(data->is_use_ssl)
-		ssl_msgto(ssl,data->nick,data->channel,msg);
+		ssl_msgto(ssl,data->channel,data->nick,msg);
 	else
-		msgto(sockfd,data->nick,data->channel,msg);
+		msgto(sockfd,data->channel,data->nick,msg);
 }

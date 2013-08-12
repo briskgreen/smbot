@@ -133,14 +133,38 @@ char *get_channel(char *msg)
 	return buf;
 }
 
-void smbot_help(bool is_use_ssl)
+void smbot_list(const char *msg,bool is_use_ssl)
 {
-	char *msg="smbot使用!+指令+参数,通过!list指令获取smbot的所有指令。任何一个指令在其指令后不跟参数的情况下均会给出该指令所对应的功能";
+	char *list="man、ip、time、dict、torrent、youku、bt、zip、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、image、list、smbot";
+	char *nick;
+	char *channel;
 
+	nick=get_nick(msg);
+	channel=get_channel(msg);
 	if(is_use_ssl)
-		SSL_write(ssl,msg,strlen(msg));
+		ssl_msgto(ssl,channel,nick,list);
 	else
-		send(sockfd,msg,strlen(msg),0);
+		msgto(sockfd,channel,nick,list);
+
+	free(channel);
+	free(nick);
+}
+
+void smbot_help(const char *msg,bool is_use_ssl)
+{
+	char *help="smbot使用!+指令+参数,通过!list指令获取smbot的所有指令。任何一个指令在其指令后不跟参数的情况下均会给出该指令所对应的功能";
+	char *channel;
+	char *nick;
+
+	channel=get_channel(msg);
+	nick=get_nick(msg);
+	if(is_use_ssl)
+		ssl_msgto(ssl,channel,nick,help);
+	else
+		msgto(sockfd,channel,nick,help);
+
+	free(channel);
+	free(nick);
 }
 
 void parse_and_perform(TASK_FACTORY *task,char *msg,char *reg,
@@ -194,4 +218,76 @@ void null_no_free(char *p)
 		return;
 	else
 		free(p);
+}
+
+void time_keeping(CHANNEL *channel,bool is_use_ssl)
+{
+	struct tm *ti;
+	time_t t;
+	char *msg[]={"\1ACTION 0点了，再不碎觉，饥佬们小心不生精啊，腐女们小心会平胸哦!\1",
+	"\1ACTION 1点了，还没有睡？正是发福利的好时间!\1",
+	"\1ACTION 2点了，这个点还没睡觉，注定孤独一生!\1",
+	"\1ACTION 3点了，3点了，碎觉碎觉!\1",
+	"\1ACTION 4点了，你是起床了还是还没睡呢？注意身体哦!\1",
+	"\1ACTION 5点了，5点了，早起的虫子有鸟吃!\1",
+	"\1ACTION 6点了，呦，呦，切克闹，煎饼果子来一套!\1",
+	"\1ACTION 7点了，正是来一发的好钟点!\1",
+	"\1ACTION 8点了，都8点了，我和我的小伙伴们都惊呆了!\1",
+	"\1ACTION 9点了，时间过的好快，快的我都快睡着了!\1",
+	"\1ACTION 10点了，00后表示，什么时候才放学啊!\1",
+	"\1ACTION 11点了，这个点是该想想中午该吃点啥了!\1",
+	"\1ACTION 12点了，酒足饭饱思淫欲，正是调戏妹纸的好时间!\1",
+	"\1ACTION 13点了，这个点不午睡都对不起普天百姓，碎觉!\1",
+	"\1ACTION 14点了，哎呀，还想再睡一会，哎，可是一个人睡太无聊了!\1",
+	"\1ACTION 15点了，请妹纸们喝茶了饥佬们!\1",
+	"\1ACTION 16点了，晚饭吃点什么呢？\1",
+	"\1ACTION 17点了，16点你丫就开始想着吃晚饭了，吃货注孤生!\1",
+	"\1ACTION 18点了，现在是该想想吃点什么了!\1",
+	"\1ACTION 19点了，我是该看电视剧还是上irc?\1",
+	"\1ACTION 20点了，又是一天，反反复复，一人吃饱，全家不饿!\1",
+	"\1ACTION 21点了，贴吧水两贴去吧!\1",
+	"\1ACTION 22点了，来点福利吧!\1",
+	"\1ACTION 23点了，往事历历在目，让我终于醒悟，光棍还是很有前途，跟着狐朋狗友大家抽烟喝酒，一玩一宿，不用发愁!\1",NULL};
+
+	while(1)
+	{
+		t=time(NULL);
+		ti=localtime(&t);
+
+		if(ti->tm_min ==0 && ti->tm_sec == 0)
+		{
+			if(is_use_ssl)
+			{
+				char *temp;
+
+				while(channel->next != NULL)
+				{
+					channel=channel->next;
+
+					temp=string_add("PRIVMSG %s:%s\n",
+							channel->element,
+							msg[ti->tm_hour % 14]);
+					SSL_write(ssl,temp,strlen(temp));
+					free(temp);
+				}
+			}
+			else
+			{
+				char *temp;
+				
+				while(channel->next != NULL)
+				{
+					channel=channel->next;
+
+					temp=string_add("PRIVMSG %s:%s\n",
+							channel->element,
+							msg[ti->tm_hour % 24]);
+					send(sockfd,temp,strlen(temp),0);
+					free(temp);
+				}
+			}
+		}
+
+		sleep(1);
+	}
 }
