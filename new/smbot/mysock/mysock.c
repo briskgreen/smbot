@@ -790,3 +790,19 @@ char *strnstr(const char *str,int len)
 	return res;
 }
 
+int to_iconv(const char *from,const char *to,char *in,
+		int in_len,char *des,int des_len)
+{
+	iconv_t cd;
+
+	if((cd=iconv_open(to,from)) == (iconv_t)-1)
+		return -1;
+
+	if(iconv(cd,&in,&in_len,&des,&des_len) == -1)
+		return -1;
+
+	iconv_close(cd);
+
+	return 0;
+}
+

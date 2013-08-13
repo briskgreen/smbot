@@ -14,6 +14,7 @@
 #include <unistd.h>
 #include <regex.h>
 #include <openssl/ssl.h>
+#include <iconv.h>
 
 #define MEM_SIZE 512
 #define TRUE 1
@@ -103,5 +104,8 @@ char *https_post_simple(const char *url,unsigned int port,
 char *string_add(const char *format,...);
 
 char *strnstr(const char *str,int len);
+
+int to_iconv(const char *from,const char *to,char *in,
+		int in_len,char *des,int des_len);
 
 #endif
