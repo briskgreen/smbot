@@ -95,7 +95,6 @@ int main(int argc,char **argv)
 	SMBOT_CONF *conf;
 	struct sigaction act;
 	char *data;
-	char *list="man、ip、time、dict、torrent、youku、bt、zip、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、image、list、smbot";
 
 	printf("init task factory . . .\n");
 	task=task_factory_init(5,10);
@@ -157,9 +156,6 @@ int main(int argc,char **argv)
 
 		if(strstr(data,"!dict"))
 			parse_arg("PRIVMSG #[^ ]* :!dict","!dict <要查询的内容> 功能:bing翻译",bing_dict,3);
-
-		if(strstr(data,"!torrent"))
-			parse_arg("PRIVMSG #[^ ]* :!torrent","!torrent <关键词> 功能:返回torrentkitty第一个磁力链接",get_torrent,2);
 
 		if(strstr(data,"!youku"))
 			parse_arg("PRIVMSG #[^ ]* :!youku","!youku <关键词> 功能:返回youku第一个链接",get_youku_url,4);

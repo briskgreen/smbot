@@ -9,8 +9,6 @@ void get_ip_addr(SMBOT_DATA *data);
 
 void bing_dict(SMBOT_DATA *data);
 
-void get_torrent(SMBOT_DATA *data);
-
 void get_youku_url(SMBOT_DATA *data);
 
 void get_bt(SMBOT_DATA *data);

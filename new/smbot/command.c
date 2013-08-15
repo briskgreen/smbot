@@ -54,8 +54,8 @@ void get_ip_addr(SMBOT_DATA *data)
 	if((pid=fork()) == 0)
 	{
 		close(pipefd[0]);
-		dup2(STDOUT_FILENO,pipefd[1]);
-		dup2(STDERR_FILENO,pipefd[1]);
+		dup2(pipefd[1],STDOUT_FILENO);
+		dup2(pipefd[1],STDERR_FILENO);
 
 		execl("exec/query_ip_addr","query_ip_addr",data->arg,NULL);
 	}
@@ -121,8 +121,100 @@ void bing_dict(SMBOT_DATA *data)
 	http_head_destroy(http);
 }
 
-void get_torrent(SMBOT_DATA *data)
-{}
+void get_youke_url(SMBOT_DATA *data)
+{
+	char *head;
+	char *host="Host: www.soku.com\n";
+	char *accept="Accept: */*\n";
+	char *connection="Connection: close\n\n";
+	char *res;
+	char *buf;
+	int sockfd;
+	char *title;
+	char *url;
+
+	buf=url_encode(data->arg);
+	head=string_add("GET /search_video/q_%s HTTP/1.1\n",buf);
+	free(buf);
+
+	sockfd=tcp_connect("www.soku.com",80);
+	if(sockfd == -1)
+	{
+		free(head);
+		msg_send("Sorry,连接远程服务器失败!",data);
+		smbot_destory(data);
+		return;
+	}
+
+	send(sockfd,head,strlen(head),0);
+	send(sockfd,host,strlen(host),0);
+	send(sockfd,accept,strlen(accept),0);
+	send(sockfd,connection,strlen(connection),0);
+	free(head);
+
+	while(buf=read_line(sockfd))
+	{
+		if(strstr(buf,"<a title="))
+			break;
+		free(buf);
+	}
+	close(sockfd);
+
+	if(buf == NULL)
+	{
+		msg_send("Sorry,no result found!",datas);
+		smbot_destory(data);
+		return;
+	}
+
+	title=match_string("<a title=\".[^\"]*",buf);
+	url=match_string("http://*.[^\"]*",buf);
+	free(buf);
+
+	res=string_add("%s <--%s",title+10,url);
+	free(title);
+	free(url);
+	msg_send(res,data);
+	smbot_destory(res);
+}
+
+void get_bt(SMBOT_DATA *data)
+{
+	char *res;
+	char *buf;
+	char *head;
+	HTTp *http;
+
+	buf=url_encode(data->arg);
+	head=string_add("GET http://btdigg.org/search?info_hash=&q=%s HTTP/1.1\n",buf);
+	free(buf);
+	http=http_head_init();
+	http_head_add(http,head);
+	http_head_add(http,"Host: btdigg.org\n");
+	http_head_add(http,"Accept: */*\n");
+	http_head_add(http,"Connection: close\n\n");
+
+	buf=http_perform(http,"127.0.0.1",8087);
+	http_head_destroy(http);
+	if(buf == NULL)
+	{
+		msg_send("Sorry,连接远程服务器失败!",data);
+		smbot_destory(data);
+		return;
+	}
+	res=match_string("magnet\:\?xt=urn\:btih\:*.[^\"]*",buf);
+
+	if(res == NULL)
+	{
+		msg_send("Sorry,no result found!",data);
+		smbot_destory(data);
+		return;
+	}
+
+	msg_send(res,data);
+	free(res);
+	smbot_destory(data);
+}
 
 void msg_send(const char *msg,SMBOT_DATA *data)
 {
