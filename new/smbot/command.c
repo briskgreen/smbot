@@ -315,7 +315,7 @@ void get_stack(SMBOT_DATA *data)
 		return;
 	}
 
-	url==match_string("/questions.[^\"]*",buf);
+	url=match_string("/questions.[^\"]*",buf);
 	des=match_string("Q: .[^<]*",buf);
 	res=string_add("%s <-- http://stackoverflow.com%s",des,url);
 	free(url);
