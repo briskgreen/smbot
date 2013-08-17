@@ -1,6 +1,5 @@
 #include "mysock.h"
 
-void format_str(char *code);
 int htoi(char *s);
 unsigned int url_len(char *url);
 
@@ -156,19 +155,6 @@ void safe_free(void **buf)
 	*buf=NULL;
 }
 
-void format_str(char *code)
-{
-	int i;
-
-	for(i=0;code[i];++i)
-	{
-		if(code[i] == '%')
-			continue;
-		if(code[i] >= 'A' && code[i] <= 'F')
-			code[i]+=32;
-	}
-}
-
 int htoi(char *s)
 {
 	int i;
@@ -177,6 +163,10 @@ int htoi(char *s)
 	for(i=0,res=0;s[i];++i)
 	{
 		res*=16;
+
+		if(s[i] >= 'A' && s[i] <= 'F')
+			s[i]+=32;
+
 		if(s[i] >= 'a' && s[i] <= 'f')
 			res+=s[i]-87;
 		else
@@ -214,7 +204,6 @@ char *url_decode(char *code)
 	char temp[3]={0};
 	int i,j;
 
-	format_str(code);
 	len=url_len(code);
 	res=malloc(len+1);
 

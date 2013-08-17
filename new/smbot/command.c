@@ -90,7 +90,7 @@ void bing_dict(SMBOT_DATA *data)
 	http_head_add(http,res);
 	null_no_free(res);
 	http_head_add(http,"Host: api.datamarket.azure.com\n");
-	http_head_add(http,"Authorization: Basic OisrZkFPcUREQUFZYmxQeExMemVXYUE0WGJqVUdGc0FqZ0RDY1FZRFhOT0U=\n");
+	http_head_add(http,BING_AU);
 	http_head_add(http,"Accept: */*\n");
 	http_head_add(http,"Connection: close\n\n");
 
@@ -211,6 +211,115 @@ void get_bt(SMBOT_DATA *data)
 		return;
 	}
 
+	msg_send(res,data);
+	free(res);
+	smbot_destory(data);
+}
+
+void get_zip_code(SMBOT_DATA *data)
+{
+	char *res;
+	char code[80]={0};
+	char *buf;
+	char *temp;
+
+	to_iconv("UTF-8//","GBK//",data->arg,strlen(data->arg),
+			code,80);
+	buf=string_add("http://opendata.baidu.com/post/s?wd=%s&p=mini&rn=20",code);
+	res=http_get_simple(buf,80);
+	free(buf);
+
+	buf=strstr(res,"begin");
+	if(buf == NULL)
+	{
+		msg_send("Sorry,no result found!",data);
+		free(res);
+		smbot_destory(data);
+		return;
+	}
+
+	temp=match_string("[0-9]\\{6\\}[^<]",buf);
+	free(buf);
+	if(temp == NULL)
+	{
+		msg_send("Sorry,no result found!",data);
+		free(res);
+		smbot_destory(data);
+		return;
+	}
+	
+	free(res);
+	msg_send(temp,data);
+	free(temp);
+	smbot_destory(data);
+}
+
+void get_weather(SMBOT_DATA *data)
+{
+	char *temp;
+	char *buf;
+	char code[1024]={0};
+
+	buf=string_add("php.weather.sina.com.cn/search.php?city=%s&dpc=1",data->arg);
+	temp=http_get_simple(buf,80);
+	free(buf);
+	if(temp == NULL)
+	{
+		msg_send("Sorry,连接到远程服务器出错!",data);
+		smbot_destory(data);
+		return;
+	}
+
+	buf=match_string("title:\'.[^\']*",temp);
+	free(temp);
+	if(buf == NULL)
+	{
+		msg_send("Sorry,no result found!",data);
+		smbot_destory(data);
+		return;
+	}
+
+	to_iconv("GBK//","UTF-8",buf+7,strlen(buf)-7,code,1024);
+	free(buf);
+	msg_send(code,data);
+	smbot_destory(data);
+}
+
+void get_stack(SMBOT_DATA *data)
+{
+	char *url;
+	char *des;
+	char *res;
+	char *buf;
+	int i;
+
+	for(i=0;data->arg[i];++i)
+		if(data->arg[i] == ' ')
+			data->arg[i]='+';
+	buf=string_add("http://stackoverflow.com/search?q=%s",data->arg);
+	res=http_get_simple(buf,80);
+	free(buf);
+	if(res == NULL)
+	{
+		msg_send("Sorry,连接到远程服务器出错!",data);
+		smbot_destory(data);
+		return;
+	}
+
+	buf=strstr(res,"Q: ");
+	free(res);
+	if(buf == NULL)
+	{
+		msg_send("Sorry,no result found!",data);
+		smbot_destory(data);
+		return;
+	}
+
+	url==match_string("/questions.[^\"]*",buf);
+	des=match_string("Q: .[^<]*",buf);
+	res=string_add("%s <-- http://stackoverflow.com%s",des,url);
+	free(url);
+	free(des);
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
