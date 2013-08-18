@@ -1,6 +1,5 @@
 #include "mysock.h"
 
-int htoi(char *s);
 unsigned int url_len(char *url);
 
 SSL_CTX *ssl_ctx;
@@ -155,10 +154,10 @@ void safe_free(void **buf)
 	*buf=NULL;
 }
 
-int htoi(char *s)
+unsigned long htoi(char *s)
 {
 	int i;
-	int res;
+	unsigned long res;
 
 	for(i=0,res=0;s[i];++i)
 	{

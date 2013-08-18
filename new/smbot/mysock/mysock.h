@@ -108,4 +108,6 @@ char *strnstr(const char *str,int len);
 int to_iconv(const char *from,const char *to,char *in,
 		int in_len,char *des,int des_len);
 
+unsigned long htoi(char *s);
+
 #endif
