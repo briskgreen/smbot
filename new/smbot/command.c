@@ -256,32 +256,26 @@ void get_zip_code(SMBOT_DATA *data)
 
 void get_weather(SMBOT_DATA *data)
 {
-	char *temp;
+	char *res;
 	char *buf;
-	char code[1024]={0};
 
-	buf=string_add("php.weather.sina.com.cn/search.php?city=%s&dpc=1",data->arg);
-	temp=http_get_simple(buf,80);
+	buf=string_add("http://v.juhe.cn/weather/index?cityname=%s&key=6a046fb4af1c75fa2025d6887f10b113",data->arg);
+	res=http_get_simple(buf,80);
 	free(buf);
-	if(temp == NULL)
+	if(strstr(res,"resultcode\":\"202\""))
 	{
-		msg_send("Sorry,连接到远程服务器出错!",data);
+		free(res);
+		msg_send("查询不到该城市的信息",data);
 		smbot_destory(data);
 		return;
 	}
 
-	buf=match_string("title:\'.[^\']*",temp);
-	free(temp);
-	if(buf == NULL)
-	{
-		msg_send("Sorry,no result found!",data);
-		smbot_destory(data);
-		return;
-	}
-
-	to_iconv("GBK//","UTF-8",buf+7,strlen(buf)-7,code,1024);
+	buf=match_string("temperature.*uv_index",res);
+	free(res);
+	res=strnstr(buf,-11);
 	free(buf);
-	msg_send(code,data);
+	msg_send(res,data);
+	free(res);
 	smbot_destory(data);
 }
 
@@ -320,6 +314,67 @@ void get_stack(SMBOT_DATA *data)
 	res=string_add("%s <-- http://stackoverflow.com%s",des,url);
 	free(url);
 	free(des);
+	msg_send(res,data);
+	free(res);
+	smbot_destory(data);
+}
+
+void get_id_information(SMBOT_DATA *data)
+{
+	char *res;
+	char *buf;
+
+	buf=string_add("http://apis.juhe.cn/idcard/index?key=94d452914f35a3cf94b6e28c36c76c77&cardno=%s",data->arg);
+	res=http_get_simple(buf,80);
+	free(buf);
+
+	buf=match_string("area.[^{]*",res);
+	free(res);
+	msg_send(buf,data);
+	free(buf);
+	smbot_destory(data);
+}
+
+void check_id_card(SMBOT_DATA *data)
+{
+	char temp[1024]={0};
+	pid_t pid;
+	int pipefd[2];
+
+	pipe(pipefd);
+	
+	if((pid=fork()) == 0)
+	{
+		close(pipefd[0]);
+
+		dup2(pipefd[1],STDOUT_FILENO);
+		dup2(pipefd[1],STDERR_FILENO);
+		execl("exec/id_card_test","id_card_test",data->arg,NULL);
+	}
+
+	close(pipefd[1]);
+	read(pipefd[0],temp,sizeof(temp));
+	waitpid(pid,NULL,WNOHANG);
+
+	msg_send(temp,data);
+	smbot_destory(data);
+}
+
+void get_url_encode(SMBOT_DATA *data)
+{
+	char *res;
+
+	res=url_encode(data->arg);
+	msg_send(res,data);
+	free(res);
+	smbot_destory(data);
+}
+
+void get_url_decode(SMBOT_DATA *data)
+{
+	char *res;
+
+	res=url_decode(data->arg);
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
