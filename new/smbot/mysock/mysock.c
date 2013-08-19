@@ -794,3 +794,26 @@ int to_iconv(const char *from,const char *to,char *in,
 	return 0;
 }
 
+char *match_string(char *reg,char *data)
+{
+	regex_t preg;
+	regmatch_t pmatch[1];
+	char *res;
+
+	if(regcomp(&preg,reg,0) != 0)
+	{
+		regfree(&preg);
+		return NULL;
+	}
+	if(regexec(&preg,data,1,pmatch,0) != 0)
+	{
+		regfree(&preg);
+		return NULL;
+	}
+	regfree(&preg);
+
+	res=strnstr(data+pmatch[0].rm_so,pmatch[0].rm_eo-pmatch[0].rm_so);
+
+	return res;
+}
+

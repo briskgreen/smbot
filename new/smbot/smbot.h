@@ -43,8 +43,6 @@ void parse_and_perform(TASK_FACTORY *task,char *msg,char *reg,
 		char *des,task_callback func,bool is_use_ssl,
 		unsigned int priority);
 
-char *match_string(char *reg,char *data);
-
 void smbot_destory(SMBOT_DATA *data);
 
 void null_no_free(char *p);

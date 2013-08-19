@@ -110,4 +110,6 @@ int to_iconv(const char *from,const char *to,char *in,
 
 unsigned long htoi(char *s);
 
+char *match_string(char *reg,char *data);
+
 #endif
