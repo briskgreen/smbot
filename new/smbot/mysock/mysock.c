@@ -1,6 +1,7 @@
 #include "mysock.h"
 
 unsigned int url_len(char *url);
+unsigned int unicode_len(const char *str);
 
 SSL_CTX *ssl_ctx;
 int mysock_sockfd;
@@ -794,7 +795,7 @@ int to_iconv(const char *from,const char *to,char *in,
 	return 0;
 }
 
-char *match_string(char *reg,char *data)
+char *match_string(const char *reg,char *data)
 {
 	regex_t preg;
 	regmatch_t pmatch[1];
@@ -815,5 +816,61 @@ char *match_string(char *reg,char *data)
 	res=strnstr(data+pmatch[0].rm_so,pmatch[0].rm_eo-pmatch[0].rm_so);
 
 	return res;
+}
+
+char *unicode_to_utf(const char *str)
+{
+	char *temp;
+	char *res;
+	char *buf;
+	int len;
+	int i,j;
+
+	len=unicode_len(str);
+	len*=2;
+	temp=malloc(len+1);
+	res=malloc(len*2);
+	bzero(res,len*2);
+	bzero(temp,len+1);
+
+	for(i=0,j=0;str[i];++i,++j)
+	{
+		if(str[i] == '\\' && str[i+1] == 'u')
+		{
+			buf=strnstr(str+i+4,2);
+			temp[j]=htoi(buf);
+			free(buf);
+			buf=strnstr(str+i+2,2);
+			temp[++j]=htoi(buf);
+			free(buf);
+			i+=5;
+		}
+		else
+		{
+			temp[j]=str[i];
+			temp[++j]=0;
+		}
+	}
+
+	to_iconv("UNICODE//","UTF-8//IGNORE",temp,len,res,len*2);
+	free(temp);
+
+	return res;
+}
+
+unsigned int unicode_len(const char *str)
+{
+	unsigned int len;
+	int i;
+
+	for(i=0,len=0;str[i];++i,++len)
+	{
+		if(str[i] == '\\' && str[i+1] == 'u')
+			i+=5;
+		else
+			++len;
+	}
+
+	return len;
 }
 
