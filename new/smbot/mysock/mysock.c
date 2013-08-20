@@ -874,3 +874,50 @@ unsigned int unicode_len(const char *str)
 	return len;
 }
 
+int strreplace(char *str,char *replace,char *des,char *res,int res_len)
+{
+	int index=0;
+	int re_len=strlen(des);
+	int src_len=strlen(replace);
+	char *p;
+	int str_len=strlen(str);
+	int len=0;
+
+	res[0]='\0';
+	while(1)
+	{
+		p=strstr(str+index,replace);
+
+		if(p == NULL)
+			break;
+
+		len+=p-str-index+re_len;
+		if(len >= res_len)
+		{
+			res[len]='\0';
+			return len;
+		}
+
+		strncat(res,str+index,p-str-index);
+		strncat(res,des,re_len);
+
+		index=p-str+src_len;
+	}
+
+	if(len == 0)
+		return -1;
+
+	if(str[index] != '\0')
+	{
+		len+=str_len-index;
+		res[len]='\0';
+
+		if(len >= res_len)
+			return len;
+
+		strncat(res,str+index,str_len-index);
+	}
+
+	return 0;
+}
+

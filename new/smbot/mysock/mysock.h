@@ -114,4 +114,6 @@ char *match_string(const char *reg,char *data);
 
 char *unicode_to_utf(const char *str);
 
+int strreplace(char *str,char *replace,char *des,char *res,int res_len);
+
 #endif
