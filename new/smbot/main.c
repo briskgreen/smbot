@@ -208,6 +208,18 @@ int main(int argc,char **argv)
 		if(strstr(data,"!bimg"))
 			parse_arg("PRIVMSG #[^ ]* :!bimg","!bimg <关键词> 功能:返回百度图片搜索第一个结果",get_bimg,1);
 
+		if(strstr(data,"!air"))
+			parse_arg("PRIVMSG #[^ ]* :!air","!air <城市名称> 功能:查询城市空气质量，城市名称使用拼音",get_air,1);
+
+		if(strstr(data,"!website"))
+			parse_arg("PRIVMSG #[^ ]* :!website","!website <域名> 功能:网站安全检测，检测结果由360提供",get_website_testing,1);
+
+		if(strstr(data,"!wifi"))
+			parse_arg("PRIVMSG #[^ ]* :!wifi","!wifi <城市名称> 功能:根据城市名返回查到的第一个wifi热点",get_wifi,1);
+
+		if(strstr(data,"!train"))
+			parse_arg("PRIVMSG #[^ ]* :!train","!train <车次> 功能:火车时刻表查询",get_train,1);
+
 		if(strstr(data,"!list"))
 		{
 			smbot_list(data,is_use_ssl);

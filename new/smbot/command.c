@@ -604,6 +604,100 @@ void get_bimg(SMBOT_DATA *data)
 	smbot_destory(data);
 }
 
+void get_air(SMBOT_DATA *data)
+{
+	char *buf;
+	char *res;
+
+	buf=string_add("http://web.juhe.cn/environment/air/cityair?city=%s&key=9b8bb61a933d5f3085a1b4b37b691a45",data->arg);
+	res=http_get_simple(buf,8080);
+	free(buf);
+	if(!strstr(res,"SUCCESSED!"))
+	{
+		free(res);
+		msg_send("查询失败，检查城市名称是否有误，城市名称一定要用拼音哦",data);
+		smbot_destory(data);
+		return;
+	}
+
+	buf=match_string("\"city\":\".[^}]*",res);
+	free(res);
+	msg_send(buf,data);
+	free(buf);
+	smbot_destory(data);
+}
+
+void get_website_testing(SMBOT_DATA *data)
+{
+	char *res;
+	char *buf;
+
+	buf=string_add("http://apis.juhe.cn/webscan/?domain=%s&key=f91b291d8924afa7461439b69b607177",data->arg);
+	res=http_get_simple(buf,80);
+	free(buf);
+	if(!strstr(res,"Successed!"))
+	{
+		free(res);
+		msg_send("检测失败!",data);
+		smbot_destory(data);
+		return;
+	}
+	buf=match_string("{\"state\":.[^\)]*",res);
+	free(res);
+	msg_send(buf,data);
+	free(buf);
+	smbot_destory(data);
+}
+
+void get_wifi(SMBOT_DATA *data)
+{
+	char *buf;
+	char *res;
+
+	res=url_encode(data->arg);
+	buf=string_add("http://apis.juhe.cn/wifi/region?key=7ce6da553e4a515d6ac790c41887447a&city=%s",res);
+	free(res);
+	res=http_get_simple(buf,80);
+	free(buf);
+
+	if(!strstr(res,"Return Successd!"))
+	{
+		free(res);
+		msg_send("查询失败!",data);
+		smbot_destory(data);
+		return;
+	}
+
+	buf=match_string("\"name\":\".[^}]*",res);
+	free(res);
+	msg_send(buf,data);
+	free(buf);
+	smbot_destory(data);
+}
+
+void get_train(SMBOT_DATA *data)
+{
+	char *res;
+	char *buf;
+
+	buf=string_add("http://apis.juhe.cn/train/s?name=%s&key=718295ce3e1884d023b7f4e072a8945e",data->arg);
+	res=http_get_simple(buf,80);
+	free(buf);
+
+	if(!strstr(res,"Successed!"))
+	{
+		free(res);
+		msg_send("查询失败!",data);
+		smbot_destory(data);
+		return;
+	}
+	buf=match_string("\"name\":\".[^}]*",res);
+	free(res);
+	msg_send(buf,data);
+	free(res);
+	smbot_destory(data);
+}
+
 void msg_send(const char *msg,SMBOT_DATA *data)
 {
 	if(data->is_use_ssl)
