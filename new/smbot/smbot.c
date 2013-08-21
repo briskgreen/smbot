@@ -135,7 +135,7 @@ char *get_channel(char *msg)
 
 void smbot_list(const char *msg,bool is_use_ssl)
 {
-	char *list="man、ip、time、dict、torrent、youku、bt、zip、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、image、list、smbot";
+	char *list="man、ip、time、dict、youku、bt、zip、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、image、list、smbot";
 	char *nick;
 	char *channel;
 

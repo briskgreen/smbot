@@ -121,7 +121,7 @@ void bing_dict(SMBOT_DATA *data)
 	http_head_destroy(http);
 }
 
-void get_youke_url(SMBOT_DATA *data)
+void get_youku_url(SMBOT_DATA *data)
 {
 	char *head;
 	char *host="Host: www.soku.com\n";
@@ -162,7 +162,7 @@ void get_youke_url(SMBOT_DATA *data)
 
 	if(buf == NULL)
 	{
-		msg_send("Sorry,no result found!",datas);
+		msg_send("Sorry,no result found!",data);
 		smbot_destory(data);
 		return;
 	}
@@ -183,7 +183,7 @@ void get_bt(SMBOT_DATA *data)
 	char *res;
 	char *buf;
 	char *head;
-	HTTp *http;
+	HTTP *http;
 
 	buf=url_encode(data->arg);
 	head=string_add("GET http://btdigg.org/search?info_hash=&q=%s HTTP/1.1\n",buf);
@@ -202,7 +202,7 @@ void get_bt(SMBOT_DATA *data)
 		smbot_destory(data);
 		return;
 	}
-	res=match_string("magnet\:\?xt=urn\:btih\:*.[^\"]*",buf);
+	res=match_string("magnet:\?xt=urn:btih:*.[^\"]*",buf);
 
 	if(res == NULL)
 	{
@@ -378,6 +378,165 @@ void get_url_decode(SMBOT_DATA *data)
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
+}
+
+void get_joke(SMBOT_DATA *data)
+{
+	char *res;
+	char *buf;
+	char temp[512];
+	int i;
+
+	buf=string_add("http://www.fangtang8.com/?s=%s",data->arg);
+	res=http_get_simple(buf,80);
+	free(buf);
+
+	buf=match_string("<p>.[^\\s]*</p>",res);
+	free(res);
+	strreplace(buf,"<p>","",temp,511);
+	free(buf);
+	res=string_add("%s",temp);
+	bzero(temp,512);
+	strreplace(res,"</p>","",temp,511);
+	free(res);
+
+	for(i=0;temp[i];++i)
+		if(temp[i] == '\n')
+			temp[i]=' ';
+	msg_send(temp,data);
+	smbot_destory(data);
+}
+
+void get_dream(SMBOT_DATA *data)
+{
+	int pipefd[2];
+	char temp[512]={0};
+	int i;
+	pid_t pid;
+
+	for(i=0;data->arg[i];++i)
+		if(data->arg[i] == ' ')
+			data->arg[i]='+';
+	pipe(pipefd);
+
+	if((pid=fork()) == 0)
+	{
+		close(pipefd[0]);
+
+		dup2(pipefd[1],STDOUT_FILENO);
+		dup2(pipefd[1],STDERR_FILENO);
+		execl("exec/dream.sh","dream",data->arg,NULL);
+	}
+
+	close(pipefd[1]);
+	read(pipefd[0],temp,512);
+	waitpid(pid,NULL,WNOHANG);
+
+	msg_send(temp,data);
+	smbot_destory(data);
+}
+
+void get_song_url(SMBOT_DATA *data)
+{
+	char *buf;
+	char *res;
+	char url[512];
+
+	buf=string_add("http://music.baidu.com/search?key=%s",data->arg);
+	res=http_get_simple(buf,80);
+	free(buf);
+
+	buf=match_string("<a href=\"/song/.[^\"]*",res);
+	free(res);
+	strreplace(buf,"<a href=\"","http://music.baidu.com",url,512);
+	free(buf);
+	
+	msg_send(url,data);
+	smbot_destory(data);
+}
+
+void get_bing(SMBOT_DATA *data)
+{
+	char *url;
+	char *buf;
+	char *title;
+	char *res;
+	char *des;
+	HTTP *http;
+
+	url=url_encode(data->arg);
+	http=http_head_init();
+	buf=string_add("GET /Bing/SearchWeb/v1/Web?Query=%%27%s%%27&$top=1&$skip=0&$format=json HTTP/1.1\n",url);
+	free(url);
+	http_head_add(http,buf);
+	free(buf);
+	http_head_add(http,"Host: api.datamarket.azure.com\n");
+	http_head_add(http,"Accept: */*\n");
+	http_head_add(http,BING_AU);
+	http_head_add(http,"Connection: close\n\n");
+
+	buf=https_perform(http,"api.datamarket.azure.com",443,NULL,NULL);
+	title=match_string("\"Title\":\".[^\"]*",buf);
+	des=match_string("\"Description\":\".[^\"]*",buf);
+	url=match_string("\"Url\":\".[^\"]*",buf);
+	free(buf);
+
+	res=string_add("%s<->%s-->%s",title+9,url+8,des+15);
+	free(title);
+	free(des);
+	free(url);
+	msg_send(res,data);
+	smbot_destory(data);
+}
+
+void get_google_image_url(SMBOT_DATA *data)
+{
+	char *res;
+	char *buf;
+	char *des;
+	char *url;
+	int i;
+
+	for(i=0;data->arg[i];++i)
+		if(data->arg[i] == ' ')
+			data->arg[i]='+';
+
+	buf=string_add("https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s&searchType=image",GOOGLE_KEY,data->arg);
+	res=https_get_simple(buf,443);
+	free(buf);
+
+	url=match_string("\"link\": \".[^\"]*",res);
+	des=match_string("\"snippet\": \".[^\"]*",res);
+	free(res);
+	res=string_add("%s<--%s",des+11,url+8);
+	free(des);
+	free(url);
+
+	msg_send(res,data);
+	free(res);
+	smbot_destory(data);
+}
+
+void get_google(SMBOT_DATA *data)
+{
+	char *res;
+	char *url;
+	char *buf;
+	char *des;
+	int i;
+
+	for(i=0;data->arg[i];++i)
+		if(data->arg[i] == ' ')
+			data->arg[i]='+';
+	buf=string_add("https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s",GOOGLE_KEY,data->arg);
+	res=https_get_simple(buf,443);
+	free(buf);
+
+	url=match_string("\"link\": \".[^\"]*",res);
+	des=match_string("\"snippet\": \".[^\"]*",res);
+	free(res);
+
+	res=string_add("%s<--%s",url+8,des+11);
 }
 
 void msg_send(const char *msg,SMBOT_DATA *data)

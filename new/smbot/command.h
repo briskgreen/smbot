@@ -4,6 +4,7 @@
 #include "smbot.h"
 
 #define BING_AU "Authorization: Basic OisrZkFPcUREQUFZYmxQeExMemVXYUE0WGJqVUdGc0FqZ0RDY1FZRFhOT0U=\n"
+#define GOOGLE_KEY "your key"
 
 void get_man_url(SMBOT_DATA *data);
 
