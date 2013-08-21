@@ -539,6 +539,71 @@ void get_google(SMBOT_DATA *data)
 	res=string_add("%s<--%s",url+8,des+11);
 }
 
+void get_baidu(SMBOT_DATA *data)
+{
+	char *buf;
+	char *res;
+	char temp[512];
+	char *title;
+	char *url;
+	int i;
+
+	for(i=0;data->arg[i];++i)
+		if(data->arg[i] == ' ')
+			data->arg[i]='+';
+
+	buf=string_add("http://www.baidu.com/s?wd=%s&rsv_spt=1&issp=1&rsv_bp=0&ie=utf-8&tn=baidujson&rn=1",data->arg);
+	res=http_get_simple(buf,80);
+	free(buf);
+	url=match_string("uri:\".[^\"]*",res);
+	title=match_string("title:\".[^\"]*",res);
+	buf=match_string("comment:\".[^\"]*",res);
+	free(res);
+	strreplace(buf+9,"\x1","",temp,512);
+	free(buf);
+	buf=string_add("%s",temp);
+	bzero(temp,512);
+	to_iconv("GB18030//","UTF-8//IGNORE",buf,strlen(buf),temp,512);
+	free(buf);
+
+	res=string_add("%s<->%s---%s",title,url,temp);
+	free(title);
+	free(url);
+
+	msg_send(res,data);
+	free(res);
+	smbot_destory(data);
+	
+}
+
+void get_bimg(SMBOT_DATA *data)
+{
+	char *title;
+	char *url;
+	char temp[512]={0};
+	char *res;
+	char *buf;
+	int i;
+
+	for(i=0;data->arg[i];++i)
+		if(data->arg[i] == ' ')
+			data->arg[i]='+';
+
+	buf=string_add("http://image.baidu.com/i?tn=baiduimageson&ipn=r&ct=201326592&cl=2&lm=-1&st=-1&fm=result&fr=&sf=1&fmq=1376411397766_R&pv=&ic=0&nc=1&z=&se=1&showtab=0&fb=0&width=&height=&face=0&istype=2&ie=utf-8&word=%s&pn=1&rn=1",data->arg);
+	res=http_get_simple(buf,80);
+	free(buf);
+	url=match_string("\"objURL\":\".[^\"]*",res);
+	title=match_string("\"fromPageTitleEnc\":\".[^\"]*",res);
+	free(res);
+	to_iconv("GB18030//","UTF-8//IGNORE",title+20,strlen(title)-20,temp,512);
+	free(title);
+	res=string_add("%s<--%s",temp,url);
+	free(url);
+	msg_send(res,data);
+	free(res);
+	smbot_destory(data);
+}
+
 void msg_send(const char *msg,SMBOT_DATA *data)
 {
 	if(data->is_use_ssl)

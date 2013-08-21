@@ -42,4 +42,8 @@ void get_google_image_url(SMBOT_DATA *data);
 
 void get_google(SMBOT_DATA *data);
 
+void get_baidu(SMBOT_DATA *data);
+
+void get_bimg(SMBOT_DATA *data);
+
 #endif

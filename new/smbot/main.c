@@ -202,6 +202,12 @@ int main(int argc,char **argv)
 		if(strstr(data,"!google"))
 			parse_arg("PRIVMSG #[^ ]* :!google","!google <关键词> 功能:返回google搜索第一个结果",get_google,1);
 
+		if(strstr(data,"!baidu"))
+			parse_arg("PRIVMSG #[^ ]* :!baidu","!baidu <关键词> 功能:返回baidu搜索第一个结果",get_baidu,1);
+
+		if(strstr(data,"!bimg"))
+			parse_arg("PRIVMSG #[^ ]* :!bimg","!bimg <关键词> 功能:返回百度图片搜索第一个结果",get_bimg,1);
+
 		if(strstr(data,"!list"))
 		{
 			smbot_list(data,is_use_ssl);
