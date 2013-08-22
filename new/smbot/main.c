@@ -76,17 +76,28 @@ void send_data(int sockfd,SMBOT_CONF *conf)
 	}
 }
 
-void send_time(bool is_use_ssl)
+void send_time(bool is_use_ssl,char *data)
 {
 	time_t t;
 	char *ti;
+	char *res;
+	char *nick;
+	char *channel;
 
+	nick=get_nick(data);
+	channel=get_channel(data);
 	t=time(NULL);
 	ti=ctime(&t);
+	res=string_add("PRIVMSG %s :%s: %s",channel,nick,ti);
+	free(nick);
+	free(channel);
+
 	if(is_use_ssl)
-		SSL_write(ssl,ti,strlen(ti));
+		SSL_write(ssl,res,strlen(res));
 	else
-		send(sockfd,ti,strlen(ti),0);
+		send(sockfd,ti,strlen(res),0);
+
+	free(res);
 }
 
 int main(int argc,char **argv)
@@ -149,13 +160,13 @@ int main(int argc,char **argv)
 
 		if(strstr(data,"!time"))
 		{
-			send_time(is_use_ssl);
+			send_time(is_use_ssl,data);
 			free(data);
 			continue;
 		}
 
 		if(strstr(data,"!dict"))
-			parse_arg("PRIVMSG #[^ ]* :!dict","!dict <要查询的内容> 功能:bing翻译",bing_dict,3);
+			parse_arg("PRIVMSG #[^ ]* :!dict","!dict <目标语言> <要查询的内容> 功能:bing翻译",bing_dict,3);
 
 		if(strstr(data,"!youku"))
 			parse_arg("PRIVMSG #[^ ]* :!youku","!youku <关键词> 功能:返回youku第一个链接",get_youku_url,4);

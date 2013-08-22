@@ -38,6 +38,7 @@ void get_man_url(SMBOT_DATA *data)
 	{
 		msg_send("Sorry,连接到远程服务器出错!",data);
 		smbot_destory(data);
+		free(data->arg);
 
 		return;
 	}
@@ -48,6 +49,7 @@ void get_man_url(SMBOT_DATA *data)
 		msg_send("Sorry,no result found!",data);
 		smbot_destory(data);
 		free(res);
+		free(data->arg);
 
 		return;
 	}
@@ -59,6 +61,7 @@ void get_man_url(SMBOT_DATA *data)
 	msg_send(res,data);
 	null_no_free(res);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_ip_addr(SMBOT_DATA *data)
@@ -66,6 +69,8 @@ void get_ip_addr(SMBOT_DATA *data)
 	pid_t pid;
 	int pipefd[2];
 	char temp[1024]={0};
+
+	null_and_help("!ip");
 
 	pipe(pipefd);
 	if((pid=fork()) == 0)
@@ -83,50 +88,59 @@ void get_ip_addr(SMBOT_DATA *data)
 
 	msg_send(temp,data);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void bing_dict(SMBOT_DATA *data)
 {
 	char *res;
 	char *buf;
+	char *url;
 	HTTP *http;
 	int i;
 
+	null_and_help("!dict");
 	for(i=0;data->arg[i]!= ' ';++i);
 	if(data->arg[i] == '\0')
 	{
 		msg_send("错误的格式",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 	buf=strnstr(data->arg,i);
 
 	http=http_head_init();
-	res=string_add("GET /Bing/MicrosoftTranslator/v1/Translate?Text=%27%s%27&To=%27%s%27&$skip=0&$top=1&$format=json HTTP/1.1\n",data->arg+i,buf);
+	url=url_encode(data->arg+i+1);
+	res=string_add("GET /Bing/MicrosoftTranslator/v1/Translate?Text=%%27%s%%27&To=%%27%s%%27&$skip=0&$top=1&$format=json HTTP/1.1\n",url,buf);
+	free(url);
 	null_no_free(buf);
 	http_head_add(http,res);
-	null_no_free(res);
+	//null_no_free(res);
 	http_head_add(http,"Host: api.datamarket.azure.com\n");
 	http_head_add(http,BING_AU);
 	http_head_add(http,"Accept: */*\n");
 	http_head_add(http,"Connection: close\n\n");
 
-	res=https_perform(http,"api.datamarket.azure.com",443,NULL,NULL);
-	if(res == NULL)
+	url=https_perform(http,"api.datamarket.azure.com",443,NULL,NULL);
+	free(res);
+	if(url == NULL)
 	{
 		msg_send("Sorry,连接到远程服务器出错",data);
 		smbot_destory(data);
 		http_head_destroy(http);
+		free(data->arg);
 		return;
 	}
 
-	buf=match_string("\"Text\":.[^\"]*",res);
-	null_no_free(res);
+	buf=match_string("\"Text\":.[^\"]*",url);
+	null_no_free(url);
 	if(buf == NULL)
 	{
 		msg_send("Sorry no result found!",data);
 		smbot_destory(data);
 		http_head_destroy(http);
+		free(data->arg);
 		return;
 	}
 
@@ -136,6 +150,7 @@ void bing_dict(SMBOT_DATA *data)
 	null_no_free(res);
 	smbot_destory(data);
 	http_head_destroy(http);
+	free(data->arg);
 }
 
 void get_youku_url(SMBOT_DATA *data)
@@ -150,6 +165,7 @@ void get_youku_url(SMBOT_DATA *data)
 	char *title;
 	char *url;
 
+	null_and_help("!youku");
 	buf=url_encode(data->arg);
 	head=string_add("GET /search_video/q_%s HTTP/1.1\n",buf);
 	free(buf);
@@ -160,6 +176,7 @@ void get_youku_url(SMBOT_DATA *data)
 		free(head);
 		msg_send("Sorry,连接远程服务器失败!",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 
@@ -181,6 +198,7 @@ void get_youku_url(SMBOT_DATA *data)
 	{
 		msg_send("Sorry,no result found!",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 
@@ -192,7 +210,8 @@ void get_youku_url(SMBOT_DATA *data)
 	free(title);
 	free(url);
 	msg_send(res,data);
-	smbot_destory(res);
+	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_bt(SMBOT_DATA *data)
@@ -202,6 +221,7 @@ void get_bt(SMBOT_DATA *data)
 	char *head;
 	HTTP *http;
 
+	null_and_help("!bt");
 	buf=url_encode(data->arg);
 	head=string_add("GET http://btdigg.org/search?info_hash=&q=%s HTTP/1.1\n",buf);
 	free(buf);
@@ -217,6 +237,7 @@ void get_bt(SMBOT_DATA *data)
 	{
 		msg_send("Sorry,连接远程服务器失败!",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 	res=match_string("magnet:\?xt=urn:btih:*.[^\"]*",buf);
@@ -231,6 +252,7 @@ void get_bt(SMBOT_DATA *data)
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_zip_code(SMBOT_DATA *data)
@@ -240,28 +262,31 @@ void get_zip_code(SMBOT_DATA *data)
 	char *buf;
 	char *temp;
 
+	null_and_help("!zip");
 	to_iconv("UTF-8//","GBK//",data->arg,strlen(data->arg),
 			code,80);
 	buf=string_add("http://opendata.baidu.com/post/s?wd=%s&p=mini&rn=20",code);
 	res=http_get_simple(buf,80);
 	free(buf);
 
-	buf=strstr(res,"begin");
+	buf=strstr(res,"href=\'s?wd=");
 	if(buf == NULL)
 	{
 		msg_send("Sorry,no result found!",data);
 		free(res);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 
-	temp=match_string("[0-9]\\{6\\}[^<]",buf);
-	free(buf);
+	temp=match_string("[0-9]\\{6\\}[^<]*",buf);
+	//free(buf);
 	if(temp == NULL)
 	{
 		msg_send("Sorry,no result found!",data);
 		free(res);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 	
@@ -269,6 +294,7 @@ void get_zip_code(SMBOT_DATA *data)
 	msg_send(temp,data);
 	free(temp);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_weather(SMBOT_DATA *data)
@@ -276,6 +302,7 @@ void get_weather(SMBOT_DATA *data)
 	char *res;
 	char *buf;
 
+	null_and_help("!weather");
 	buf=string_add("http://v.juhe.cn/weather/index?cityname=%s&key=6a046fb4af1c75fa2025d6887f10b113",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
@@ -284,6 +311,7 @@ void get_weather(SMBOT_DATA *data)
 		free(res);
 		msg_send("查询不到该城市的信息",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 
@@ -294,6 +322,7 @@ void get_weather(SMBOT_DATA *data)
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_stack(SMBOT_DATA *data)
@@ -304,6 +333,7 @@ void get_stack(SMBOT_DATA *data)
 	char *buf;
 	int i;
 
+	null_and_help("!stack");
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -314,15 +344,17 @@ void get_stack(SMBOT_DATA *data)
 	{
 		msg_send("Sorry,连接到远程服务器出错!",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 
-	buf=strstr(res,"Q: ");
+	buf=strstr(res,"<div class=\"result-link\">");
 	free(res);
 	if(buf == NULL)
 	{
 		msg_send("Sorry,no result found!",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 
@@ -334,6 +366,7 @@ void get_stack(SMBOT_DATA *data)
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_id_information(SMBOT_DATA *data)
@@ -341,6 +374,7 @@ void get_id_information(SMBOT_DATA *data)
 	char *res;
 	char *buf;
 
+	null_and_help("!id");
 	buf=string_add("http://apis.juhe.cn/idcard/index?key=94d452914f35a3cf94b6e28c36c76c77&cardno=%s",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
@@ -350,6 +384,7 @@ void get_id_information(SMBOT_DATA *data)
 	msg_send(buf,data);
 	free(buf);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void check_id_card(SMBOT_DATA *data)
@@ -358,6 +393,7 @@ void check_id_card(SMBOT_DATA *data)
 	pid_t pid;
 	int pipefd[2];
 
+	null_and_help("!checkid");
 	pipe(pipefd);
 	
 	if((pid=fork()) == 0)
@@ -375,26 +411,31 @@ void check_id_card(SMBOT_DATA *data)
 
 	msg_send(temp,data);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_url_encode(SMBOT_DATA *data)
 {
 	char *res;
 
+	null_and_help("!url");
 	res=url_encode(data->arg);
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_url_decode(SMBOT_DATA *data)
 {
 	char *res;
 
+	null_and_help("!deurl");
 	res=url_decode(data->arg);
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_joke(SMBOT_DATA *data)
@@ -404,6 +445,7 @@ void get_joke(SMBOT_DATA *data)
 	char temp[512];
 	int i;
 
+	null_and_help("!joke");
 	buf=string_add("http://www.fangtang8.com/?s=%s",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
@@ -422,6 +464,7 @@ void get_joke(SMBOT_DATA *data)
 			temp[i]=' ';
 	msg_send(temp,data);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_dream(SMBOT_DATA *data)
@@ -431,6 +474,7 @@ void get_dream(SMBOT_DATA *data)
 	int i;
 	pid_t pid;
 
+	null_and_help("!dream");
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -451,6 +495,7 @@ void get_dream(SMBOT_DATA *data)
 
 	msg_send(temp,data);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_song_url(SMBOT_DATA *data)
@@ -459,6 +504,7 @@ void get_song_url(SMBOT_DATA *data)
 	char *res;
 	char url[512];
 
+	null_and_help("!song");
 	buf=string_add("http://music.baidu.com/search?key=%s",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
@@ -470,6 +516,7 @@ void get_song_url(SMBOT_DATA *data)
 	
 	msg_send(url,data);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_bing(SMBOT_DATA *data)
@@ -481,6 +528,7 @@ void get_bing(SMBOT_DATA *data)
 	char *des;
 	HTTP *http;
 
+	null_and_help("!bing");
 	url=url_encode(data->arg);
 	http=http_head_init();
 	buf=string_add("GET /Bing/SearchWeb/v1/Web?Query=%%27%s%%27&$top=1&$skip=0&$format=json HTTP/1.1\n",url);
@@ -504,6 +552,7 @@ void get_bing(SMBOT_DATA *data)
 	free(url);
 	msg_send(res,data);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_google_image_url(SMBOT_DATA *data)
@@ -514,6 +563,7 @@ void get_google_image_url(SMBOT_DATA *data)
 	char *url;
 	int i;
 
+	null_and_help("!image");
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -532,6 +582,7 @@ void get_google_image_url(SMBOT_DATA *data)
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_google(SMBOT_DATA *data)
@@ -542,6 +593,7 @@ void get_google(SMBOT_DATA *data)
 	char *des;
 	int i;
 
+	null_and_help("!google");
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -554,6 +606,10 @@ void get_google(SMBOT_DATA *data)
 	free(res);
 
 	res=string_add("%s<--%s",url+8,des+11);
+	msg_send(res,data);
+	free(res);
+	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_baidu(SMBOT_DATA *data)
@@ -565,6 +621,7 @@ void get_baidu(SMBOT_DATA *data)
 	char *url;
 	int i;
 
+	null_and_help("!baidu");
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -590,7 +647,7 @@ void get_baidu(SMBOT_DATA *data)
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
-	
+	free(data->arg);
 }
 
 void get_bimg(SMBOT_DATA *data)
@@ -602,6 +659,7 @@ void get_bimg(SMBOT_DATA *data)
 	char *buf;
 	int i;
 
+	null_and_help("!bimg");
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -619,6 +677,7 @@ void get_bimg(SMBOT_DATA *data)
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_air(SMBOT_DATA *data)
@@ -626,6 +685,7 @@ void get_air(SMBOT_DATA *data)
 	char *buf;
 	char *res;
 
+	null_and_help("!air");
 	buf=string_add("http://web.juhe.cn/environment/air/cityair?city=%s&key=9b8bb61a933d5f3085a1b4b37b691a45",data->arg);
 	res=http_get_simple(buf,8080);
 	free(buf);
@@ -634,6 +694,7 @@ void get_air(SMBOT_DATA *data)
 		free(res);
 		msg_send("查询失败，检查城市名称是否有误，城市名称一定要用拼音哦",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 
@@ -642,6 +703,7 @@ void get_air(SMBOT_DATA *data)
 	msg_send(buf,data);
 	free(buf);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_website_testing(SMBOT_DATA *data)
@@ -649,6 +711,7 @@ void get_website_testing(SMBOT_DATA *data)
 	char *res;
 	char *buf;
 
+	null_and_help("!website");
 	buf=string_add("http://apis.juhe.cn/webscan/?domain=%s&key=f91b291d8924afa7461439b69b607177",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
@@ -657,6 +720,7 @@ void get_website_testing(SMBOT_DATA *data)
 		free(res);
 		msg_send("检测失败!",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 	buf=match_string("{\"state\":.[^\)]*",res);
@@ -664,6 +728,7 @@ void get_website_testing(SMBOT_DATA *data)
 	msg_send(buf,data);
 	free(buf);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_wifi(SMBOT_DATA *data)
@@ -671,6 +736,7 @@ void get_wifi(SMBOT_DATA *data)
 	char *buf;
 	char *res;
 
+	null_and_help("!wifi");
 	res=url_encode(data->arg);
 	buf=string_add("http://apis.juhe.cn/wifi/region?key=7ce6da553e4a515d6ac790c41887447a&city=%s",res);
 	free(res);
@@ -682,6 +748,7 @@ void get_wifi(SMBOT_DATA *data)
 		free(res);
 		msg_send("查询失败!",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 
@@ -690,6 +757,7 @@ void get_wifi(SMBOT_DATA *data)
 	msg_send(buf,data);
 	free(buf);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void get_train(SMBOT_DATA *data)
@@ -697,6 +765,7 @@ void get_train(SMBOT_DATA *data)
 	char *res;
 	char *buf;
 
+	null_and_help("!train");
 	buf=string_add("http://apis.juhe.cn/train/s?name=%s&key=718295ce3e1884d023b7f4e072a8945e",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
@@ -706,6 +775,7 @@ void get_train(SMBOT_DATA *data)
 		free(res);
 		msg_send("查询失败!",data);
 		smbot_destory(data);
+		free(data->arg);
 		return;
 	}
 	buf=match_string("\"name\":\".[^}]*",res);
@@ -713,6 +783,7 @@ void get_train(SMBOT_DATA *data)
 	msg_send(buf,data);
 	free(res);
 	smbot_destory(data);
+	free(data->arg);
 }
 
 void msg_send(const char *msg,SMBOT_DATA *data)
