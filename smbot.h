@@ -1,50 +1,52 @@
 #ifndef _SMBOT_H
 #define _SMBOT_H
 
-#include "dict.h"
-#include "query_ip.h"
-#include "get_man.h"
-#include "get_time.h"
-#include "torrent.h"
-#include "youku.h"
-#include "bt.h"
-#include "yb.h"
-#include "weather.h"
-#include "stack.h"
-#include "id.h"
-#include "checkid.h"
-#include "url.h"
-#include "joke.h"
-#include "dream.h"
-#include "song.h"
-#include "bing.h"
-#include "google.h"
-#include "image.h"
+#include "TaskFactory/taskfactory.h"
+#include "mysock/mysock.h"
 #include <signal.h>
-#include <regex.h>
+#include <time.h>
 
-#define SER "irc.freenode.net"
-#define PORT 6667
-#define NICK "NICK smbot\n"
-#define USER "USER smbot sbmot irc.freenode.net :smbot\n"
-#define JOIN_DEBIAN_CN "JOIN #debian_cn\n"
-#define JOIN_LINUXBA "JOIN #linuxba\n"
-#define JOIN_LINUXBAR "JOIN #linuxbar\n"
-#define JOIN_LINUKSO "JOIN #linukso\n"
-#define MSG "PRIVMSG "
+#define QUIT_MSG "如果一切都变成了或许，谁还会记得曾经\n"
 
 int sockfd;
-pid_t pid;
+SSL *ssl;
+
+typedef HTTP CHANNEL;
+
+typedef struct
+{
+	char *nick;
+	char *channel;
+	char *arg;
+	bool is_use_ssl;
+}SMBOT_DATA;
 
 void msgto(int sockfd,const char *channel,const char *nick,
 		const char *msg);
 
-char *get_nick(char *msg);
+void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
+		const char *msg);
 
-char *get_channel(char *msg);
+char *get_nick(char *msg);
 
 char *get_arg(char *buf,char *prg,char *des);
 
-void pong_ser(int sockfd,char *msg);
+void pong_server(char *msg,bool is_use_ssl);
+
+char *get_channel(char *msg);
+
+void smbot_list(const char *msg,bool is_use_ssl);
+
+void smbot_help(const char *msg,bool is_use_ssl);
+
+void parse_and_perform(TASK_FACTORY *task,char *msg,char *reg,
+		char *des,task_callback func,bool is_use_ssl,
+		unsigned int priority);
+
+void smbot_destory(SMBOT_DATA *data);
+
+void null_no_free(char *p);
+
+void time_keeping(CHANNEL *channel,bool is_use_ssl);
 
 #endif

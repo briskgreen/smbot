@@ -303,7 +303,7 @@ void get_weather(SMBOT_DATA *data)
 	char *buf;
 
 	null_and_help("!weather");
-	buf=string_add("http://v.juhe.cn/weather/index?cityname=%s&key=6a046fb4af1c75fa2025d6887f10b113",data->arg);
+	buf=string_add("http://v.juhe.cn/weather/index?cityname=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
 	if(strstr(res,"resultcode\":\"202\""))
@@ -375,7 +375,7 @@ void get_id_information(SMBOT_DATA *data)
 	char *buf;
 
 	null_and_help("!id");
-	buf=string_add("http://apis.juhe.cn/idcard/index?key=94d452914f35a3cf94b6e28c36c76c77&cardno=%s",data->arg);
+	buf=string_add("http://apis.juhe.cn/idcard/index?key=your api key&cardno=%s",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
 
@@ -416,12 +416,12 @@ void check_id_card(SMBOT_DATA *data)
 
 void get_url_encode(SMBOT_DATA *data)
 {
-	char *res;
+	char *url;
 
 	null_and_help("!url");
-	res=url_encode(data->arg);
-	msg_send(res,data);
-	free(res);
+	url=url_encode(data->arg);
+	msg_send(url,data);
+	free(url);
 	smbot_destory(data);
 	free(data->arg);
 }
@@ -503,14 +503,18 @@ void get_song_url(SMBOT_DATA *data)
 	char *buf;
 	char *res;
 	char url[512];
+	char *code;
 
 	null_and_help("!song");
-	buf=string_add("http://music.baidu.com/search?key=%s",data->arg);
+	code=url_encode(data->arg);
+	buf=string_add("http://music.baidu.com/search?key=%s",code);
+	free(code);
 	res=http_get_simple(buf,80);
 	free(buf);
 
 	buf=match_string("<a href=\"/song/.[^\"]*",res);
 	free(res);
+	printf("%s\n",buf);
 	strreplace(buf,"<a href=\"","http://music.baidu.com",url,512);
 	free(buf);
 	
@@ -531,22 +535,23 @@ void get_bing(SMBOT_DATA *data)
 	null_and_help("!bing");
 	url=url_encode(data->arg);
 	http=http_head_init();
-	buf=string_add("GET /Bing/SearchWeb/v1/Web?Query=%%27%s%%27&$top=1&$skip=0&$format=json HTTP/1.1\n",url);
+	res=string_add("GET /Bing/SearchWeb/v1/Web?Query=%%27%s%%27&$top=1&$skip=0&$format=json HTTP/1.1\n",url);
 	free(url);
-	http_head_add(http,buf);
-	free(buf);
+	http_head_add(http,res);
+	//free(buf);
 	http_head_add(http,"Host: api.datamarket.azure.com\n");
 	http_head_add(http,"Accept: */*\n");
 	http_head_add(http,BING_AU);
 	http_head_add(http,"Connection: close\n\n");
 
 	buf=https_perform(http,"api.datamarket.azure.com",443,NULL,NULL);
+	free(res);
 	title=match_string("\"Title\":\".[^\"]*",buf);
 	des=match_string("\"Description\":\".[^\"]*",buf);
 	url=match_string("\"Url\":\".[^\"]*",buf);
 	free(buf);
 
-	res=string_add("%s<->%s-->%s",title+9,url+8,des+15);
+	res=string_add("%s<->%s-->%s",title+9,url+7,des+15);
 	free(title);
 	free(des);
 	free(url);
@@ -575,7 +580,7 @@ void get_google_image_url(SMBOT_DATA *data)
 	url=match_string("\"link\": \".[^\"]*",res);
 	des=match_string("\"snippet\": \".[^\"]*",res);
 	free(res);
-	res=string_add("%s<--%s",des+11,url+8);
+	res=string_add("%s<--%s",des+12,url+9);
 	free(des);
 	free(url);
 
@@ -604,8 +609,16 @@ void get_google(SMBOT_DATA *data)
 	url=match_string("\"link\": \".[^\"]*",res);
 	des=match_string("\"snippet\": \".[^\"]*",res);
 	free(res);
+	if(url == NULL || des == NULL)
+	{
+		null_no_free(url);
+		null_no_free(des);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
 
-	res=string_add("%s<--%s",url+8,des+11);
+	res=string_add("%s<--%s",url+9,des+12);
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
@@ -616,7 +629,8 @@ void get_baidu(SMBOT_DATA *data)
 {
 	char *buf;
 	char *res;
-	char temp[512];
+	char temp[512]={0};
+	char ti[512]={0};
 	char *title;
 	char *url;
 	int i;
@@ -639,9 +653,10 @@ void get_baidu(SMBOT_DATA *data)
 	bzero(temp,512);
 	to_iconv("GB18030//","UTF-8//IGNORE",buf,strlen(buf),temp,512);
 	free(buf);
-
-	res=string_add("%s<->%s---%s",title,url,temp);
+	to_iconv("GB18030//","UTF-8//IGNORE",title+6,strlen(title),ti,512);
 	free(title);
+
+	res=string_add("%s<->%s---%s",ti,url+6,temp);
 	free(url);
 
 	msg_send(res,data);
@@ -664,15 +679,15 @@ void get_bimg(SMBOT_DATA *data)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
 
-	buf=string_add("http://image.baidu.com/i?tn=baiduimageson&ipn=r&ct=201326592&cl=2&lm=-1&st=-1&fm=result&fr=&sf=1&fmq=1376411397766_R&pv=&ic=0&nc=1&z=&se=1&showtab=0&fb=0&width=&height=&face=0&istype=2&ie=utf-8&word=%s&pn=1&rn=1",data->arg);
+	buf=string_add("http://image.baidu.com/i?tn=baiduimagejson&ipn=r&ct=201326592&cl=2&lm=-1&st=-1&fm=result&fr=&sf=1&fmq=1376411397766_R&pv=&ic=0&nc=1&z=&se=1&showtab=0&fb=0&width=&height=&face=0&istype=2&ie=utf-8&word=%s&pn=1&rn=1",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
 	url=match_string("\"objURL\":\".[^\"]*",res);
 	title=match_string("\"fromPageTitleEnc\":\".[^\"]*",res);
 	free(res);
-	to_iconv("GB18030//","UTF-8//IGNORE",title+20,strlen(title)-20,temp,512);
+	to_iconv("GB18030//","UTF-8//IGNORE",title+21,strlen(title)-21,temp,512);
 	free(title);
-	res=string_add("%s<--%s",temp,url);
+	res=string_add("%s<--%s",temp,url+10);
 	free(url);
 	msg_send(res,data);
 	free(res);
@@ -686,7 +701,7 @@ void get_air(SMBOT_DATA *data)
 	char *res;
 
 	null_and_help("!air");
-	buf=string_add("http://web.juhe.cn/environment/air/cityair?city=%s&key=9b8bb61a933d5f3085a1b4b37b691a45",data->arg);
+	buf=string_add("http://web.juhe.cn/environment/air/cityair?city=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,8080);
 	free(buf);
 	if(!strstr(res,"SUCCESSED!"))
@@ -712,7 +727,7 @@ void get_website_testing(SMBOT_DATA *data)
 	char *buf;
 
 	null_and_help("!website");
-	buf=string_add("http://apis.juhe.cn/webscan/?domain=%s&key=f91b291d8924afa7461439b69b607177",data->arg);
+	buf=string_add("http://apis.juhe.cn/webscan/?domain=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
 	if(!strstr(res,"Successed!"))
@@ -738,10 +753,11 @@ void get_wifi(SMBOT_DATA *data)
 
 	null_and_help("!wifi");
 	res=url_encode(data->arg);
-	buf=string_add("http://apis.juhe.cn/wifi/region?key=7ce6da553e4a515d6ac790c41887447a&city=%s",res);
+	buf=string_add("http://apis.juhe.cn/wifi/region?key=your api key&city=%s",res);
 	free(res);
 	res=http_get_simple(buf,80);
 	free(buf);
+	printf("%s\n",res);
 
 	if(!strstr(res,"Return Successd!"))
 	{
@@ -766,7 +782,7 @@ void get_train(SMBOT_DATA *data)
 	char *buf;
 
 	null_and_help("!train");
-	buf=string_add("http://apis.juhe.cn/train/s?name=%s&key=718295ce3e1884d023b7f4e072a8945e",data->arg);
+	buf=string_add("http://apis.juhe.cn/train/s?name=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
 
@@ -781,6 +797,47 @@ void get_train(SMBOT_DATA *data)
 	buf=match_string("\"name\":\".[^}]*",res);
 	free(res);
 	msg_send(buf,data);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+void get_sm_message(SMBOT_DATA *data)
+{
+	char *res;
+	char *buf;
+	char temp[512];
+	int i;
+
+	null_and_help("!sm");
+	for(i=0;data->arg[i];++i)
+		if(data->arg[i] == ' ')
+			data->arg[i]='+';
+
+	buf=string_add("http://xiaofengrobot.sinaapp.com/web.php?callback=jQuery191041205509454157474_1376842442554&para=%s&_=1376842442555",data->arg);
+	res=http_get_simple(buf,80);
+	free(buf);
+	if(res == NULL)
+	{
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
+	buf=match_string("test(\".[^\"]*",res);
+	free(res);
+	if(buf == NULL)
+	{
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+	res=unicode_to_utf(buf+6);
+	free(buf);
+
+	if(strreplace(res,"<br>","",temp,511) != -1)
+		msg_send(temp,data);
+	else
+		msg_send(res,data);
 	free(res);
 	smbot_destory(data);
 	free(data->arg);
