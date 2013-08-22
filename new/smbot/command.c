@@ -1,11 +1,28 @@
 #include "command.h"
 
+#define null_and_help(msg_arg) \
+{\
+	if(data->arg == NULL)\
+	{\
+		smbot_destory(data);\
+		return;\
+	}\
+	if(strstr(data->arg,msg_arg))\
+	{\
+		msg_send(data->arg,data);\
+		smbot_destory(data);\
+		return;\
+	}\
+}
+
 void msg_send(const char *msg,SMBOT_DATA *data);
 
 void get_man_url(SMBOT_DATA *data)
 {
 	char *buf;
 	char *res;
+
+	null_and_help("!man");
 
 	if((data->arg[0] <= '9' && data->arg[0] >= '1') && data->arg[1] == ' ')
 		buf=string_add("term=%s&section=%c&submitted=1\n\n",

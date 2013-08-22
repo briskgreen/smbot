@@ -185,7 +185,8 @@ void smbot_destory(SMBOT_DATA *data)
 {
 	null_no_free(data->nick);
 	null_no_free(data->channel);
-	null_no_free(data->arg);
+	/*if(!strstr(data->arg,arg))
+		null_no_free(data->arg);*/
 	safe_free((void **)&data);
 }
 
