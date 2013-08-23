@@ -551,7 +551,7 @@ void get_bing(SMBOT_DATA *data)
 	url=match_string("\"Url\":\".[^\"]*",buf);
 	free(buf);
 
-	res=string_add("%s<->%s-->%s",title+9,url+7,des+15);
+	res=string_add("%s<->%s -->%s",title+9,url+7,des+15);
 	free(title);
 	free(des);
 	free(url);
@@ -618,7 +618,7 @@ void get_google(SMBOT_DATA *data)
 		return;
 	}
 
-	res=string_add("%s<--%s",url+9,des+12);
+	res=string_add("%s <--%s",url+9,des+12);
 	msg_send(res,data);
 	free(res);
 	smbot_destory(data);
@@ -656,7 +656,7 @@ void get_baidu(SMBOT_DATA *data)
 	to_iconv("GB18030//","UTF-8//IGNORE",title+6,strlen(title),ti,512);
 	free(title);
 
-	res=string_add("%s<->%s---%s",ti,url+6,temp);
+	res=string_add("%s<->%s ---%s",ti,url+6,temp);
 	free(url);
 
 	msg_send(res,data);
