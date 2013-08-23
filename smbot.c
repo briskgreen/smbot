@@ -7,6 +7,8 @@ void time_send_sock(int sockfd,CHANNEL *channel,char *msg);
 void msgto(int sockfd,const char *channel,const char *nick,
 		const char *msg)
 {
+	task_factory_entry();
+
 	int len;
 	int n=0;
 	char *buf=NULL;
@@ -25,11 +27,15 @@ void msgto(int sockfd,const char *channel,const char *nick,
 		free(buf);
 		free(temp);
 	}while(len > 400);
+
+	task_factory_leave();
 }
 
 void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 		const char *msg)
 {
+	task_factory_entry();
+
 	int len;
 	int n=0;
 	char *buf=NULL;
@@ -47,6 +53,8 @@ void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 		free(buf);
 		free(temp);
 	}while(len > 400);
+
+	task_factory_leave();
 }
 
 char *get_nick(char *msg)
@@ -103,9 +111,15 @@ void pong_server(char *msg,bool is_use_ssl)
 	msg[1]='O';
 
 	if(is_use_ssl)
+	{
 		SSL_write(ssl,msg,strlen(msg));
+		SSL_write(ssl,"\n",1);
+	}
 	else
+	{
 		send(sockfd,msg,strlen(msg),0);
+		send(sockfd,"\n",1,0);
+	}
 
 	free(msg);
 }
@@ -202,7 +216,7 @@ void null_no_free(char *p)
 		free(p);
 }
 
-void time_keeping(SSL *ssl,int sockfd,bool is_use_ssl)
+void time_keeping(bool *is_use_ssl)
 {
 	struct tm *ti;
 	time_t t;
@@ -242,7 +256,7 @@ void time_keeping(SSL *ssl,int sockfd,bool is_use_ssl)
 
 		if(ti->tm_min ==0 && ti->tm_sec == 0)
 		{
-			if(is_use_ssl)
+			if(*is_use_ssl)
 				time_send_ssl(ssl,channel,msg[ti->tm_hour % 24]);
 			else
 				time_send_sock(sockfd,channel,msg[ti->tm_hour % 24]);
@@ -292,6 +306,8 @@ void get_channel_list(CHANNEL *channel)
 
 void time_send_ssl(SSL *ssl,CHANNEL *channel,char *msg)
 {
+	task_factory_entry();
+
 	char *res;
 
 	while(channel->next != NULL)
@@ -302,10 +318,14 @@ void time_send_ssl(SSL *ssl,CHANNEL *channel,char *msg)
 		SSL_write(ssl,res,strlen(res));
 		free(res);
 	}
+
+	task_factory_leave();
 }
 
 void time_send_sock(int sockfd,CHANNEL *channel,char *msg)
 {
+	task_factory_entry();
+
 	char *res;
 
 	while(channel->next != NULL)
@@ -316,4 +336,6 @@ void time_send_sock(int sockfd,CHANNEL *channel,char *msg)
 		send(sockfd,res,strlen(res),0);
 		free(res);
 	}
+
+	task_factory_leave();
 }

@@ -1,7 +1,6 @@
 #include "config.h"
 
 bool is_use_ssl=FALSE;
-pid_t pid;
 
 #define parse_arg(reg,des,func,priority) \
 {\
@@ -23,8 +22,6 @@ void quit(int signum)
 		close(sockfd);
 	}
 	
-	kill(pid,SIGKILL);
-
 	exit(-1);
 }
 
@@ -138,9 +135,8 @@ int main(int argc,char **argv)
 		safe_send_data(ssl,conf);
 	else
 		send_data(sockfd,conf);
-	//smbot_conf_close(conf);
-	if((pid=fork())== 0)
-		time_keeping(ssl,sockfd,is_use_ssl);
+
+	task_factory_add(task,time_keeping,&is_use_ssl,1);
 	smbot_conf_close(conf);
 
 	while(1)
@@ -241,7 +237,7 @@ int main(int argc,char **argv)
 			continue;
 		}
 
-		if(strstr(data,"!smbot"))
+		if(strstr(data,"!help smbot"))
 		{
 			smbot_help(data,is_use_ssl);
 			free(data);
