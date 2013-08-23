@@ -656,7 +656,7 @@ void get_baidu(SMBOT_DATA *data)
 	to_iconv("GB18030//","UTF-8//IGNORE",title+6,strlen(title),ti,512);
 	free(title);
 
-	res=string_add("%s<->%s ---%s",ti,url+6,temp);
+	res=string_add("%s<->%s ---%s",ti,url+5,temp);
 	free(url);
 
 	msg_send(res,data);
