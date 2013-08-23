@@ -140,7 +140,7 @@ int main(int argc,char **argv)
 		send_data(sockfd,conf);
 	//smbot_conf_close(conf);
 	if((pid=fork())== 0)
-		time_keeping(conf->channel,is_use_ssl);
+		time_keeping(ssl,sockfd,is_use_ssl);
 	smbot_conf_close(conf);
 
 	while(1)

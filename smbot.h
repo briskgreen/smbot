@@ -47,6 +47,6 @@ void smbot_destory(SMBOT_DATA *data);
 
 void null_no_free(char *p);
 
-void time_keeping(CHANNEL *channel,bool is_use_ssl);
+void time_keeping(SSL *ssl,int sockfd,bool is_use_ssl);
 
 #endif

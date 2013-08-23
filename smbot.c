@@ -1,5 +1,9 @@
 #include "smbot.h"
 
+void get_channel_list(CHANNEL *channel);
+void time_send_ssl(SSL *ssl,CHANNEL *channel,char *msg);
+void time_send_sock(int sockfd,CHANNEL *channel,char *msg);
+
 void msgto(int sockfd,const char *channel,const char *nick,
 		const char *msg)
 {
@@ -198,10 +202,11 @@ void null_no_free(char *p)
 		free(p);
 }
 
-void time_keeping(CHANNEL *channel,bool is_use_ssl)
+void time_keeping(SSL *ssl,int sockfd,bool is_use_ssl)
 {
 	struct tm *ti;
 	time_t t;
+	CHANNEL *channel;
 	char *msg[]={"\1ACTION 0点了，再不碎觉，饥佬们小心不生精啊，腐女们小心会平胸哦!\1",
 	"\1ACTION 1点了，还没有睡？正是发福利的好时间!\1",
 	"\1ACTION 2点了，这个点还没睡觉，注定孤独一生!\1",
@@ -227,6 +232,9 @@ void time_keeping(CHANNEL *channel,bool is_use_ssl)
 	"\1ACTION 22点了，来点福利吧!\1",
 	"\1ACTION 23点了，往事历历在目，让我终于醒悟，光棍还是很有前途，跟着狐朋狗友大家抽烟喝酒，一玩一宿，不用发愁!\1",NULL};
 
+	channel=http_head_init();
+	get_channel_list(channel);
+
 	while(1)
 	{
 		t=time(NULL);
@@ -235,37 +243,77 @@ void time_keeping(CHANNEL *channel,bool is_use_ssl)
 		if(ti->tm_min ==0 && ti->tm_sec == 0)
 		{
 			if(is_use_ssl)
-			{
-				char *temp;
-
-				while(channel->next != NULL)
-				{
-					channel=channel->next;
-
-					temp=string_add("PRIVMSG %s:%s\n",
-							channel->element,
-							msg[ti->tm_hour % 14]);
-					SSL_write(ssl,temp,strlen(temp));
-					free(temp);
-				}
-			}
+				time_send_ssl(ssl,channel,msg[ti->tm_hour % 24]);
 			else
-			{
-				char *temp;
-				
-				while(channel->next != NULL)
-				{
-					channel=channel->next;
-
-					temp=string_add("PRIVMSG %s:%s\n",
-							channel->element,
-							msg[ti->tm_hour % 24]);
-					send(sockfd,temp,strlen(temp),0);
-					free(temp);
-				}
-			}
+				time_send_sock(sockfd,channel,msg[ti->tm_hour % 24]);
 		}
 
 		sleep(1);
+	}
+}
+
+void get_channel_list(CHANNEL *channel)
+{
+	FILE *fp;
+	char buf[1024]={0};
+	char *res;
+	int len;
+	int n=0;
+	char temp[512]={0};
+
+	if((fp=fopen(".config","rb")) == NULL)
+		_exit(-1);
+	fseek(fp,0L,SEEK_END);
+	len=ftell(fp);
+	rewind(fp);
+	fread(buf,len,1,fp);
+	fclose(fp);
+
+	res=strstr(buf,"channel #");
+
+	for(len=8;res[len];++len)
+	{
+		temp[n]=res[len];
+
+		if(res[len] == ' ' || res[len] == '\n')
+		{
+			char *t;
+
+			t=strnstr(temp,n);
+			http_head_add(channel,t);
+			n=0;
+			bzero(temp,sizeof(temp));
+			continue;
+		}
+
+		++n;
+	}
+}
+
+void time_send_ssl(SSL *ssl,CHANNEL *channel,char *msg)
+{
+	char *res;
+
+	while(channel->next != NULL)
+	{
+		channel=channel->next;
+
+		res=string_add("PRIVMSG %s :%s\n",channel->element,msg);
+		SSL_write(ssl,res,strlen(res));
+		free(res);
+	}
+}
+
+void time_send_sock(int sockfd,CHANNEL *channel,char *msg)
+{
+	char *res;
+
+	while(channel->next != NULL)
+	{
+		channel=channel->next;
+
+		res=string_add("PRIVMSG %s :%s\n",channel->element,msg);
+		send(sockfd,res,strlen(res),0);
+		free(res);
 	}
 }
