@@ -228,7 +228,7 @@ int main(int argc,char **argv)
 			parse_arg("PRIVMSG #[^ ]* :!train","!train <车次> 功能:火车时刻表查询",get_train,1);
 
 		if(strstr(data,"!sm"))
-			parse_arg("PRIVMSG #[^ ]* :!sm","!sm <你想要说的话> 功能:与机器人对话，使用\'问题%A:答案\'方式可调教机器人",get_sm_message,1);
+			parse_arg("PRIVMSG #[^ ]* :!sm","!sm <你想要说的话> 功能:与机器人对话，使用\'问题:答案\'方式可调教机器人",get_sm_message,1);
 
 		if(strstr(data,"!list"))
 		{
