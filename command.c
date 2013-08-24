@@ -823,6 +823,15 @@ void get_sm_message(SMBOT_DATA *data)
 		return;
 	}
 
+	if(strstr(res,"504 Gateway Time-out") && strstr(res,"503 Service Unavailable"))
+	{
+		msg_send("哎呀，机器人好像出了点小状况，休息片刻再来调戏吧!",data);
+		free(res);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
 	buf=match_string("test(\".[^\"]*",res);
 	free(res);
 	if(buf == NULL)
