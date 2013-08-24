@@ -685,6 +685,16 @@ void get_bimg(SMBOT_DATA *data)
 	url=match_string("\"objURL\":\".[^\"]*",res);
 	title=match_string("\"fromPageTitleEnc\":\".[^\"]*",res);
 	free(res);
+	if(url == NULL || title == NULL)
+	{
+		null_no_free(url);
+		null_no_free(title);
+		msg_send("查询失败!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
 	to_iconv("GB18030//","UTF-8//IGNORE",title+21,strlen(title)-21,temp,512);
 	free(title);
 	res=string_add("%s<--%s",temp,url+10);
