@@ -6,7 +6,7 @@
 #include <signal.h>
 #include <time.h>
 
-#define QUIT_MSG "如果一切都变成了或许，谁还会记得曾经\n"
+#define QUIT_MSG "QUIT :如果一切都变成了或许，谁还会记得曾经!\n"
 
 int sockfd;
 SSL *ssl;
