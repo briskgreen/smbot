@@ -576,6 +576,13 @@ void get_google_image_url(SMBOT_DATA *data)
 	buf=string_add("https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s&searchType=image",GOOGLE_KEY,data->arg);
 	res=https_get_simple(buf,443);
 	free(buf);
+	if(res == NULL)
+	{
+		msg_send("查询失败!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
 
 	url=match_string("\"link\": \".[^\"]*",res);
 	des=match_string("\"snippet\": \".[^\"]*",res);
@@ -824,14 +831,8 @@ void get_sm_message(SMBOT_DATA *data)
 			data->arg[i]='+';
 
 	buf=string_add("http://xiaofengrobot.sinaapp.com/web.php?callback=jQuery191041205509454157474_1376842442554&para=%s&_=1376842442555",data->arg);
-	res=http_get_simple(buf,80);
+	while((res=http_get_simple(buf,80)) != NULL);
 	free(buf);
-	if(res == NULL)
-	{
-		smbot_destory(data);
-		free(data->arg);
-		return;
-	}
 
 	if(strstr(res,"504 Gateway Time-out") && strstr(res,"503 Service Unavailable"))
 	{
