@@ -268,6 +268,13 @@ void get_zip_code(SMBOT_DATA *data)
 	buf=string_add("http://opendata.baidu.com/post/s?wd=%s&p=mini&rn=20",code);
 	res=http_get_simple(buf,80);
 	free(buf);
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
 
 	buf=strstr(res,"href=\'s?wd=");
 	if(buf == NULL)
@@ -306,6 +313,15 @@ void get_weather(SMBOT_DATA *data)
 	buf=string_add("http://v.juhe.cn/weather/index?cityname=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
+
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
 	if(strstr(res,"resultcode\":\"202\""))
 	{
 		free(res);
@@ -378,6 +394,13 @@ void get_id_information(SMBOT_DATA *data)
 	buf=string_add("http://apis.juhe.cn/idcard/index?key=your api key&cardno=%s",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
 
 	buf=match_string("area.[^{]*",res);
 	free(res);
@@ -449,6 +472,13 @@ void get_joke(SMBOT_DATA *data)
 	buf=string_add("http://www.fangtang8.com/?s=%s",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
 
 	buf=match_string("<p>.[^\\s]*</p>",res);
 	free(res);
@@ -511,6 +541,13 @@ void get_song_url(SMBOT_DATA *data)
 	free(code);
 	res=http_get_simple(buf,80);
 	free(buf);
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
 
 	buf=match_string("<a href=\"/song/.[^\"]*",res);
 	free(res);
@@ -545,7 +582,16 @@ void get_bing(SMBOT_DATA *data)
 	http_head_add(http,"Connection: close\n\n");
 
 	buf=https_perform(http,"api.datamarket.azure.com",443,NULL,NULL);
+	http_head_destroy(http);
 	free(res);
+	if(buf == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
 	title=match_string("\"Title\":\".[^\"]*",buf);
 	des=match_string("\"Description\":\".[^\"]*",buf);
 	url=match_string("\"Url\":\".[^\"]*",buf);
@@ -671,6 +717,14 @@ void get_baidu(SMBOT_DATA *data)
 	buf=string_add("http://www.baidu.com/s?wd=%s&rsv_spt=1&issp=1&rsv_bp=0&ie=utf-8&tn=baidujson&rn=1",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
 	url=match_string("uri:\".[^\"]*",res);
 	title=match_string("title:\".[^\"]*",res);
 	buf=match_string("comment:\".[^\"]*",res);
@@ -781,6 +835,14 @@ void get_website_testing(SMBOT_DATA *data)
 	buf=string_add("http://apis.juhe.cn/webscan/?domain=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
 	if(!strstr(res,"Successed!"))
 	{
 		free(res);
@@ -808,7 +870,13 @@ void get_wifi(SMBOT_DATA *data)
 	free(res);
 	res=http_get_simple(buf,80);
 	free(buf);
-	printf("%s\n",res);
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
 
 	if(!strstr(res,"Return Successd!"))
 	{
@@ -836,6 +904,13 @@ void get_train(SMBOT_DATA *data)
 	buf=string_add("http://apis.juhe.cn/train/s?name=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
 
 	if(!strstr(res,"Successed!"))
 	{
