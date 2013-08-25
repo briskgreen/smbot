@@ -566,6 +566,7 @@ void get_google_image_url(SMBOT_DATA *data)
 	char *buf;
 	char *des;
 	char *url;
+	HTTP *http;
 	int i;
 
 	null_and_help("!image");
@@ -573,8 +574,14 @@ void get_google_image_url(SMBOT_DATA *data)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
 
-	buf=string_add("https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s&searchType=image",GOOGLE_KEY,data->arg);
-	res=https_get_simple(buf,443);
+	buf=string_add("GET https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s&searchType=image HTTP/1.1\n",GOOGLE_KEY,data->arg);
+	//res=https_get_simple(buf,443);
+	http=http_head_init();
+	http_head_add(http,buf);
+	http_head_add(http,"Accept: */*\m");
+	http_head_add(http,"Connection: close\n\n");
+	res=http_perform(http,"127.0.0.1",8087);
+	http_head_destroy(http);
 	free(buf);
 	if(res == NULL)
 	{
@@ -603,15 +610,29 @@ void get_google(SMBOT_DATA *data)
 	char *url;
 	char *buf;
 	char *des;
+	HTTP *http;
 	int i;
 
 	null_and_help("!google");
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
-	buf=string_add("https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s",GOOGLE_KEY,data->arg);
-	res=https_get_simple(buf,443);
+	buf=string_add("GET https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s HTTP/1.1\n",GOOGLE_KEY,data->arg);
+	//res=https_get_simple(buf,443);
+	http=http_head_init();
+	http_head_add(http,buf);
+	http_head_add(http,"Accept: */*\n");
+	http_head_add(http,"Connection: close\n\n");
+	res=http_perform(http,"127.0.0.1",8087);
+	http_head_destroy(http);
 	free(buf);
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
 
 	url=match_string("\"link\": \".[^\"]*",res);
 	des=match_string("\"snippet\": \".[^\"]*",res);
