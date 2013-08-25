@@ -831,7 +831,7 @@ void get_sm_message(SMBOT_DATA *data)
 			data->arg[i]='+';
 
 	buf=string_add("http://xiaofengrobot.sinaapp.com/web.php?callback=jQuery191041205509454157474_1376842442554&para=%s&_=1376842442555",data->arg);
-	while((res=http_get_simple(buf,80)) != NULL);
+	while((res=http_get_simple(buf,80)) == NULL);
 	free(buf);
 
 	if(strstr(res,"504 Gateway Time-out") && strstr(res,"503 Service Unavailable"))
