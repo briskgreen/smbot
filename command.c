@@ -682,6 +682,19 @@ void get_baidu(SMBOT_DATA *data)
 	to_iconv("GB18030//","UTF-8//IGNORE",buf,strlen(buf),temp,512);
 	free(buf);
 	to_iconv("GB18030//","UTF-8//IGNORE",title+6,strlen(title),ti,512);
+
+	if(strstr(temp,"<strong>"))
+	{
+		buf=string_add("%s",temp);
+		bzero(temp,sizeof(temp));
+		strreplace(buf,"<strong>"," ",temp,sizeof(temp));
+		free(buf);
+		buf=string_add("%s",temp);
+		bzero(temp,sizeof(temp));
+		strreplace(buf,"<\\/strong>"," ",temp,sizeof(temp));
+		free(buf);
+	}
+
 	free(title);
 
 	res=string_add("%s<->%s ---%s",ti,url+5,temp);
