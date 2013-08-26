@@ -192,7 +192,7 @@ int main(int argc,char **argv)
 			parse_arg("PRIVMSG #[^ ]* :!deurl","!deurl <url编码> 功能:url解码",get_url_decode,5);
 
 		if(strstr(data,"!joke"))
-			parse_arg("PRIVMSG #[^ ]* :!join","!join <关键词> 功能:返回一个小笑话",get_joke,2);
+			parse_arg("PRIVMSG #[^ ]* :!joke","!joke <关键词> 功能:返回一个小笑话",get_joke,2);
 
 		if(strstr(data,"!dream"))
 			parse_arg("PRIVMSG #[^ ]* :!dream","!dream <关键词> 功能:周公解梦",get_dream,2);
