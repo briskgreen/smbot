@@ -333,6 +333,14 @@ void get_weather(SMBOT_DATA *data)
 
 	buf=match_string("temperature.*uv_index",res);
 	free(res);
+	if(buf == NULL)
+	{
+		msg_send("查询出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
 	res=strnstr(buf,-11);
 	free(buf);
 	msg_send(res,data);
