@@ -11,22 +11,24 @@ void msgto(int sockfd,const char *channel,const char *nick,
 
 	int len;
 	int n=0;
+	int send_n=0;
 	char *buf=NULL;
 	char *temp;
 
 	len=strlen(msg);
 
-	do
+	while(len >= 0)
 	{
-		buf=strnstr(msg+n,400);
+		buf=strnstr(msg+send_n,300);
 		temp=string_add("PRIVMSG %s :%s: %s\n",
-				channel,nick,buf+n);
+				channel,nick,buf);
 
 		n=send(sockfd,temp,strlen(temp),0);
 		len-=n;
+		send_n+=n;
 		free(buf);
 		free(temp);
-	}while(len > 400);
+	};
 
 	task_factory_leave();
 }
@@ -37,22 +39,24 @@ void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 	task_factory_entry();
 
 	int len;
-	int n=0;
+	int n;
+	int send_n=0;
 	char *buf=NULL;
 	char *temp;
 
 	len=strlen(msg);
 
-	do
+	while(len >= 0)
 	{
-		buf=strnstr(msg+n,400);
+		buf=strnstr(msg+send_n,300);
 		temp=string_add("PRIVMSG %s :%s: %s\n",
-				channel,nick,buf+n);
+				channel,nick,buf);
 		n=SSL_write(ssl,temp,strlen(temp));
 		len-=n;
+		send_n+=n;
 		free(buf);
 		free(temp);
-	}while(len > 400);
+	};
 
 	task_factory_leave();
 }
