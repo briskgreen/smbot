@@ -313,7 +313,6 @@ void get_weather(SMBOT_DATA *data)
 	buf=string_add("http://v.juhe.cn/weather/index?cityname=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
-
 	if(res == NULL)
 	{
 		msg_send("连接到远程服务器出错!",data);
@@ -559,7 +558,6 @@ void get_song_url(SMBOT_DATA *data)
 
 	buf=match_string("<a href=\"/song/.[^\"]*",res);
 	free(res);
-	printf("%s\n",buf);
 	strreplace(buf,"<a href=\"","http://music.baidu.com",url,512);
 	free(buf);
 	
@@ -590,7 +588,6 @@ void get_bing(SMBOT_DATA *data)
 	http_head_add(http,"Connection: close\n\n");
 
 	buf=https_perform(http,"api.datamarket.azure.com",443,NULL,NULL);
-	http_head_destroy(http);
 	free(res);
 	if(buf == NULL)
 	{
@@ -629,14 +626,16 @@ void get_google_image_url(SMBOT_DATA *data)
 			data->arg[i]='+';
 
 	buf=string_add("GET https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s&searchType=image HTTP/1.1\n",GOOGLE_KEY,data->arg);
-	//res=https_get_simple(buf,443);
+	/*res=https_get_simple(buf,443);
+	free(buf);*/
 	http=http_head_init();
 	http_head_add(http,buf);
-	http_head_add(http,"Accept: */*\m");
+	http_head_add(http,"Accept: */*\n");
 	http_head_add(http,"Connection: close\n\n");
 	res=http_perform(http,"127.0.0.1",8087);
 	http_head_destroy(http);
 	free(buf);
+
 	if(res == NULL)
 	{
 		msg_send("查询失败!",data);
@@ -644,7 +643,6 @@ void get_google_image_url(SMBOT_DATA *data)
 		free(data->arg);
 		return;
 	}
-
 	url=match_string("\"link\": \".[^\"]*",res);
 	des=match_string("\"snippet\": \".[^\"]*",res);
 	free(res);
@@ -672,7 +670,8 @@ void get_google(SMBOT_DATA *data)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
 	buf=string_add("GET https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s HTTP/1.1\n",GOOGLE_KEY,data->arg);
-	//res=https_get_simple(buf,443);
+	/*res=https_get_simple(buf,443);
+	free(buf);*/
 	http=http_head_init();
 	http_head_add(http,buf);
 	http_head_add(http,"Accept: */*\n");
@@ -680,6 +679,7 @@ void get_google(SMBOT_DATA *data)
 	res=http_perform(http,"127.0.0.1",8087);
 	http_head_destroy(http);
 	free(buf);
+
 	if(res == NULL)
 	{
 		msg_send("连接到远程服务器出错!",data);
@@ -690,7 +690,7 @@ void get_google(SMBOT_DATA *data)
 
 	url=match_string("\"link\": \".[^\"]*",res);
 	des=match_string("\"snippet\": \".[^\"]*",res);
-	free(res);
+	null_no_free(res);
 	if(url == NULL || des == NULL)
 	{
 		null_no_free(url);
@@ -725,14 +725,6 @@ void get_baidu(SMBOT_DATA *data)
 	buf=string_add("http://www.baidu.com/s?wd=%s&rsv_spt=1&issp=1&rsv_bp=0&ie=utf-8&tn=baidujson&rn=1",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
-	if(res == NULL)
-	{
-		msg_send("连接到远程服务器出错!",data);
-		smbot_destory(data);
-		free(data->arg);
-		return;
-	}
-
 	url=match_string("uri:\".[^\"]*",res);
 	title=match_string("title:\".[^\"]*",res);
 	buf=match_string("comment:\".[^\"]*",res);
@@ -744,19 +736,6 @@ void get_baidu(SMBOT_DATA *data)
 	to_iconv("GB18030//","UTF-8//IGNORE",buf,strlen(buf),temp,512);
 	free(buf);
 	to_iconv("GB18030//","UTF-8//IGNORE",title+6,strlen(title),ti,512);
-
-	if(strstr(temp,"<strong>"))
-	{
-		buf=string_add("%s",temp);
-		bzero(temp,sizeof(temp));
-		strreplace(buf,"<strong>"," ",temp,sizeof(temp));
-		free(buf);
-		buf=string_add("%s",temp);
-		bzero(temp,sizeof(temp));
-		strreplace(buf,"<\\/strong>"," ",temp,sizeof(temp));
-		free(buf);
-	}
-
 	free(title);
 
 	res=string_add("%s<->%s ---%s",ti,url+5,temp);
@@ -797,8 +776,19 @@ void get_bimg(SMBOT_DATA *data)
 		free(data->arg);
 		return;
 	}
+	to_iconv("GB18030//","UTF-8//IGNORE",title+20,strlen(title)-20,temp,512);
+	if(strstr(temp,"<strong>"))
+	{
+		buf=string_add("%s",temp);
+		bzero(temp,sizeof(temp));
+		strreplace(buf,"<strong>","",temp,sizeof(temp));
+		free(buf);
+		buf=string_add("%s",temp);
+		bzero(temp,sizeof(temp));
+		strreplace(buf,"<\\/strong>","",temp,sizeof(temp));
+		free(buf);
+	}
 
-	to_iconv("GB18030//","UTF-8//IGNORE",title+21,strlen(title)-21,temp,512);
 	free(title);
 	res=string_add("%s<--%s",temp,url+10);
 	free(url);
@@ -817,6 +807,14 @@ void get_air(SMBOT_DATA *data)
 	buf=string_add("http://web.juhe.cn/environment/air/cityair?city=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,8080);
 	free(buf);
+	if(res == NULL)
+	{
+		msg_send("连接到远程服务器出错!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
 	if(!strstr(res,"SUCCESSED!"))
 	{
 		free(res);
@@ -946,7 +944,6 @@ void get_sm_message(SMBOT_DATA *data)
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
-
 	buf=string_add("http://xiaofengrobot.sinaapp.com/web.php?callback=jQuery191041205509454157474_1376842442554&para=%s&_=1376842442555",data->arg);
 	while((res=http_get_simple(buf,80)) == NULL);
 	free(buf);
