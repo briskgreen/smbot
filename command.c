@@ -372,7 +372,6 @@ void get_stack(SMBOT_DATA *data)
 	}
 
 	buf=strstr(res,"<div class=\"result-link\">");
-	free(res);
 	if(buf == NULL)
 	{
 		msg_send("Sorry,no result found!",data);
@@ -383,6 +382,7 @@ void get_stack(SMBOT_DATA *data)
 
 	url=match_string("/questions.[^\"]*",buf);
 	des=match_string("Q: .[^<]*",buf);
+	free(res);
 	res=string_add("%s <-- http://stackoverflow.com%s",des,url);
 	free(url);
 	free(des);
