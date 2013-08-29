@@ -646,6 +646,16 @@ void get_google_image_url(SMBOT_DATA *data)
 	url=match_string("\"link\": \".[^\"]*",res);
 	des=match_string("\"snippet\": \".[^\"]*",res);
 	free(res);
+	if(url == NULL || des == NULL)
+	{
+		msg_send("未找到结果!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+	i=strlen(des);
+	des[i-2]='\0';
+
 	res=string_add("%s<--%s",des+12,url+9);
 	free(des);
 	free(url);
@@ -699,6 +709,8 @@ void get_google(SMBOT_DATA *data)
 		free(data->arg);
 		return;
 	}
+	i=strlen(des);
+	des[i-2]='\0';
 
 	res=string_add("%s <--%s",url+9,des+12);
 	msg_send(res,data);
