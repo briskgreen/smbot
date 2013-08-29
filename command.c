@@ -644,7 +644,7 @@ void get_google_image_url(SMBOT_DATA *data)
 		return;
 	}
 	url=match_string("\"link\": \".[^\"]*",res);
-	des=match_string("\"snippet\": \".[^\"]*",res);
+	des=match_string("\"snippet\": \".[^\n]*",res);
 	free(res);
 	if(url == NULL || des == NULL)
 	{
@@ -699,7 +699,7 @@ void get_google(SMBOT_DATA *data)
 	}
 
 	url=match_string("\"link\": \".[^\"]*",res);
-	des=match_string("\"snippet\": \".[^\"]*",res);
+	des=match_string("\"snippet\": \".[^\n]*",res);
 	null_no_free(res);
 	if(url == NULL || des == NULL)
 	{
@@ -969,7 +969,7 @@ void get_sm_message(SMBOT_DATA *data)
 		return;
 	}
 
-	buf=match_string("test(\".[^\"]*",res);
+	buf=match_string("test(\".[^\n]*",res);
 	free(res);
 	if(buf == NULL)
 	{
@@ -977,6 +977,9 @@ void get_sm_message(SMBOT_DATA *data)
 		free(data->arg);
 		return;
 	}
+	i=strlen(buf);
+	buf[i-3]='\0';
+
 	res=unicode_to_utf(buf+6);
 	free(buf);
 
