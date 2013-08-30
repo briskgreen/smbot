@@ -33,6 +33,7 @@ void send_http_get_request(int sockfd,char *ip,BOOL flage)
 	char *head;
 	char *content_type="Content-Type: text/html\n";
 	char *host;
+	char *age="User-Agent: Mozilla/5.0 (X11; Linux i686; rv:20.0) Gecko/20100101 Firefox/20.0\n";
 	char *connection="Connection: close\n\n";
 
 	if(flage)
@@ -53,6 +54,8 @@ void send_http_get_request(int sockfd,char *ip,BOOL flage)
 
 	send(sockfd,head,strlen(head),0);
 	send(sockfd,host,strlen(host),0);
+	if(!flage)
+		send(sockfd,age,strlen(age),0);
 	send(sockfd,content_type,strlen(content_type),0);
 	send(sockfd,connection,strlen(connection),0);
 
