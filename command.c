@@ -100,7 +100,9 @@ void bing_dict(SMBOT_DATA *data)
 	int i;
 
 	null_and_help("!dict");
-	for(i=0;data->arg[i]!= ' ';++i);
+	for(i=0;data->arg[i]!= ' ';++i)
+		if(data->arg[i] == '\0')
+			break;
 	if(data->arg[i] == '\0')
 	{
 		msg_send("错误的格式",data);
@@ -411,6 +413,14 @@ void get_id_information(SMBOT_DATA *data)
 
 	buf=match_string("area.[^{]*",res);
 	free(res);
+	if(buf == NULL)
+	{
+		msg_send("查询出错，检查你的身份证号码是否正确!",data);
+		free(data->arg);
+		smbot_destory(data);
+		return;
+	}
+
 	msg_send(buf,data);
 	free(buf);
 	smbot_destory(data);
