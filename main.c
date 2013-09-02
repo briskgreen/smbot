@@ -105,7 +105,7 @@ int main(int argc,char **argv)
 	char *data;
 
 	printf("init task factory . . .\n");
-	task=task_factory_init(5,10);
+	task=task_factory_init(20,100);
 	printf("init task factory successed . . .\n");
 	printf("set signal . . .\n");
 	act.sa_flags=0;
