@@ -157,22 +157,23 @@ void bing_dict(SMBOT_DATA *data)
 
 void get_youku_url(SMBOT_DATA *data)
 {
-	char *head;
-	char *host="Host: www.soku.com\n";
-	char *accept="Accept: */*\n";
-	char *connection="Connection: close\n\n";
+	//char *head;
+	//char *host="Host: www.soku.com\n";
+	//char *accept="Accept: */*\n";
+	//char *connection="Connection: close\n\n";
 	char *res;
 	char *buf;
-	int sockfd;
+	//int sockfd;
 	char *title;
 	char *url;
 
 	null_and_help("!youku");
-	buf=url_encode(data->arg);
-	head=string_add("GET /search_video/q_%s HTTP/1.1\n",buf);
-	free(buf);
+	url=url_encode(data->arg);
+	//head=string_add("GET /search_video/q_%s HTTP/1.1\n",buf);
+	buf=string_add("http://www.soku.com/search_video/q_%s",url);
+	free(url);
 
-	sockfd=tcp_connect("www.soku.com",80);
+	/*sockfd=tcp_connect("www.soku.com",80);
 	if(sockfd == -1)
 	{
 		free(head);
@@ -194,8 +195,31 @@ void get_youku_url(SMBOT_DATA *data)
 			break;
 		free(buf);
 	}
-	close(sockfd);
+	close(sockfd);*/
 
+	while(1)
+	{
+		res=http_get_simple(buf,80);
+		if(res == NULL)
+			continue;
+		if(res <= '\0')
+		{
+			null_no_free(res);
+			continue;
+		}
+		else
+			break;
+	}
+	/*if(buf == NULL)
+	{
+		msg_send("Sorry,no result found!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}*/
+	free(buf);
+	buf=match_string("<a title=.[^<]*",res);
+	free(res);
 	if(buf == NULL)
 	{
 		msg_send("Sorry,no result found!",data);
