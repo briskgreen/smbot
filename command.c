@@ -157,45 +157,15 @@ void bing_dict(SMBOT_DATA *data)
 
 void get_youku_url(SMBOT_DATA *data)
 {
-	//char *head;
-	//char *host="Host: www.soku.com\n";
-	//char *accept="Accept: */*\n";
-	//char *connection="Connection: close\n\n";
 	char *res;
 	char *buf;
-	//int sockfd;
 	char *title;
 	char *url;
 
 	null_and_help("!youku");
 	url=url_encode(data->arg);
-	//head=string_add("GET /search_video/q_%s HTTP/1.1\n",buf);
 	buf=string_add("http://www.soku.com/search_video/q_%s",url);
 	free(url);
-
-	/*sockfd=tcp_connect("www.soku.com",80);
-	if(sockfd == -1)
-	{
-		free(head);
-		msg_send("Sorry,连接远程服务器失败!",data);
-		smbot_destory(data);
-		free(data->arg);
-		return;
-	}
-
-	send(sockfd,head,strlen(head),0);
-	send(sockfd,host,strlen(host),0);
-	send(sockfd,accept,strlen(accept),0);
-	send(sockfd,connection,strlen(connection),0);
-	free(head);
-
-	while(buf=read_line(sockfd))
-	{
-		if(strstr(buf,"<a title="))
-			break;
-		free(buf);
-	}
-	close(sockfd);*/
 
 	while(1)
 	{
@@ -210,13 +180,7 @@ void get_youku_url(SMBOT_DATA *data)
 		else
 			break;
 	}
-	/*if(buf == NULL)
-	{
-		msg_send("Sorry,no result found!",data);
-		smbot_destory(data);
-		free(data->arg);
-		return;
-	}*/
+
 	free(buf);
 	buf=match_string("<a title=.[^<]*",res);
 	free(res);
@@ -991,14 +955,6 @@ void get_sm_message(SMBOT_DATA *data)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
 	buf=string_add("http://xiaofengrobot.sinaapp.com/web.php?callback=jQuery191041205509454157474_1376842442554&para=%s&_=1376842442555",data->arg);
-	/*while((res=http_get_simple(buf,80)))
-		if(res[0] <= '\0' || res == NULL)
-		{
-			null_no_free(res);
-			continue;
-		}
-		else
-			break;*/
 	while(1)
 	{
 		res=http_get_simple(buf,80);
