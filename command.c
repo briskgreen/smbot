@@ -599,6 +599,14 @@ void get_bing(SMBOT_DATA *data)
 	des=match_string("\"Description\":\".[^\"]*",buf);
 	url=match_string("\"Url\":\".[^\"]*",buf);
 	free(buf);
+	
+	if(title == NULL || des == NULL || url == NULL)
+	{
+		msg_send("查询出错，请稍后重新查询!",data);
+		smbot_destory(data);
+		null_no_free(data->arg);
+		return;
+	}
 
 	res=string_add("%s<->%s -->%s",title+9,url+7,des+15);
 	free(title);
@@ -739,6 +747,15 @@ void get_baidu(SMBOT_DATA *data)
 	title=match_string("title:\".[^\"]*",res);
 	buf=match_string("comment:\".[^\"]*",res);
 	free(res);
+
+	if(url == NULL || title == NULL || buf == NULL)
+	{
+		msg_send("查询出错，请稍后重新查询!",data);
+		smbot_destory(data);
+		null_no_free(data->arg);
+		return;
+	}
+
 	strreplace(buf+9,"\x1","",temp,512);
 	free(buf);
 	buf=string_add("%s",temp);
