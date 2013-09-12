@@ -22,10 +22,10 @@ typedef struct
 }SMBOT_DATA;
 
 void msgto(int sockfd,const char *channel,const char *nick,
-		const char *msg);
+		char *msg);
 
 void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
-		const char *msg);
+		char *msg);
 
 char *get_nick(char *msg);
 

@@ -5,7 +5,7 @@ void time_send_ssl(SSL *ssl,CHANNEL *channel,char *msg);
 void time_send_sock(int sockfd,CHANNEL *channel,char *msg);
 
 void msgto(int sockfd,const char *channel,const char *nick,
-		const char *msg)
+		char *msg)
 {
 	task_factory_entry();
 
@@ -14,6 +14,10 @@ void msgto(int sockfd,const char *channel,const char *nick,
 	int send_n=0;
 	char *buf=NULL;
 	char *temp;
+
+	for(len=0;msg[len];++len)
+		if(msg[len] == '\n' || msg[len] == '\r')
+			msg[len]=' ';
 
 	len=strlen(msg);
 
@@ -34,7 +38,7 @@ void msgto(int sockfd,const char *channel,const char *nick,
 }
 
 void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
-		const char *msg)
+		char *msg)
 {
 	task_factory_entry();
 
@@ -43,6 +47,10 @@ void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 	int send_n=0;
 	char *buf=NULL;
 	char *temp;
+
+	for(len=0;msg[len];++len)
+		if(msg[len] == '\n' || msg[len] == '\r')
+			msg[len]=' ';
 
 	len=strlen(msg);
 
