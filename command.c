@@ -494,6 +494,14 @@ void get_joke(SMBOT_DATA *data)
 	strreplace(res,"</p>","",temp,511);
 	free(res);
 
+	if(strstr(temp,"<br />"))
+	{
+		res=string_add("%s",temp);
+		bzero(temp,sizeof(temp));
+		strreplace(res,"<br />","",temp,511);
+		free(res);
+	}
+
 	for(i=0;temp[i];++i)
 		if(temp[i] == '\n')
 			temp[i]=' ';
