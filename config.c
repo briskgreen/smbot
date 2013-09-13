@@ -12,6 +12,7 @@ SMBOT_CONF *smbot_conf_init(void)
 
 	conf->nick=NULL;
 	conf->user_name=NULL;
+	conf->passwd=NULL;
 	conf->really_name=NULL;
 	conf->use_ssl=NULL;
 	conf->server=NULL;
@@ -42,6 +43,8 @@ void smbot_conf_read(SMBOT_CONF *conf)
 	getline(&data,&len,conf->fp);
 	conf->user_name=strnstr(data+10,-1);
 	getline(&data,&len,conf->fp);
+	conf->passwd=strnstr(data+7,-1);
+	getline(&data,&len,conf->fp);
 	conf->really_name=strnstr(data+12,-1);
 	getline(&data,&len,conf->fp);
 	conf->use_ssl=strnstr(data+8,-1);
@@ -61,6 +64,7 @@ void smbot_conf_close(SMBOT_CONF *conf)
 
 	free(conf->nick);
 	free(conf->user_name);
+	free(conf->passwd);
 	free(conf->really_name);
 	free(conf->server);
 	free(conf->use_ssl);
@@ -85,6 +89,7 @@ void conf_get_channel(CHANNEL *channel,const char *data)
 			res=strnstr(temp,n);
 			http_head_add(channel,res);
 			n=0;
+			bzero(temp,sizeof(temp));
 			continue;
 		}
 

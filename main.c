@@ -29,16 +29,44 @@ void safe_send_data(SSL *ssl,SMBOT_CONF *conf)
 {
 	char *nick;
 	char *user;
+	char *identify;
 	char *join;
+	char *buf;
 
 	nick=string_add("NICK %s\n",conf->nick);
 	user=string_add("USER %s %s %s :%s\n",conf->nick,
 			conf->user_name,conf->server,conf->really_name);
+	identify=string_add("PRIVMSG NickServ :IDENTIFY %s\n",conf->passwd);
 
 	SSL_write(ssl,nick,strlen(nick));
 	SSL_write(ssl,user,strlen(user));
+	SSL_write(ssl,identify,strlen(identify));
 	free(nick);
 	free(user);
+	free(identify);
+
+	while(buf=ssl_read_line(ssl))
+	{
+		printf("%s\n",buf);
+
+		if(strstr(buf,"You are now identified for"))
+		{
+			free(buf);
+			break;
+		}
+
+		if(strstr(buf,"Invalid password for"))
+		{
+			free(buf);
+			printf("Invalid password!\n");
+			exit(-1);
+		}
+
+		free(buf);
+	}
+
+	if(buf == NULL)
+		exit(-1);
 	
 	while(conf->channel->next != NULL)
 	{
@@ -53,16 +81,44 @@ void send_data(int sockfd,SMBOT_CONF *conf)
 {
 	char *nick;
 	char *user;
+	char *identify;
 	char *join;
+	char *buf;
 
 	nick=string_add("NICK %s\n",conf->nick);
 	user=string_add("USER %s %s %s :%s\n",conf->nick,
 			conf->user_name,conf->server,conf->really_name);
+	identify=string_add("PRIVMSG NickServ :IDENTIFY %s\n",conf->passwd);
 
 	send(sockfd,nick,strlen(nick),0);
 	send(sockfd,user,strlen(user),0);
+	send(sockfd,identify,strlen(identify),0);
 	free(nick);
 	free(user);
+	free(identify);
+
+	while(buf=read_line(sockfd))
+	{
+		printf("%s\n",buf);
+
+		if(strstr(buf,"You are now identified for"))
+		{
+			free(buf);
+			break;
+		}
+
+		if(strstr(buf,"Invalid password for"))
+		{
+			free(buf);
+			printf("Invalid password!\n");
+			exit(-1);
+		}
+
+		free(buf);
+	}
+
+	if(buf == NULL)
+		exit(-1);
 	
 	while(conf->channel->next != NULL)
 	{

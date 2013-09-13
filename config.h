@@ -10,6 +10,7 @@ typedef struct
 	FILE *fp;
 	char *nick;
 	char *user_name;
+	char *passwd;
 	char *really_name;
 	char *use_ssl;
 	char *server;
