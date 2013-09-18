@@ -79,7 +79,10 @@ void get_ip_addr(SMBOT_DATA *data)
 		dup2(pipefd[1],STDOUT_FILENO);
 		dup2(pipefd[1],STDERR_FILENO);
 
-		execl("exec/query_ip_addr","query_ip_addr",data->arg,NULL);
+		if(fork() == 0)
+			execl("exec/query_ip_addr","query_ip_addr",data->arg,NULL);
+		wait(NULL);
+		_exit(0);
 	}
 
 	close(pipefd[1]);
@@ -430,7 +433,11 @@ void check_id_card(SMBOT_DATA *data)
 
 		dup2(pipefd[1],STDOUT_FILENO);
 		dup2(pipefd[1],STDERR_FILENO);
-		execl("exec/id_card_test","id_card_test",data->arg,NULL);
+
+		if(fork() == 0)
+			execl("exec/id_card_test","id_card_test",data->arg,NULL);
+		wait(NULL);
+		_exit(0);
 	}
 
 	close(pipefd[1]);
@@ -529,7 +536,11 @@ void get_dream(SMBOT_DATA *data)
 
 		dup2(pipefd[1],STDOUT_FILENO);
 		dup2(pipefd[1],STDERR_FILENO);
-		execl("exec/dream.sh","dream",data->arg,NULL);
+
+		if(fork() == 0)
+			execl("exec/dream.sh","dream",data->arg,NULL);
+		wait(NULL);
+		_exit(0);
 	}
 
 	close(pipefd[1]);
