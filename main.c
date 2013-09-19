@@ -148,7 +148,7 @@ void send_time(bool is_use_ssl,char *data)
 	if(is_use_ssl)
 		SSL_write(ssl,res,strlen(res));
 	else
-		send(sockfd,ti,strlen(res),0);
+		send(sockfd,res,strlen(res),0);
 
 	free(res);
 }
