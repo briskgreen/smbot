@@ -32,7 +32,7 @@ bool smbot_conf_open(SMBOT_CONF *conf)
 
 void smbot_conf_read(SMBOT_CONF *conf)
 {
-	int len;
+	size_t len;
 	char *data=NULL;
 	char *temp;
 
