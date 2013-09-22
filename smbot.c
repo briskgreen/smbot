@@ -24,8 +24,11 @@ void msgto(int sockfd,const char *channel,const char *nick,
 	while(len >= 0)
 	{
 		buf=strnstr(msg+send_n,400);
-		temp=string_add("PRIVMSG %s :%s: %s\n",
-				channel,nick,buf);
+		if(channel == NULL)
+			temp=string_add("PRIVMSG %s :%s\n",nick,buf);
+		else
+			temp=string_add("PRIVMSG %s :%s: %s\n",
+					channel,nick,buf);
 
 		n=send(sockfd,temp,strlen(temp),0);
 		len-=n;
@@ -57,8 +60,11 @@ void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 	while(len >= 0)
 	{
 		buf=strnstr(msg+send_n,400);
-		temp=string_add("PRIVMSG %s :%s: %s\n",
-				channel,nick,buf);
+		if(channel == NULL)
+			temp=string_add("PRIVMSG %s :%s\n",nick,buf);
+		else
+			temp=string_add("PRIVMSG %s :%s: %s\n",
+					channel,nick,buf);
 		n=SSL_write(ssl,temp,strlen(temp));
 		len-=n;
 		send_n+=n;
