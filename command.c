@@ -66,28 +66,24 @@ void get_man_url(SMBOT_DATA *data)
 
 void get_ip_addr(SMBOT_DATA *data)
 {
-	pid_t pid;
 	int pipefd[2];
 	char temp[1024]={0};
 
 	null_and_help("!ip");
 
 	pipe(pipefd);
-	if((pid=fork()) == 0)
+	if(fork() == 0)
 	{
 		close(pipefd[0]);
 		dup2(pipefd[1],STDOUT_FILENO);
 		dup2(pipefd[1],STDERR_FILENO);
 
-		if(fork() == 0)
-			execl("exec/query_ip_addr","query_ip_addr",data->arg,NULL);
-		wait(NULL);
-		_exit(0);
+		execl("exec/query_ip_addr","query_ip_addr",data->arg,NULL);
 	}
 
 	close(pipefd[1]);
+	wait(NULL);
 	read(pipefd[0],temp,sizeof(temp));
-	waitpid(pid,NULL,WNOHANG);
 
 	msg_send(temp,data);
 	smbot_destory(data);
@@ -421,28 +417,24 @@ void get_id_information(SMBOT_DATA *data)
 void check_id_card(SMBOT_DATA *data)
 {
 	char temp[1024]={0};
-	pid_t pid;
 	int pipefd[2];
 
 	null_and_help("!checkid");
 	pipe(pipefd);
 	
-	if((pid=fork()) == 0)
+	if(fork() == 0)
 	{
 		close(pipefd[0]);
 
 		dup2(pipefd[1],STDOUT_FILENO);
 		dup2(pipefd[1],STDERR_FILENO);
 
-		if(fork() == 0)
-			execl("exec/id_card_test","id_card_test",data->arg,NULL);
-		wait(NULL);
-		_exit(0);
+		execl("exec/id_card_test","id_card_test",data->arg,NULL);
 	}
 
 	close(pipefd[1]);
+	wait(NULL);
 	read(pipefd[0],temp,sizeof(temp));
-	waitpid(pid,NULL,WNOHANG);
 
 	msg_send(temp,data);
 	smbot_destory(data);
@@ -522,7 +514,6 @@ void get_dream(SMBOT_DATA *data)
 	int pipefd[2];
 	char temp[512]={0};
 	int i;
-	pid_t pid;
 
 	null_and_help("!dream");
 	for(i=0;data->arg[i];++i)
@@ -530,22 +521,19 @@ void get_dream(SMBOT_DATA *data)
 			data->arg[i]='+';
 	pipe(pipefd);
 
-	if((pid=fork()) == 0)
+	if(fork() == 0)
 	{
 		close(pipefd[0]);
 
 		dup2(pipefd[1],STDOUT_FILENO);
 		dup2(pipefd[1],STDERR_FILENO);
 
-		if(fork() == 0)
-			execl("exec/dream.sh","dream",data->arg,NULL);
-		wait(NULL);
-		_exit(0);
+		execl("exec/dream.sh","dream",data->arg,NULL);
 	}
 
 	close(pipefd[1]);
+	wait(NULL);
 	read(pipefd[0],temp,512);
-	waitpid(pid,NULL,WNOHANG);
 
 	msg_send(temp,data);
 	smbot_destory(data);
