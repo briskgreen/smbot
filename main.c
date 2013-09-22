@@ -205,6 +205,9 @@ int main(int argc,char **argv)
 		else
 			data=read_line(sockfd);
 
+		if(data == NULL)
+			break;
+
 		printf("%s\n",data);
 
 		if(strstr(data,"!man"))
@@ -307,5 +310,7 @@ int main(int argc,char **argv)
 			pong_server(data,is_use_ssl);
 	}
 
+	task_factory_destroy(task);
+	ssl_close(ssl);
 	return 0;
 }
