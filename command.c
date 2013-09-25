@@ -36,7 +36,7 @@ void get_man_url(SMBOT_DATA *data)
 	null_no_free(buf);
 	if(res == NULL)
 	{
-		msg_send("Sorry,连接到远程服务器出错!",data);
+		msg_send("哎哟喂，淫家连接远程服务器失败了〇。〇!",data);
 		smbot_destory(data);
 		free(data->arg);
 
@@ -46,7 +46,7 @@ void get_man_url(SMBOT_DATA *data)
 	buf=match_string("location: .[^\r]*",res);
 	if(buf == NULL)
 	{
-		msg_send("Sorry,no result found!",data);
+		msg_send("哎呀呀，淫家木有发现目标!",data);
 		smbot_destory(data);
 		free(res);
 		free(data->arg);
@@ -104,7 +104,7 @@ void bing_dict(SMBOT_DATA *data)
 			break;
 	if(data->arg[i] == '\0')
 	{
-		msg_send("错误的格式",data);
+		msg_send("哎哟，表酱紫吗，你的格式错误了啦^_^",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -127,7 +127,7 @@ void bing_dict(SMBOT_DATA *data)
 	free(res);
 	if(url == NULL)
 	{
-		msg_send("Sorry,连接到远程服务器出错",data);
+		msg_send("我那个XX艹，我竟然连接远程服务器出错了!",data);
 		smbot_destory(data);
 		http_head_destroy(http);
 		free(data->arg);
@@ -138,7 +138,7 @@ void bing_dict(SMBOT_DATA *data)
 	null_no_free(url);
 	if(buf == NULL)
 	{
-		msg_send("Sorry no result found!",data);
+		msg_send("啊哦，淫家木有发现结果肿么办!",data);
 		smbot_destory(data);
 		http_head_destroy(http);
 		free(data->arg);
@@ -185,7 +185,7 @@ void get_youku_url(SMBOT_DATA *data)
 	free(res);
 	if(buf == NULL)
 	{
-		msg_send("Sorry,no result found!",data);
+		msg_send("俺没有发现目标，俺一定是打开方式不对!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -224,7 +224,7 @@ void get_bt(SMBOT_DATA *data)
 	http_head_destroy(http);
 	if(buf == NULL)
 	{
-		msg_send("Sorry,连接远程服务器失败!",data);
+		msg_send("我做出了一个艰难的决定，我要告诉你我连接远程服务器失败了!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -233,7 +233,7 @@ void get_bt(SMBOT_DATA *data)
 
 	if(res == NULL)
 	{
-		msg_send("Sorry,no result found!",data);
+		msg_send("你一定是打开方式不对，不然怎么会没有搜到结果呢!",data);
 		smbot_destory(data);
 		return;
 	}
@@ -259,7 +259,7 @@ void get_zip_code(SMBOT_DATA *data)
 	free(buf);
 	if(res == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("呜~淫家连接远程服务器失败了!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -268,7 +268,7 @@ void get_zip_code(SMBOT_DATA *data)
 	buf=strstr(res,"href=\'s?wd=");
 	if(buf == NULL)
 	{
-		msg_send("Sorry,no result found!",data);
+		msg_send("俺没有发现目标@.@",data);
 		free(res);
 		smbot_destory(data);
 		free(data->arg);
@@ -279,7 +279,7 @@ void get_zip_code(SMBOT_DATA *data)
 	//free(buf);
 	if(temp == NULL)
 	{
-		msg_send("Sorry,no result found!",data);
+		msg_send("俺没有发现目标!",data);
 		free(res);
 		smbot_destory(data);
 		free(data->arg);
@@ -304,7 +304,7 @@ void get_weather(SMBOT_DATA *data)
 	free(buf);
 	if(res == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("我连啊连连啊连，对不起我没连上!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -313,7 +313,7 @@ void get_weather(SMBOT_DATA *data)
 	if(strstr(res,"resultcode\":\"202\""))
 	{
 		free(res);
-		msg_send("查询不到该城市的信息",data);
+		msg_send("淫家木有查询到该城市信号了啦!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -323,7 +323,7 @@ void get_weather(SMBOT_DATA *data)
 	free(res);
 	if(buf == NULL)
 	{
-		msg_send("查询出错!",data);
+		msg_send("哎呀，俺出错了!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -354,7 +354,7 @@ void get_stack(SMBOT_DATA *data)
 	free(buf);
 	if(res == NULL)
 	{
-		msg_send("Sorry,连接到远程服务器出错!",data);
+		msg_send("俺连啊连连啊连，对不起俺没连上!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -363,7 +363,7 @@ void get_stack(SMBOT_DATA *data)
 	buf=strstr(res,"<div class=\"result-link\">");
 	if(buf == NULL)
 	{
-		msg_send("Sorry,no result found!",data);
+		msg_send("淫家木有发现目标了啦!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -392,7 +392,7 @@ void get_id_information(SMBOT_DATA *data)
 	free(buf);
 	if(res == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("俺连啊连连啊连，哎呀，淫家木有连上!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -402,7 +402,7 @@ void get_id_information(SMBOT_DATA *data)
 	free(res);
 	if(buf == NULL)
 	{
-		msg_send("查询出错，检查你的身份证号码是否正确!",data);
+		msg_send("出错了啦，你一定是输入的方式不对!",data);
 		free(data->arg);
 		smbot_destory(data);
 		return;
@@ -478,7 +478,7 @@ void get_joke(SMBOT_DATA *data)
 	free(buf);
 	if(res == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("没连上没连上没连上!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -555,7 +555,7 @@ void get_song_url(SMBOT_DATA *data)
 	free(buf);
 	if(res == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("啊哦，淫家连接远程服务器失败了!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -596,7 +596,7 @@ void get_bing(SMBOT_DATA *data)
 	free(res);
 	if(buf == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("俺逢山过水，遇神杀神遇佛杀佛。。。好吧，淫家没连上远程服务器!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -609,7 +609,7 @@ void get_bing(SMBOT_DATA *data)
 	
 	if(title == NULL || des == NULL || url == NULL)
 	{
-		msg_send("查询出错，请稍后重新查询!",data);
+		msg_send("呜~淫家木有发现结果肿么办",data);
 		smbot_destory(data);
 		null_no_free(data->arg);
 		return;
@@ -651,7 +651,7 @@ void get_google_image_url(SMBOT_DATA *data)
 
 	if(res == NULL)
 	{
-		msg_send("查询失败!",data);
+		msg_send("俺一定是打开方式不对，不然怎么会没有搜到结果呢!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -661,7 +661,7 @@ void get_google_image_url(SMBOT_DATA *data)
 	free(res);
 	if(url == NULL || des == NULL)
 	{
-		msg_send("未找到结果!",data);
+		msg_send("俺木有找到你想要的东西!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -705,7 +705,7 @@ void get_google(SMBOT_DATA *data)
 
 	if(res == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("啊哦,淫家连接远程服务器失败了!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -757,7 +757,7 @@ void get_baidu(SMBOT_DATA *data)
 
 	if(url == NULL || title == NULL || buf == NULL)
 	{
-		msg_send("查询出错，请稍后重新查询!",data);
+		msg_send("肿么办，淫家什么也没查到!",data);
 		smbot_destory(data);
 		null_no_free(data->arg);
 		return;
@@ -805,7 +805,7 @@ void get_bimg(SMBOT_DATA *data)
 	{
 		null_no_free(url);
 		null_no_free(title);
-		msg_send("查询失败!",data);
+		msg_send("哎呀呀，淫家什么也没查到!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -843,7 +843,7 @@ void get_air(SMBOT_DATA *data)
 	free(buf);
 	if(res == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("啊，淫家连接远程服务器失败了!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -852,7 +852,7 @@ void get_air(SMBOT_DATA *data)
 	if(!strstr(res,"SUCCESSED!"))
 	{
 		free(res);
-		msg_send("查询失败，检查城市名称是否有误，城市名称一定要用拼音哦",data);
+		msg_send("查询失败了，你一定是没有用拼音!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -877,7 +877,7 @@ void get_website_testing(SMBOT_DATA *data)
 	free(buf);
 	if(res == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("啊呀，淫家连接远程服务器失败了!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -886,7 +886,7 @@ void get_website_testing(SMBOT_DATA *data)
 	if(!strstr(res,"Successed!"))
 	{
 		free(res);
-		msg_send("检测失败!",data);
+		msg_send("检测失败了啦!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -912,7 +912,7 @@ void get_wifi(SMBOT_DATA *data)
 	free(buf);
 	if(res == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("哎呀呀，淫家连接远程服务器失败了!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -921,7 +921,7 @@ void get_wifi(SMBOT_DATA *data)
 	if(!strstr(res,"Return Successd!"))
 	{
 		free(res);
-		msg_send("查询失败!",data);
+		msg_send("淫家木有发现结果肿么办!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -946,7 +946,7 @@ void get_train(SMBOT_DATA *data)
 	free(buf);
 	if(res == NULL)
 	{
-		msg_send("连接到远程服务器出错!",data);
+		msg_send("俺连啊连连啊连，对不起俺没连上!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -955,7 +955,7 @@ void get_train(SMBOT_DATA *data)
 	if(!strstr(res,"Successed!"))
 	{
 		free(res);
-		msg_send("查询失败!",data);
+		msg_send("俺查啊查，查啊查，对不起，俺没什么也没查到!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
@@ -996,7 +996,7 @@ void get_sm_message(SMBOT_DATA *data)
 
 	if(strstr(res,"504 Gateway Time-out") && strstr(res,"503 Service Unavailable"))
 	{
-		msg_send("哎呀，机器人好像出了点小状况，休息片刻再来调戏吧!",data);
+		msg_send("哎呀，淫家有点不方便了啦，每个月总会有那么几天，放过俺先吧^_^",data);
 		free(res);
 		smbot_destory(data);
 		free(data->arg);
