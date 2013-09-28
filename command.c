@@ -492,7 +492,7 @@ void get_joke(SMBOT_DATA *data)
 	free(res);
 	if(buf == NULL)
 	{
-		msg_send("啊哦，你在搜些什么，为什么我什么都没搜!",data);
+		msg_send("啊哦，你在搜些什么，为什么我什么都没搜到!",data);
 		smbot_destory(data);
 		free(data->arg);
 		return;
