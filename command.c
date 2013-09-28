@@ -469,11 +469,15 @@ void get_joke(SMBOT_DATA *data)
 {
 	char *res;
 	char *buf;
-	char temp[512];
+	char temp[1024]={0};
 	int i;
 
 	null_and_help("!joke");
-	buf=string_add("http://www.fangtang8.com/?s=%s",data->arg);
+	for(i=0;data->arg[i];++i)
+		if(data->arg[i] == ' ')
+			data->arg[i]='+';
+
+	buf=string_add("http://www.xiao688.com/cms/search/?sw=%s&sbtn=提交",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
 	if(res == NULL)
@@ -484,26 +488,31 @@ void get_joke(SMBOT_DATA *data)
 		return;
 	}
 
-	buf=match_string("<p>.[^\\s]*</p>",res);
+	buf=match_string("<div class=\"des\">.[^\n]*",res);
 	free(res);
-	strreplace(buf,"<p>","",temp,511);
-	free(buf);
-	res=string_add("%s",temp);
-	bzero(temp,512);
-	strreplace(res,"</p>","",temp,511);
-	free(res);
+	if(buf == NULL)
+	{
+		msg_send("啊哦，你在搜些什么，为什么我什么都没搜!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
 
-	if(strstr(temp,"<br />"))
+	res=strnstr(buf+strlen("<div class=\"des\">"),-7);
+	strreplace(res,"<b>","",temp,sizeof(temp));
+	free(res);
+	res=string_add("%s",temp);
+	bzero(temp,sizeof(temp));
+	strreplace(res,"</b>","",temp,sizeof(temp));
+	free(res);
+	if(strstr(temp,"&nbsp;"))
 	{
 		res=string_add("%s",temp);
 		bzero(temp,sizeof(temp));
-		strreplace(res,"<br />","",temp,511);
+		strreplace(res,"&nbsp;","",temp,sizeof(temp));
 		free(res);
 	}
 
-	for(i=0;temp[i];++i)
-		if(temp[i] == '\n')
-			temp[i]=' ';
 	msg_send(temp,data);
 	smbot_destory(data);
 	free(data->arg);

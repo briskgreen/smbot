@@ -19,23 +19,31 @@ void msgto(int sockfd,const char *channel,const char *nick,
 		if(msg[len] == '\n' || msg[len] == '\r')
 			msg[len]=' ';
 
+	if(channel == NULL)
+		post_len=strlen("PRIVMSG ")+strlen(nick)+3;
+	else
+		post_len=strlen("PRIVMSG ")+strlen(channel)+strlen(nick)+5;
+
 	len=strlen(msg);
+	n=420-post_len;
+	n/=3;
+	n*=3;
 
 	while(len >= 0)
 	{
-		buf=strnstr(msg+send_n,400);
+		buf=strnstr(msg+send_n,n);
 		if(channel == NULL)
 			temp=string_add("PRIVMSG %s :%s\n",nick,buf);
 		else
 			temp=string_add("PRIVMSG %s :%s: %s\n",
 					channel,nick,buf);
 
-		n=send(sockfd,temp,strlen(temp),0);
+		send(sockfd,temp,strlen(temp),0);
 		len-=n;
 		send_n+=n;
 		free(buf);
 		free(temp);
-	};
+	}
 
 	task_factory_leave();
 }
@@ -46,8 +54,9 @@ void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 	task_factory_entry();
 
 	int len;
-	int n;
+	int n=0;
 	int send_n=0;
+	int post_len;
 	char *buf=NULL;
 	char *temp;
 
@@ -55,22 +64,30 @@ void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 		if(msg[len] == '\n' || msg[len] == '\r')
 			msg[len]=' ';
 
+	if(channel == NULL)
+		post_len=strlen("PRIVMSG ")+strlen(nick)+3;
+	else
+		post_len=strlen("PRIVMSG ")+strlen(channel)+strlen(nick)+5;
+
 	len=strlen(msg);
+	n=420-post_len;
+	n/=3;
+	n*=3;
 
 	while(len >= 0)
 	{
-		buf=strnstr(msg+send_n,400);
+		buf=strnstr(msg+send_n,n);
 		if(channel == NULL)
 			temp=string_add("PRIVMSG %s :%s\n",nick,buf);
 		else
 			temp=string_add("PRIVMSG %s :%s: %s\n",
 					channel,nick,buf);
-		n=SSL_write(ssl,temp,strlen(temp));
+		SSL_write(ssl,temp,strlen(temp));
 		len-=n;
 		send_n+=n;
 		free(buf);
 		free(temp);
-	};
+	}
 
 	task_factory_leave();
 }
