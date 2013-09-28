@@ -292,14 +292,14 @@ int main(int argc,char **argv)
 		if(strstr(data,"!sm"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!sm","!sm <你想要说的话> 功能:与机器人对话，使用\'问题%答案\'方式可调教机器人",get_sm_message,1);
 
-		if(strstr(data,"!list"))
+		if(strstr(data,"!list") && strstr(data,"PRIVMSG"))
 		{
 			smbot_list(data,is_use_ssl);
 			free(data);
 			continue;
 		}
 
-		if(strstr(data,"!help smbot"))
+		if(strstr(data,"!help smbot") && strstr(data,"PRIVMSG"))
 		{
 			smbot_help(data,is_use_ssl);
 			free(data);
