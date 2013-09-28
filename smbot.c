@@ -11,6 +11,7 @@ void msgto(int sockfd,const char *channel,const char *nick,
 
 	int len;
 	int n=0;
+	int post_len;
 	int send_n=0;
 	char *buf=NULL;
 	char *temp;
