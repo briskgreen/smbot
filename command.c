@@ -492,10 +492,19 @@ void get_joke(SMBOT_DATA *data)
 	}
 
 	buf=match_string("<div class=\"title\">\\[<a href=\".[^\n]*",res);
+	if(buf == NULL)
+	{
+		msg_send("啊哦，你在搜些什么，为什么我什么都没搜到!",data);
+		smbot_destory(data);
+		free(data->arg);
+		free(res);
+		return;
+	}
+
 	title=match_string("title=\".[^\"]*",buf);
 	url=match_string("\] <a href=\".[^\"]*",buf);
 	
-	if(buf == NULL || title == NULL || url == NULL)
+	if(title == NULL || url == NULL)
 	{
 		msg_send("啊哦，你在搜些什么，为什么我什么都没搜到!",data);
 		smbot_destory(data);
