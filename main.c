@@ -156,6 +156,18 @@ void send_time(bool is_use_ssl,char *data)
 	free(res);
 }
 
+int smbot_select(int sockfd,SSL *ssl,bool is_use_ssl)
+{
+	fd_set reads;
+
+	FD_ZERO(&reads);
+	if(is_use_ssl)
+		sockfd=SSL_get_fd(ssl);
+	FD_SET(sockfd,&reads);
+	
+	return select(sockfd+1,&reads,NULL,NULL,NULL);
+}
+
 int main(int argc,char **argv)
 {
 	TASK_FACTORY *task;
@@ -200,6 +212,8 @@ int main(int argc,char **argv)
 
 	while(1)
 	{
+		smbot_select(sockfd,ssl,is_use_ssl);
+
 		if(is_use_ssl)
 			data=ssl_read_line(ssl);
 		else
