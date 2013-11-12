@@ -360,7 +360,8 @@ void get_stack(SMBOT_DATA *data)
 		return;
 	}
 
-	buf=strstr(res,"<div class=\"result-link\">");
+	//buf=strstr(res,"<div class=\"result-link\">");
+	buf=match_string("<a href=\"/questions/.[^>]*",res);
 	if(buf == NULL)
 	{
 		msg_send("淫家木有发现目标了啦!",data);
@@ -370,9 +371,9 @@ void get_stack(SMBOT_DATA *data)
 	}
 
 	url=match_string("/questions.[^\"]*",buf);
-	des=match_string("Q: .[^<]*",buf);
+	des=match_string("title=\".[^\"]*",buf);
 	free(res);
-	res=string_add("%s <-- http://stackoverflow.com%s",des,url);
+	res=string_add("%s <-- http://stackoverflow.com%s",des+7,url);
 	free(url);
 	free(des);
 	msg_send(res,data);
