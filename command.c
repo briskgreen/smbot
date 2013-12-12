@@ -246,9 +246,14 @@ void get_youtube(SMBOT_DATA *data)
 
 	url=string_add("http://www.youtube.com/watch?v=%s",buf+12);
 	free(buf);
-	des=match_string("\"description\": \".[^\"]*",res);
-	buf=match_string("\"title\": \".[^\"]*",res);
+	des=match_string("\"description\": \".[^\n]*",res);
+	buf=match_string("\"title\": \".[^\n]*",res);
 	free(res);
+
+	i=strlen(des);
+	des[i-2]='\0';
+	i=strlen(buf);
+	buf[i-2]='\0';
 
 	res=string_add("%s -- %s -- %s",buf+10,des+16,url);
 	free(buf);
