@@ -225,7 +225,6 @@ void get_youtube(SMBOT_DATA *data)
 	res=http_perform(http,"127.0.0.1",8087);
 	http_head_destroy(http);
 	free(buf);
-	printf("%s\n",data->arg);
 
 	if(res == NULL)
 	{
@@ -235,7 +234,6 @@ void get_youtube(SMBOT_DATA *data)
 		return;
 	}
 
-	printf("%s\n",res);
 	buf=match_string("\"videoId\": \".[^\"]*",res);
 	if(buf == NULL)
 	{
