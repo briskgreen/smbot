@@ -3,7 +3,7 @@ smbot
 
 smbot是一个简单的irc机器人
 
-其中包括指令man、ip、time、dict、youku、bt、zip、weather、 
+其中包括指令man、ip、time、dict、youku、yt、bt、zip、weather、 
 
 stack、id、checkid、url、deurl、joke、dream、song、bing、 
 
