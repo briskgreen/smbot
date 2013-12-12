@@ -243,6 +243,9 @@ int main(int argc,char **argv)
 		if(strstr(data,"!youku"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!youku","!youku <关键词> 功能:返回youku第一个链接",get_youku_url,4);
 
+		if(strstr(data,"!yt"))
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!yt","!yt <关键词> 功能:返回youtube第一个频道连接",get_youtube,4);
+
 		if(strstr(data,"!bt"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!bt","!bt <关键词> 功能:返回btdigg.org第一个磁力链接",get_bt,4);
 

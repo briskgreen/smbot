@@ -203,6 +203,66 @@ void get_youku_url(SMBOT_DATA *data)
 	free(data->arg);
 }
 
+void get_youtube(SMBOT_DATA *data)
+{
+	char *res;
+	char *url;
+	char *buf;
+	char *des;
+	HTTP *http;
+	int i;
+
+	null_and_help("!yt");
+	for(i=0;data->arg[i];++i)
+		if(data->arg[i] == ' ')
+			data->arg[i]='+';
+
+	buf=string_add("GET https://www.googleapis.com/youtube/v3/search?key=%s&part=snippet&maxResults=1&q=%s HTTP/1.1\n",GOOGLE_KEY,data->arg);
+	http=http_head_init();
+	http_head_add(http,buf);
+	http_head_add(http,"Accept: */*\n");
+	http_head_add(http,"Connect: close\n\n");
+	res=http_perform(http,"127.0.0.1",8087);
+	http_head_destroy(http);
+	free(buf);
+	printf("%s\n",data->arg);
+
+	if(res == NULL)
+	{
+		msg_send("淫家连接远程服务器失败了!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
+	printf("%s\n",res);
+	buf=match_string("\"videoId\": \".[^\"]*",res);
+	if(buf == NULL)
+	{
+		null_no_free(res);
+		msg_send("淫家没有找到肿么办!",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
+	url=string_add("http://www.youtube.com/watch?v=%s",buf+12);
+	free(buf);
+	des=match_string("\"description\": \".[^\"]*",res);
+	buf=match_string("\"title\": \".[^\"]*",res);
+	free(res);
+
+	res=string_add("%s -- %s -- %s",buf+10,des+16,url);
+	free(buf);
+	free(des);
+	free(url);
+
+	msg_send(res,data);
+	free(res);
+	smbot_destory(data);
+	free(data->arg);
+}
+
 void get_bt(SMBOT_DATA *data)
 {
 	char *res;
@@ -360,8 +420,7 @@ void get_stack(SMBOT_DATA *data)
 		return;
 	}
 
-	//buf=strstr(res,"<div class=\"result-link\">");
-	buf=match_string("<a href=\"/questions/.[^>]*",res);
+	buf=strstr(res,"<div class=\"result-link\">");
 	if(buf == NULL)
 	{
 		msg_send("淫家木有发现目标了啦!",data);
@@ -371,9 +430,9 @@ void get_stack(SMBOT_DATA *data)
 	}
 
 	url=match_string("/questions.[^\"]*",buf);
-	des=match_string("title=\".[^\"]*",buf);
+	des=match_string("Q: .[^<]*",buf);
 	free(res);
-	res=string_add("%s <-- http://stackoverflow.com%s",des+7,url);
+	res=string_add("%s <-- http://stackoverflow.com%s",des,url);
 	free(url);
 	free(des);
 	msg_send(res,data);

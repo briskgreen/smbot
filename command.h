@@ -4,7 +4,7 @@
 #include "smbot.h"
 
 #define BING_AU "your bing key"
-#define GOOGLE_KEY "your google key"
+#define GOOGLE_KEY "your google api key"
 
 void get_man_url(SMBOT_DATA *data);
 
@@ -13,6 +13,8 @@ void get_ip_addr(SMBOT_DATA *data);
 void bing_dict(SMBOT_DATA *data);
 
 void get_youku_url(SMBOT_DATA *data);
+
+void get_youtube(SMBOT_DATA *data);
 
 void get_bt(SMBOT_DATA *data);
 
