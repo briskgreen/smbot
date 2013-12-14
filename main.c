@@ -225,7 +225,7 @@ int main(int argc,char **argv)
 		printf("%s\n",data);
 
 		if(strstr(data,"!man"))
-			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!man","!man [0-9] <要查询的内容> 功能:返回linuxmanpages连接",get_man_url,5);
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!man","!man [1-9] <要查询的内容> 功能:返回linuxmanpages连接",get_man_url,5);
 
 		if(strstr(data,"!ip"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!ip","!ip <ipv4/6地址或域名> 功能:返回ipv4/6或者域名的物理位置",get_ip_addr,5);
