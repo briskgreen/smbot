@@ -30,7 +30,7 @@ void get_man_url(SMBOT_DATA *data)
 	else if((data->arg[0] > '9' || data->arg[0] < '0') && data->arg[1] != ' ')
 		buf=string_add("term=%s&section=-1&submitted=1\n\n",
 				data->arg);
-        else if((data->arg[1] == '\0') || (data->arg[3] == ' '))
+        else /*if((data->arg[1] == '\0') || (data->arg[3] == ' '))*/
         {
                 msg_send("你一定是输入方式不对!",data);
                 smbot_destory(data);
