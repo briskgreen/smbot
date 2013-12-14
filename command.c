@@ -24,10 +24,10 @@ void get_man_url(SMBOT_DATA *data)
 
 	null_and_help("!man");
 
-	if((data->arg[0] <= '9' && data->arg[0] >= '1') && data->arg[1] == ' ')
+	if((data->arg[0] <= '8' && data->arg[0] >= '1') && data->arg[1] == ' ')
 		buf=string_add("term=%s&section=%c&submitted=1\n\n",
 				data->arg+2,data->arg[0]);
-	else if((data->arg[0] > '9' || data->arg[0] < '0') && data->arg[1] != ' ')
+	else if((data->arg[0] > '8' || data->arg[0] < '0') && data->arg[1] != ' ')
 		buf=string_add("term=%s&section=-1&submitted=1\n\n",
 				data->arg);
         else /*if((data->arg[1] == '\0') || (data->arg[3] == ' '))*/
