@@ -443,6 +443,17 @@ void get_stack(SMBOT_DATA *data)
 	url=match_string("/questions.[^\"]*",buf);
 	des=match_string("Q: .[^<]*",buf);
 	free(res);
+
+	if(url == NULL || des == NULL)
+	{
+		msg_send("啊哦，出了点小问题哦!",data);
+		smbot_destory(data);
+		null_no_free(url);
+		null_no_free(des);
+		free(data->arg);
+		return;
+	}
+
 	res=string_add("%s <-- http://stackoverflow.com%s",des,url);
 	free(url);
 	free(des);
