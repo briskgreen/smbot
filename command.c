@@ -692,6 +692,15 @@ void get_song_url(SMBOT_DATA *data)
 
 	buf=match_string("<a href=\"/song/.[^\"]*",res);
 	free(res);
+
+	if(buf == NULL)
+	{
+		msg_send("啊哦，淫家木有发现结果肿么办〇。〇",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
 	strreplace(buf,"<a href=\"","http://music.baidu.com",url,512);
 	free(buf);
 	
