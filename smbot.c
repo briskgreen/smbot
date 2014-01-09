@@ -142,6 +142,27 @@ char *get_arg(char *buf,char *prg,char *des)
 	return res;
 }
 
+int pong(char *reg,char *data)
+{
+	regex_t preg;
+	regmatch_t pmatch[1];
+
+	if(regcomp(&preg,reg,0) != 0)
+	{
+		regfree(&preg);
+		return 0;
+	}
+
+	if(regexec(&preg,data,1,pmatch,0) != 0)
+	{
+		regfree(&preg);
+		return 0;
+	}
+
+	regfree(&preg);
+	return 1;
+}
+
 void pong_server(char *msg,bool is_use_ssl)
 {
 	msg[1]='O';

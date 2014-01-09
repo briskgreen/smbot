@@ -31,6 +31,8 @@ char *get_nick(char *msg);
 
 char *get_arg(char *buf,char *prg,char *des);
 
+int pong(char *reg,char *data);
+
 void pong_server(char *msg,bool is_use_ssl);
 
 char *get_channel(char *msg);

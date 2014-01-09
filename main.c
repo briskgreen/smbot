@@ -323,7 +323,8 @@ int main(int argc,char **argv)
 			continue;
 		}
 
-		if(strstr(data,"PING") && !strstr(data,"PRIVMSG"))
+		//if(strstr(data,"PING") && !strstr(data,"PRIVMSG"))
+		if(pong("^PING :.*",data))
 			pong_server(data,is_use_ssl);
 	}
 
