@@ -638,7 +638,7 @@ send:
 	free(data->arg);
 }
 
-void get_dream(SMBOT_DATA *data)
+/*void get_dream(SMBOT_DATA *data)
 {
 	int pipefd[2];
 	char temp[512]={0};
@@ -665,6 +665,46 @@ void get_dream(SMBOT_DATA *data)
 	read(pipefd[0],temp,512);
 
 	msg_send(temp,data);
+	smbot_destory(data);
+	free(data->arg);
+}*/
+
+void get_dream(SMBOT_DATA *data)
+{
+	char *res;
+	char *url;
+	char *buf;
+	
+	null_and_help("!dream");
+
+	url=url_encode(data->arg);
+	buf=string_add("http://api2.sinaapp.com/search/dream/?appkey=0020130430&appsecert=fa6095e113cd28fd&reqtype=text&keyword=%s",url);
+	free(url);
+
+	res=http_get_simple(buf,80);
+	free(buf);
+	if(res == NULL)
+	{
+		msg_send("额，那个什么，俺没连上",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
+	buf=match_string("content\":\".[^\}]*",res);
+	if(buf == NULL)
+	{
+		msg_send("查询出了点小小滴问题",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+	free(res);
+	res=strnstr(buf+strlen("content\":\""),-1);
+	free(buf);
+
+	msg_send(res,data);
+	free(res);
 	smbot_destory(data);
 	free(data->arg);
 }
@@ -1109,14 +1149,19 @@ void get_sm_message(SMBOT_DATA *data)
 {
 	char *res;
 	char *buf;
-	char temp[512];
+	char *url;
+	char temp[1024];
 	int i;
 
 	null_and_help("!sm");
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
-	buf=string_add("http://xiaofengrobot.sinaapp.com/web.php?callback=jQuery191041205509454157474_1376842442554&para=%s&_=1376842442555",data->arg);
+
+	url=url_encode(data->arg);
+	buf=string_add("http://xiaofengrobot.sinaapp.com/web.php?callback=jQuery191041205509454157474_1376842442554&para=%s&_=1376842442555",url);
+	free(url);
+
 	while(1)
 	{
 		res=http_get_simple(buf,80);
@@ -1155,7 +1200,7 @@ void get_sm_message(SMBOT_DATA *data)
 	res=unicode_to_utf(buf+6);
 	free(buf);
 
-	if(strreplace(res,"<br>","",temp,511) != -1)
+	if(strreplace(res,"<br>","",temp,1023) != -1)
 		msg_send(temp,data);
 	else
 		msg_send(res,data);
