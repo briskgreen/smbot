@@ -1,4 +1,5 @@
 #include "config.h"
+#include <sys/time.h>
 
 bool is_use_ssl=FALSE;
 
@@ -159,13 +160,16 @@ void send_time(bool is_use_ssl,char *data)
 int smbot_select(int sockfd,SSL *ssl,bool is_use_ssl)
 {
 	fd_set reads;
+	struct timeval timeout;
 
 	FD_ZERO(&reads);
 	if(is_use_ssl)
 		sockfd=SSL_get_fd(ssl);
 	FD_SET(sockfd,&reads);
+	timeout.tv_sec=10*60;
+	timeout.tv_usec=0;
 	
-	return select(sockfd+1,&reads,NULL,NULL,NULL);
+	return select(sockfd+1,&reads,NULL,NULL,&timeout);
 }
 
 int main(int argc,char **argv)
@@ -212,7 +216,8 @@ int main(int argc,char **argv)
 
 	while(1)
 	{
-		smbot_select(sockfd,ssl,is_use_ssl);
+		if(smbot_select(sockfd,ssl,is_use_ssl) <= 0)
+			break;
 
 		if(is_use_ssl)
 			data=ssl_read_line(ssl);
@@ -330,5 +335,6 @@ int main(int argc,char **argv)
 
 	task_factory_destroy(task);
 	ssl_close(ssl);
+
 	return 0;
 }
