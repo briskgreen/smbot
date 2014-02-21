@@ -60,7 +60,7 @@ void msgto(int sockfd,const char *channel,const char *nick,
 			buf=string_add("PRIVMSG %s :%s: %s\n",
 					channel,nick,msg);
 
-		SSL_write(ssl,buf,strlen(buf));
+		send(sockfd,buf,strlen(buf),0);
 		free(buf);
 	}
 
