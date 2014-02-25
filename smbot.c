@@ -193,7 +193,7 @@ char *get_nick(char *msg)
 	return buf;
 }
 
-char *get_arg(char *buf,char *prg,char *des)
+char *get_arg(char *buf,char *prg,char *des,bool *have_arg)
 {
 	regex_t preg;
 	regmatch_t pmatch[1];
@@ -205,11 +205,13 @@ char *get_arg(char *buf,char *prg,char *des)
 	if(regcomp(&preg,prg,0) != 0)
 	{
 		regfree(&preg);
+		*have_arg=FALSE;
 		return NULL;
 	}
 	if(regexec(&preg,buf,1,pmatch,0) != 0)
 	{
 		regfree(&preg);
+		*have_arg=FALSE;
 		return NULL;
 	}
 	regfree(&preg);
@@ -217,10 +219,17 @@ char *get_arg(char *buf,char *prg,char *des)
 	index=pmatch[0].rm_eo;
 	temp=buf[index];
 	if(temp != ' ' && temp == '\r')
+	{
+		*have_arg=FALSE;
 		return des;
+	}
 	else if(temp != ' ' && temp != '\r')
+	{
+		*have_arg=FALSE;
 		return NULL;
+	}
 
+	*have_arg=TRUE;
 	for(index+=2,len=1;buf[index];++len,++index);
 	res=malloc(len);
 	strncpy(res,buf+pmatch[0].rm_eo+1,len-1);
@@ -338,7 +347,7 @@ void parse_and_perform(TASK_FACTORY *task,char *msg,char *reg,
 	data=malloc(sizeof(SMBOT_DATA));
 	data->nick=get_nick(msg);
 	data->channel=get_channel(msg);
-	data->arg=get_arg(msg,reg,des);
+	data->arg=get_arg(msg,reg,des,&data->have_arg);
 	data->is_use_ssl=is_use_ssl;
 	task_factory_add(task,func,data,priority);
 }

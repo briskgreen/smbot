@@ -1,13 +1,13 @@
 #include "command.h"
 
-#define null_and_help(msg_arg) \
+#define null_and_help() \
 {\
 	if(data->arg == NULL)\
 	{\
 		smbot_destory(data);\
 		return;\
 	}\
-	if(strstr(data->arg,msg_arg))\
+	if(!data->have_arg)\
 	{\
 		msg_send(data->arg,data);\
 		smbot_destory(data);\
@@ -22,7 +22,7 @@ void get_man_url(SMBOT_DATA *data)
 	char *buf;
 	char *res;
 
-	null_and_help("!man");
+	null_and_help();
 
 	if((data->arg[0] <= '8' && data->arg[0] >= '1') && data->arg[1] == ' ')
 		buf=string_add("term=%s&section=%c&submitted=1\n\n",
@@ -77,7 +77,7 @@ void get_ip_addr(SMBOT_DATA *data)
 	int pipefd[2];
 	char temp[1024]={0};
 
-	null_and_help("!ip");
+	null_and_help();
 
 	pipe(pipefd);
 	if(fork() == 0)
@@ -106,7 +106,7 @@ void bing_dict(SMBOT_DATA *data)
 	HTTP *http;
 	int i;
 
-	null_and_help("!dict");
+	null_and_help();
 	for(i=0;data->arg[i]!= ' ';++i)
 		if(data->arg[i] == '\0')
 			break;
@@ -169,7 +169,7 @@ void get_youku_url(SMBOT_DATA *data)
 	char *title;
 	char *url;
 
-	null_and_help("!youku");
+	null_and_help();
 	url=url_encode(data->arg);
 	buf=string_add("http://www.soku.com/search_video/q_%s",url);
 	free(url);
@@ -220,7 +220,7 @@ void get_youtube(SMBOT_DATA *data)
 	HTTP *http;
 	int i;
 
-	null_and_help("!yt");
+	null_and_help();
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -281,7 +281,7 @@ void get_bt(SMBOT_DATA *data)
 	char *head;
 	HTTP *http;
 
-	null_and_help("!bt");
+	null_and_help();
 	buf=url_encode(data->arg);
 	head=string_add("GET http://btdigg.org/search?info_hash=&q=%s HTTP/1.1\n",buf);
 	free(buf);
@@ -322,7 +322,7 @@ void get_zip_code(SMBOT_DATA *data)
 	char *buf;
 	char *temp;
 
-	null_and_help("!zip");
+	null_and_help();
 	to_iconv("UTF-8//","GBK//",data->arg,strlen(data->arg),
 			code,80);
 	buf=string_add("http://opendata.baidu.com/post/s?wd=%s&p=mini&rn=20",code);
@@ -369,7 +369,7 @@ void get_weather(SMBOT_DATA *data)
 	char *res;
 	char *buf;
 
-	null_and_help("!weather");
+	null_and_help();
 	buf=string_add("http://v.juhe.cn/weather/index?cityname=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
@@ -416,7 +416,7 @@ void get_stack(SMBOT_DATA *data)
 	char *buf;
 	int i;
 
-	null_and_help("!stack");
+	null_and_help();
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -468,7 +468,7 @@ void get_id_information(SMBOT_DATA *data)
 	char *res;
 	char *buf;
 
-	null_and_help("!id");
+	null_and_help();
 	buf=string_add("http://apis.juhe.cn/idcard/index?key=your api key&cardno=%s",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
@@ -501,7 +501,7 @@ void check_id_card(SMBOT_DATA *data)
 	char temp[1024]={0};
 	int pipefd[2];
 
-	null_and_help("!checkid");
+	null_and_help();
 	pipe(pipefd);
 	
 	if(fork() == 0)
@@ -527,7 +527,7 @@ void get_url_encode(SMBOT_DATA *data)
 {
 	char *url;
 
-	null_and_help("!url");
+	null_and_help();
 	url=url_encode(data->arg);
 	msg_send(url,data);
 	free(url);
@@ -539,7 +539,7 @@ void get_url_decode(SMBOT_DATA *data)
 {
 	char *res;
 
-	null_and_help("!deurl");
+	null_and_help();
 	res=url_decode(data->arg);
 	msg_send(res,data);
 	free(res);
@@ -556,7 +556,7 @@ void get_joke(SMBOT_DATA *data)
 	char temp[1024]={0};
 	int i;
 
-	null_and_help("!joke");
+	null_and_help();
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -644,7 +644,7 @@ send:
 	char temp[512]={0};
 	int i;
 
-	null_and_help("!dream");
+	null_and_help();
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -675,7 +675,7 @@ void get_dream(SMBOT_DATA *data)
 	char *url;
 	char *buf;
 	
-	null_and_help("!dream");
+	null_and_help();
 
 	url=url_encode(data->arg);
 	buf=string_add("http://api2.sinaapp.com/search/dream/?appkey=0020130430&appsecert=fa6095e113cd28fd&reqtype=text&keyword=%s",url);
@@ -716,7 +716,7 @@ void get_song_url(SMBOT_DATA *data)
 	char url[512];
 	char *code;
 
-	null_and_help("!song");
+	null_and_help();
 	code=url_encode(data->arg);
 	buf=string_add("http://music.baidu.com/search?key=%s",code);
 	free(code);
@@ -758,7 +758,7 @@ void get_bing(SMBOT_DATA *data)
 	char *des;
 	HTTP *http;
 
-	null_and_help("!bing");
+	null_and_help();
 	url=url_encode(data->arg);
 	http=http_head_init();
 	res=string_add("GET /Bing/SearchWeb/v1/Web?Query=%%27%s%%27&$top=1&$skip=0&$format=json HTTP/1.1\n",url);
@@ -811,7 +811,7 @@ void get_google_image_url(SMBOT_DATA *data)
 	HTTP *http;
 	int i;
 
-	null_and_help("!image");
+	null_and_help();
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -866,7 +866,7 @@ void get_google(SMBOT_DATA *data)
 	HTTP *http;
 	int i;
 
-	null_and_help("!google");
+	null_and_help();
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -920,7 +920,7 @@ void get_baidu(SMBOT_DATA *data)
 	char *url;
 	int i;
 
-	null_and_help("!baidu");
+	null_and_help();
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -968,7 +968,7 @@ void get_bimg(SMBOT_DATA *data)
 	char *buf;
 	int i;
 
-	null_and_help("!bimg");
+	null_and_help();
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';
@@ -1015,7 +1015,7 @@ void get_air(SMBOT_DATA *data)
 	char *buf;
 	char *res;
 
-	null_and_help("!air");
+	null_and_help();
 	buf=string_add("http://web.juhe.cn/environment/air/cityair?city=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,8080);
 	free(buf);
@@ -1049,7 +1049,7 @@ void get_website_testing(SMBOT_DATA *data)
 	char *res;
 	char *buf;
 
-	null_and_help("!website");
+	null_and_help();
 	buf=string_add("http://apis.juhe.cn/webscan/?domain=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
@@ -1082,7 +1082,7 @@ void get_wifi(SMBOT_DATA *data)
 	char *buf;
 	char *res;
 
-	null_and_help("!wifi");
+	null_and_help();
 	res=url_encode(data->arg);
 	buf=string_add("http://apis.juhe.cn/wifi/region?key=your api key&city=%s",res);
 	free(res);
@@ -1118,7 +1118,7 @@ void get_train(SMBOT_DATA *data)
 	char *res;
 	char *buf;
 
-	null_and_help("!train");
+	null_and_help();
 	buf=string_add("http://apis.juhe.cn/train/s?name=%s&key=your api key",data->arg);
 	res=http_get_simple(buf,80);
 	free(buf);
@@ -1153,7 +1153,7 @@ void get_sm_message(SMBOT_DATA *data)
 	char temp[1024];
 	int i;
 
-	null_and_help("!sm");
+	null_and_help();
 	for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
 			data->arg[i]='+';

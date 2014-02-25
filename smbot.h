@@ -18,6 +18,7 @@ typedef struct
 	char *nick;
 	char *channel;
 	char *arg;
+	bool have_arg;
 	bool is_use_ssl;
 }SMBOT_DATA;
 
@@ -29,7 +30,7 @@ void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 
 char *get_nick(char *msg);
 
-char *get_arg(char *buf,char *prg,char *des);
+char *get_arg(char *buf,char *prg,char *des,bool *have_arg);
 
 int pong(char *reg,char *data);
 
