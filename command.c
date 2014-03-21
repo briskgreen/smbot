@@ -1154,9 +1154,9 @@ void get_sm_message(SMBOT_DATA *data)
 	int i;
 
 	null_and_help();
-	for(i=0;data->arg[i];++i)
+	/*for(i=0;data->arg[i];++i)
 		if(data->arg[i] == ' ')
-			data->arg[i]='+';
+			data->arg[i]='+';*/
 
 	url=url_encode(data->arg);
 	buf=string_add("http://xiaofengrobot.sinaapp.com/web.php?callback=jQuery191041205509454157474_1376842442554&para=%s&_=1376842442555",url);
