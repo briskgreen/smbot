@@ -249,6 +249,7 @@ void get_youku_url(SMBOT_DATA *data)
 	else
 		msg_send("哎呀，俺什么也没有查到!",data);
 
+	curl_easy_cleanup(curl);
 	smbot_destory(data);
 	free(data->arg);
 }
