@@ -14,8 +14,16 @@
 		return;\
 	}\
 }
+#define CHARSIZE sizeof(char)
+
+typedef struct
+{
+	int len;
+	char *data;
+}retdata;
 
 void msg_send(const char *msg,SMBOT_DATA *data);
+size_t get_data(char *ptr,size_t size,size_t nmemb,retdata *data);
 
 void get_man_url(SMBOT_DATA *data)
 {
@@ -162,7 +170,7 @@ void bing_dict(SMBOT_DATA *data)
 	free(data->arg);
 }
 
-void get_youku_url(SMBOT_DATA *data)
+/*void get_youku_url(SMBOT_DATA *data)
 {
 	char *res;
 	char *buf;
@@ -207,6 +215,40 @@ void get_youku_url(SMBOT_DATA *data)
 	free(title);
 	free(url);
 	msg_send(res,data);
+	smbot_destory(data);
+	free(data->arg);
+}*/
+void get_youku_url(SMBOT_DATA *data)
+{
+	CURL *curl;
+	retdata ret;
+	char *res;
+	char *buf;
+	char *url;
+	
+	null_and_help();
+	url=url_encode(data->arg);
+	buf=string_add("http://brisk.eu.org/api/youku.php?q=%s",url);
+	free(url);
+
+	curl=curl_easy_init();
+	ret.data=NULL;
+	ret.len=0;
+
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("连接网络出现错误了哦",data);
+	else if(ret.len)
+	{
+		res=youku_parse(ret.data);
+		msg_send(res,data);
+		free(ret.data);
+	}
+	else
+		msg_send("哎呀，俺什么也没有查到!",data);
+
 	smbot_destory(data);
 	free(data->arg);
 }
@@ -1215,4 +1257,29 @@ void msg_send(const char *msg,SMBOT_DATA *data)
 		ssl_msgto(ssl,data->channel,data->nick,msg);
 	else
 		msgto(sockfd,data->channel,data->nick,msg);
+}
+
+size_t get_data(char *ptr,size_t size,size_t nmemb,retdata *data)
+{
+	if(data->len)
+	{
+		char *temp;
+
+		temp=malloc(CHARSIZE*data->len+1);
+		snprintf(temp,CHARSIZE*data->len+1,"%s",data->data);
+		free(data->data);
+
+		data->data=malloc(CHARSIZE*(data->len+nmemb)+1);
+		snprintf(data->data,CHARSIZE*(data->len+nmemb)+1,"%s%s",temp,ptr);
+		free(temp);
+	}
+	else
+	{
+		data->data=malloc(CHARSIZE*nmemb+1);
+		snprintf(data->data,CHARSIZE*nmemb+1,"%s",ptr);
+	}
+
+	data->len+=nmemb;
+
+	return nmemb;
 }

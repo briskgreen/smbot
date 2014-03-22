@@ -1,7 +1,9 @@
 #ifndef _COMMAND_H
 #define _COMMAND_H
 
+#include <curl/curl.h>
 #include "smbot.h"
+#include "parse.h"
 
 #define BING_AU "your bing key"
 #define GOOGLE_KEY "your google api key"
