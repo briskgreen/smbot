@@ -33,6 +33,43 @@ char *youku_parse(char *str)
 	return res;
 }
 
+char *google_parse(char *str)
+{
+	char *res=NULL;
+	json_object *obj;
+	json_object *item;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data("返回了错误的数据!");
+	obj=json_object_object_get(obj,"items");
+	if(obj == NULL)
+		return error_data("啊哦，查询出错了哦!");
+
+	obj=json_object_array_get_idx(obj,0);
+	if(obj == NULL)
+		return error_data("啊哦，查询出错了哦!");
+	item=json_object_object_get(obj,"title");
+	if(item == NULL)
+		return error_data("啊哦，查询出错了哦!");
+	res=stradd(res,json_object_get_string(item));
+	res=stradd(res," <-> ");
+	json_object_put(item);
+
+	item=json_object_object_get(obj,"link");
+	res=stradd(res,json_object_get_string(item));
+	res=stradd(res," ----");
+	json_object_put(item);
+
+	item=json_object_object_get(obj,"snippet");
+	res=stradd(res,json_object_get_string(item));
+	json_object_put(item);
+
+	json_object_put(obj);
+
+	return res;
+}
+
 char *error_data(char *msg)
 {
 	char *res;

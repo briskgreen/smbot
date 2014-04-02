@@ -5,4 +5,6 @@
 
 char *youku_parse(char *str);
 
+char *google_parse(char *str);
+
 #endif

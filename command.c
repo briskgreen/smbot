@@ -245,6 +245,7 @@ void get_youku_url(SMBOT_DATA *data)
 		res=youku_parse(ret.data);
 		msg_send(res,data);
 		free(ret.data);
+		null_no_free(res);
 	}
 	else
 		msg_send("哎呀，俺什么也没有查到!",data);
@@ -900,7 +901,7 @@ void get_google_image_url(SMBOT_DATA *data)
 	free(data->arg);
 }
 
-void get_google(SMBOT_DATA *data)
+/*void get_google(SMBOT_DATA *data)
 {
 	char *res;
 	char *url;
@@ -916,10 +917,10 @@ void get_google(SMBOT_DATA *data)
 	buf=string_add("GET https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s HTTP/1.1\n",GOOGLE_KEY,data->arg);
 	/*res=https_get_simple(buf,443);
 	free(buf);*/
-	http=http_head_init();
-	http_head_add(http,buf);
-	http_head_add(http,"Accept: */*\n");
-	http_head_add(http,"Connection: close\n\n");
+//	http=http_head_init();
+//	http_head_add(http,buf);
+//	http_head_add(http,"Accept: */*\n");
+/*	http_head_add(http,"Connection: close\n\n");
 	res=http_perform(http,"127.0.0.1",8087);
 	http_head_destroy(http);
 	free(buf);
@@ -949,6 +950,42 @@ void get_google(SMBOT_DATA *data)
 	res=string_add("%s <--%s",url+9,des+12);
 	msg_send(res,data);
 	free(res);
+	smbot_destory(data);
+	free(data->arg);
+}*/
+
+void get_google(SMBOT_DATA *data)
+{
+	CURL *curl;
+	retdata ret;
+	char *buf;
+	char *url;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s",GOOGLE_KEY,url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
+	curl_easy_setopt(curl,CURLOPT_PROXY,"127.0.0.1:8087");
+	if(curl_easy_perform(curl) != 0)
+		msg_send("连接网络出现错误了哦!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=google_parse(ret.data);
+		free(ret.data);
+		msg_send(buf,data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
 	smbot_destory(data);
 	free(data->arg);
 }

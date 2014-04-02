@@ -6,7 +6,7 @@
 #include "parse.h"
 
 #define BING_AU "your bing key"
-#define GOOGLE_KEY "your google api key"
+#define GOOGLE_KEY "your google key"
 
 void get_man_url(SMBOT_DATA *data);
 
