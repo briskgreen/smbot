@@ -973,7 +973,7 @@ void get_google(SMBOT_DATA *data)
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
-	curl_easy_setopt(curl,CURLOPT_PROXY,"127.0.0.1:8087");
+	//curl_easy_setopt(curl,CURLOPT_PROXY,"127.0.0.1:8087");
 	if(curl_easy_perform(curl) != 0)
 		msg_send("连接网络出现错误了哦!",data);
 	else if(ret.len)
