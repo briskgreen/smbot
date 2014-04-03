@@ -108,6 +108,59 @@ void get_ip_addr(SMBOT_DATA *data)
 
 void bing_dict(SMBOT_DATA *data)
 {
+	CURL *curl;
+	char *buf;
+	char *url;
+	char *res;
+	retdata ret;
+	int i;
+
+	null_and_help();
+	for(i=0;data->arg[i] != ' ';++i)
+		if(data->arg[i] == '\0')
+			break;
+	if(data->arg[i] == '\0')
+	{
+		msg_send("哎哟，表酱紫吗，你的格式错误了啦^_^",data);
+		smbot_destory(data);
+		free(data->arg);
+		return;
+	}
+
+	buf=strnstr(data->arg,i);
+	url=url_encode(data->arg+i+1);
+	ret.len=0;
+	ret.data=NULL;
+	res=string_add("https://api.datamarket.azure.com/Bing/MicrosoftTranslator/v1/Translate?Text=%%27%s%%27&To=%%27%s%%27&$skip=0&$top=1&$format=json",url,buf);
+	free(url);
+	free(buf);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,res);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
+	curl_easy_setopt(curl,CURLOPT_HTTPAUTH,CURLAUTH_BASIC);
+	curl_easy_setopt(curl,CURLOPT_USERPWD,BING_AU);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("我那个XX艹，我竟然连接远程服务器出错了!",data);
+	else if(ret.len)
+	{
+		free(res);
+		res=dict_parse(ret.data);
+		free(ret.data);
+		msg_send(res,data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(res);
+	smbot_destory(data);
+	free(data->arg);
+
+}
+
+/*void bing_dict(SMBOT_DATA *data)
+{
 	char *res;
 	char *buf;
 	char *url;
@@ -135,9 +188,9 @@ void bing_dict(SMBOT_DATA *data)
 	http_head_add(http,res);
 	//null_no_free(res);
 	http_head_add(http,"Host: api.datamarket.azure.com\n");
-	http_head_add(http,BING_AU);
-	http_head_add(http,"Accept: */*\n");
-	http_head_add(http,"Connection: close\n\n");
+	http_head_add(http,BING_AU);*/
+//	http_head_add(http,"Accept: */*\n");
+/*	http_head_add(http,"Connection: close\n\n");
 
 	url=https_perform(http,"api.datamarket.azure.com",443,NULL,NULL);
 	free(res);
@@ -168,56 +221,8 @@ void bing_dict(SMBOT_DATA *data)
 	smbot_destory(data);
 	http_head_destroy(http);
 	free(data->arg);
-}
-
-/*void get_youku_url(SMBOT_DATA *data)
-{
-	char *res;
-	char *buf;
-	char *title;
-	char *url;
-
-	null_and_help();
-	url=url_encode(data->arg);
-	buf=string_add("http://www.soku.com/search_video/q_%s",url);
-	free(url);
-
-	while(1)
-	{
-		res=http_get_simple(buf,80);
-		if(res == NULL)
-			continue;
-		if(res <= '\0')
-		{
-			null_no_free(res);
-			continue;
-		}
-		else
-			break;
-	}
-
-	free(buf);
-	buf=match_string("<a title=.[^<]*",res);
-	free(res);
-	if(buf == NULL)
-	{
-		msg_send("俺没有发现目标，俺一定是打开方式不对!",data);
-		smbot_destory(data);
-		free(data->arg);
-		return;
-	}
-
-	title=match_string("<a title=\".[^\"]*",buf);
-	url=match_string("http://*.[^\"]*",buf);
-	free(buf);
-
-	res=string_add("%s <--%s",title+10,url);
-	free(title);
-	free(url);
-	msg_send(res,data);
-	smbot_destory(data);
-	free(data->arg);
 }*/
+
 void get_youku_url(SMBOT_DATA *data)
 {
 	CURL *curl;
@@ -253,6 +258,7 @@ void get_youku_url(SMBOT_DATA *data)
 	curl_easy_cleanup(curl);
 	smbot_destory(data);
 	free(data->arg);
+	free(buf);
 }
 
 void get_youtube(SMBOT_DATA *data)
@@ -410,6 +416,40 @@ void get_zip_code(SMBOT_DATA *data)
 
 void get_weather(SMBOT_DATA *data)
 {
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://v.juhe.cn/weather/index?key=your key&cityname=%s",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("我连啊连连啊连，对不起我没连上!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=weather_parse(ret.data);
+		free(ret.data);
+		msg_send(buf,data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+/*void get_weather(SMBOT_DATA *data)
+{
 	char *res;
 	char *buf;
 
@@ -450,7 +490,7 @@ void get_weather(SMBOT_DATA *data)
 	free(res);
 	smbot_destory(data);
 	free(data->arg);
-}
+}*/
 
 void get_stack(SMBOT_DATA *data)
 {
@@ -682,37 +722,6 @@ send:
 	free(data->arg);
 }
 
-/*void get_dream(SMBOT_DATA *data)
-{
-	int pipefd[2];
-	char temp[512]={0};
-	int i;
-
-	null_and_help();
-	for(i=0;data->arg[i];++i)
-		if(data->arg[i] == ' ')
-			data->arg[i]='+';
-	pipe(pipefd);
-
-	if(fork() == 0)
-	{
-		close(pipefd[0]);
-
-		dup2(pipefd[1],STDOUT_FILENO);
-		dup2(pipefd[1],STDERR_FILENO);
-
-		execl("exec/dream.sh","dream",data->arg,NULL);
-	}
-
-	close(pipefd[1]);
-	wait(NULL);
-	read(pipefd[0],temp,512);
-
-	msg_send(temp,data);
-	smbot_destory(data);
-	free(data->arg);
-}*/
-
 void get_dream(SMBOT_DATA *data)
 {
 	char *res;
@@ -795,6 +804,44 @@ void get_song_url(SMBOT_DATA *data)
 
 void get_bing(SMBOT_DATA *data)
 {
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+
+	ret.data=NULL;
+	ret.len=0;
+	buf=string_add("https://api.datamarket.azure.com/Bing/SearchWeb/v1/Web?Query=%%27%s%%27&$top=1&$skip=0&$format=json",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
+	curl_easy_setopt(curl,CURLOPT_HTTPAUTH,CURLAUTH_BASIC);
+	curl_easy_setopt(curl,CURLOPT_USERPWD,BING_AU);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("俺逢山过水，遇神杀神遇佛杀佛。。。好吧，淫家没连上远程服务器= =",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=bing_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+/*void get_bing(SMBOT_DATA *data)
+{
 	char *url;
 	char *buf;
 	char *title;
@@ -809,9 +856,9 @@ void get_bing(SMBOT_DATA *data)
 	free(url);
 	http_head_add(http,res);
 	//free(buf);
-	http_head_add(http,"Host: api.datamarket.azure.com\n");
-	http_head_add(http,"Accept: */*\n");
-	http_head_add(http,BING_AU);
+	http_head_add(http,"Host: api.datamarket.azure.com\n");*/
+//	http_head_add(http,"Accept: */*\n");
+/*	http_head_add(http,BING_AU);
 	http_head_add(http,"Connection: close\n\n");
 
 	buf=https_perform(http,"api.datamarket.azure.com",443,NULL,NULL);
@@ -844,7 +891,7 @@ void get_bing(SMBOT_DATA *data)
 	msg_send(res,data);
 	smbot_destory(data);
 	free(data->arg);
-}
+}*/
 
 void get_google_image_url(SMBOT_DATA *data)
 {
@@ -900,59 +947,6 @@ void get_google_image_url(SMBOT_DATA *data)
 	smbot_destory(data);
 	free(data->arg);
 }
-
-/*void get_google(SMBOT_DATA *data)
-{
-	char *res;
-	char *url;
-	char *buf;
-	char *des;
-	HTTP *http;
-	int i;
-
-	null_and_help();
-	for(i=0;data->arg[i];++i)
-		if(data->arg[i] == ' ')
-			data->arg[i]='+';
-	buf=string_add("GET https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s HTTP/1.1\n",GOOGLE_KEY,data->arg);
-	/*res=https_get_simple(buf,443);
-	free(buf);*/
-//	http=http_head_init();
-//	http_head_add(http,buf);
-//	http_head_add(http,"Accept: */*\n");
-/*	http_head_add(http,"Connection: close\n\n");
-	res=http_perform(http,"127.0.0.1",8087);
-	http_head_destroy(http);
-	free(buf);
-
-	if(res == NULL)
-	{
-		msg_send("啊哦,淫家连接远程服务器失败了!",data);
-		smbot_destory(data);
-		free(data->arg);
-		return;
-	}
-
-	url=match_string("\"link\": \".[^\"]*",res);
-	des=match_string("\"snippet\": \".[^\n]*",res);
-	null_no_free(res);
-	if(url == NULL || des == NULL)
-	{
-		null_no_free(url);
-		null_no_free(des);
-		smbot_destory(data);
-		free(data->arg);
-		return;
-	}
-	i=strlen(des);
-	des[i-2]='\0';
-
-	res=string_add("%s <--%s",url+9,des+12);
-	msg_send(res,data);
-	free(res);
-	smbot_destory(data);
-	free(data->arg);
-}*/
 
 void get_google(SMBOT_DATA *data)
 {
@@ -1159,6 +1153,40 @@ void get_website_testing(SMBOT_DATA *data)
 
 void get_wifi(SMBOT_DATA *data)
 {
+	CURL *curl;
+	char *url;
+	char *buf;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://apis.juhe.cn/wifi/region?key=your key&city=%s",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("哎呀呀，淫家连接远程服务器失败了!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=wifi_parse(ret.data);
+		free(ret.data);
+		msg_send(buf,data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+/*void get_wifi(SMBOT_DATA *data)
+{
 	char *buf;
 	char *res;
 
@@ -1191,7 +1219,7 @@ void get_wifi(SMBOT_DATA *data)
 	free(buf);
 	smbot_destory(data);
 	free(data->arg);
-}
+}*/
 
 void get_train(SMBOT_DATA *data)
 {
