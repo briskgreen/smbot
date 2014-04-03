@@ -50,6 +50,7 @@ void msgto(int sockfd,const char *channel,const char *nick,
 			free(temp);
 			len-=(350+n-index);
 			n+=350;
+			usleep(80000);
 		}
 	}
 	else
@@ -139,6 +140,7 @@ void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 			free(temp);
 			len-=(350+n-index);
 			n+=350;
+			usleep(80000);
 		}
 	}
 	else
