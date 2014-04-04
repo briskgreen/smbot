@@ -16,6 +16,7 @@ void msgto(int sockfd,const char *channel,const char *nick,
 	int send_n=0;
 	char *buf=NULL;
 	char *temp;
+	int count=0;
 
 	for(len=0;msg[len];++len)
 		if(msg[len] == '\n' || msg[len] == '\r')
@@ -50,7 +51,12 @@ void msgto(int sockfd,const char *channel,const char *nick,
 			free(temp);
 			len-=(350+n-index);
 			n+=350;
-			usleep(80000);
+
+			++count;
+			if(count > 5)
+				sleep(1);
+			else
+				usleep(80000);
 		}
 	}
 	else
@@ -106,6 +112,7 @@ void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 	//int post_len=0;
 	char *buf=NULL;
 	char *temp;
+	int count=0;
 
 	for(len=0;msg[len];++len)
 		if(msg[len] == '\n' || msg[len] == '\r')
@@ -140,7 +147,12 @@ void ssl_msgto(SSL *ssl,const char *channel,const char *nick,
 			free(temp);
 			len-=(350+n-index);
 			n+=350;
-			usleep(80000);
+			
+			++count;
+			if(count > 5)
+				sleep(1);
+			else
+				usleep(80000);
 		}
 	}
 	else
