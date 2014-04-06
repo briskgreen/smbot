@@ -326,6 +326,40 @@ void get_youtube(SMBOT_DATA *data)
 
 void get_bt(SMBOT_DATA *data)
 {
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://brisk.eu.org/api/magnet.php?q=%s",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("我做出了一个艰难的决定，我要告诉你我连接远程服务器失败了!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=bt_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+/*void get_bt(SMBOT_DATA *data)
+{
 	char *res;
 	char *buf;
 	char *head;
@@ -337,9 +371,9 @@ void get_bt(SMBOT_DATA *data)
 	free(buf);
 	http=http_head_init();
 	http_head_add(http,head);
-	http_head_add(http,"Host: btdigg.org\n");
-	http_head_add(http,"Accept: */*\n");
-	http_head_add(http,"Connection: close\n\n");
+	http_head_add(http,"Host: btdigg.org\n");*/
+//	http_head_add(http,"Accept: */*\n");
+/*	http_head_add(http,"Connection: close\n\n");
 
 	buf=http_perform(http,"127.0.0.1",8087);
 	http_head_destroy(http);
@@ -363,7 +397,7 @@ void get_bt(SMBOT_DATA *data)
 	free(res);
 	smbot_destory(data);
 	free(data->arg);
-}
+}*/
 
 void get_zip_code(SMBOT_DATA *data)
 {
@@ -986,6 +1020,40 @@ void get_google(SMBOT_DATA *data)
 
 void get_baidu(SMBOT_DATA *data)
 {
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://www.baidu.com/s?wd=%s&rsv_spt=1&issp=1&rsv_bp=0&ie=utf-8&tn=json&rn=1",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("哎呀，连接到远程服务器出错了〇。〇",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=baidu_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+/*void get_baidu(SMBOT_DATA *data)
+{
 	char *buf;
 	char *res;
 	char temp[512]={0};
@@ -1031,7 +1099,7 @@ void get_baidu(SMBOT_DATA *data)
 	free(res);
 	smbot_destory(data);
 	free(data->arg);
-}
+}*/
 
 void get_bimg(SMBOT_DATA *data)
 {
@@ -1080,6 +1148,40 @@ void get_bimg(SMBOT_DATA *data)
 	free(url);
 	msg_send(res,data);
 	free(res);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+void get_news(SMBOT_DATA *data)
+{
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://news.baidu.com/ns?word=%s&tn=json&rn=1",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("啊哦，淫家连接远程服务器失败了!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=news_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
 	smbot_destory(data);
 	free(data->arg);
 }

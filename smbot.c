@@ -320,7 +320,7 @@ char *get_channel(char *msg)
 
 void smbot_list(const char *msg,bool is_use_ssl)
 {
-	char *list="man、ip、time、dict、youku、yt、bt、zip、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、image、list、baidu、bimg、air、website、wifi、train、sm、help smbot";
+	char *list="man、ip、time、dict、youku、yt、bt、zip、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、image、list、baidu、bimg、news、air、website、wifi、train、sm、help smbot";
 	char *nick;
 	char *channel;
 

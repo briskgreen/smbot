@@ -299,6 +299,9 @@ int main(int argc,char **argv)
 		if(strstr(data,"!bimg"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!bimg","!bimg <关键词> 功能:返回百度图片搜索第一个结果",get_bimg,1);
 
+		if(strstr(data,"!news"))
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!news","!news <关键词> 功能:根据关键词返回百度新闻第一条结果",get_news,1);
+
 		if(strstr(data,"!air"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!air","!air <城市名称> 功能:查询城市空气质量，城市名称使用拼音",get_air,1);
 

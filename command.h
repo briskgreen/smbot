@@ -50,6 +50,8 @@ void get_baidu(SMBOT_DATA *data);
 
 void get_bimg(SMBOT_DATA *data);
 
+void get_news(SMBOT_DATA *data);
+
 void get_air(SMBOT_DATA *data);
 
 void get_website_testing(SMBOT_DATA *data);

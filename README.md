@@ -7,14 +7,14 @@ smbot是一个简单的irc机器人
 
 stack、id、checkid、url、deurl、joke、dream、song、bing、 
 
-google、image、list、baidu、bimg、air、website、wifi、 
+google、image、list、baidu、bimg、air、news、website、wifi、 
 
 train、sm、smbot 
 
 
 其中使用了Google Custom Search API、Bing Search API、Bing Translate API 
 
-以及聚合数据网络提供的一些api，除baidu、bimg外其它指令均是采用模拟浏览器 
+以及聚合数据网络提供的一些api，除baidu、news、bimg外其它指令均是采用模拟浏览器 
 
 方式使用GET或POST请求将得到的网页源码进行正则匹配。
 

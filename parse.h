@@ -15,4 +15,10 @@ char *weather_parse(char *str);
 
 char *wifi_parse(char *str);
 
+char *bt_parse(char *str);
+
+char *baidu_parse(char *str);
+
+char *news_parse(char *str);
+
 #endif

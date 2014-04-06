@@ -5,7 +5,7 @@
 
 char *error_data(char *msg);
 char *stradd(char *from,char *sub);
-void object_stradd(char **res,char *str,char *key,json_object *obj);
+int object_stradd(char **res,char *str,char *key,json_object *obj);
 
 char *youku_parse(char *str)
 {
@@ -204,7 +204,11 @@ char *wifi_parse(char *str)
 	obj=json_object_array_get_idx(obj,0);
 	if(obj == NULL)
 		return error_data("查询出错了哦!");
-	object_stradd(&res,"名字:","name",obj);
+	if(object_stradd(&res,"名字:","name",obj))
+	{
+		json_object_put(obj);
+		return res;
+	}
 	object_stradd(&res," 所在城市:","city",obj);
 	object_stradd(&res," 所在省份:","province",obj);
 	object_stradd(&res," 简介:","intro",obj);
@@ -213,6 +217,91 @@ char *wifi_parse(char *str)
 	object_stradd(&res," google纬度:","google_lat",obj);
 	object_stradd(&res," baidu经度:","baidu_lon",obj);
 	object_stradd(&res," baidu纬度:","baidu_lat",obj);
+
+	json_object_put(obj);
+
+	return res;
+}
+
+char *bt_parse(char *str)
+{
+	json_object *obj;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data("返回了错误的数据");
+	obj=json_object_array_get_idx(obj,0);
+	if(obj == NULL)
+		return error_data("没有发现结果");
+
+	if(object_stradd(&res,NULL,"title",obj))
+	{
+		json_object_put(obj);
+		return res;
+	}
+	object_stradd(&res," --- ","magnet",obj);
+	object_stradd(&res," 大小: ","size",obj);
+	object_stradd(&res," 文件数: ","files",obj);
+	object_stradd(&res," 下载数: ","downloads",obj);
+	object_stradd(&res," 添加时间: ","addtime",obj);
+	object_stradd(&res," 发现时间: ","update",obj);
+	object_stradd(&res," 虚假种子: ","fake",obj);
+
+	json_object_put(obj);
+
+	return res;
+}
+
+char *baidu_parse(char *str)
+{
+	json_object *obj;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data("没有查询到任何结果肿么办");
+	obj=json_object_object_get(obj,"feed");
+	obj=json_object_object_get(obj,"entry");
+	obj=json_object_array_get_idx(obj,0);
+	if(obj == NULL)
+		return error_data("没有查询到任何结果肿么办!");
+
+
+	if(object_stradd(&res,NULL,"title",obj))
+	{
+		json_object_put(obj);
+		return res;
+	}
+	object_stradd(&res," <-> ","url",obj);
+	object_stradd(&res," --- ","abs",obj);
+	
+	json_object_put(obj);
+
+	return res;
+}
+
+char *news_parse(char *str)
+{
+	json_object *obj;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data("查询出错了哦");
+	obj=json_object_object_get(obj,"feed");
+	obj=json_object_object_get(obj,"entry");
+	obj=json_object_array_get_idx(obj,0);
+	if(obj == NULL)
+		return error_data("查询出错了哦");
+
+	if(object_stradd(&res,NULL,"title",obj))
+	{
+		json_object_put(obj);
+		return res;
+	}
+	object_stradd(&res," <-> ","url",obj);
+	object_stradd(&res," --- ","abs",obj);
 
 	json_object_put(obj);
 
@@ -251,12 +340,19 @@ char *stradd(char *from,char *sub)
 	return res;
 }
 
-void object_stradd(char **res,char *str,char *key,json_object *obj)
+int object_stradd(char **res,char *str,char *key,json_object *obj)
 {
 	json_object *item;
 
 	item=json_object_object_get(obj,key);
+	if(item == NULL)
+	{
+		*res=stradd(*res,"啊哦，淫家没有发现任何结果!");
+		return 1;
+	}
 	*res=stradd(*res,str);
 	*res=stradd(*res,json_object_get_string(item));
 	json_object_put(item);
+
+	return 0;
 }
