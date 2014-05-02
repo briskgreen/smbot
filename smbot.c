@@ -291,6 +291,24 @@ void pong_server(char *msg,bool is_use_ssl)
 	free(msg);
 }
 
+void notice(char *data,bool is_use_ssl)
+{
+	char *nick=get_nick(data);
+	char *ping=strstr(data,"smbot :")+7;
+	char *msg;
+
+	msg=malloc(strlen(nick)+strlen(ping)+strlen("NOTICE ")+4);
+	sprintf(msg,"NOTICE %s :%s\n",nick,ping);
+
+	if(is_use_ssl)
+		SSL_write(ssl,msg,strlen(msg));
+	else
+		send(sockfd,msg,strlen(msg),0);
+
+	free(msg);
+	free(nick);
+}
+
 char *get_channel(char *msg)
 {
 	char *buf;

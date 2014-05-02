@@ -334,6 +334,8 @@ int main(int argc,char **argv)
 		//if(strstr(data,"PING") && !strstr(data,"PRIVMSG"))
 		if(pong("^PING :.*",data))
 			pong_server(data,is_use_ssl);
+		if(pong("^:.[^ ]* PRIVMSG smbot :\x1PING .*",data))
+			notice(data,is_use_ssl);
 	}
 
 	task_factory_destroy(task);

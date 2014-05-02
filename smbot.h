@@ -36,6 +36,8 @@ int pong(char *reg,char *data);
 
 void pong_server(char *msg,bool is_use_ssl);
 
+void notice(char *data,bool is_use_ssl);
+
 char *get_channel(char *msg);
 
 void smbot_list(const char *msg,bool is_use_ssl);
