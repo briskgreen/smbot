@@ -249,7 +249,7 @@ int flood(LIST *list,FD *data)
 	now=time(NULL);
 	if(data->flood > 0)
 	{
-		if(now-data->time > 60*data->flood)
+		if((now-data->time) > (60*data->flood))
 		{
 			data->flood=0;
 			data->count=0;
@@ -260,16 +260,19 @@ int flood(LIST *list,FD *data)
 	++data->count;
 	if(data->count%5 == 0)
 	{
-		if(now-data->time < 7)
+		if(now-data->time < 15)
 		{
 			data->time=now;
 			++data->flood;
+			goto end;
 		}
 
-		if(data->count/5 > 1)
+		data->time=now;
+		if((data->flood) && (data->count/5 > 1))
 			++data->flood;
 	}
 
+end:
 	if(data->count % 65535 == 0)
 		data->count=6;
 
