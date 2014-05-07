@@ -5,7 +5,7 @@ bool is_use_ssl=FALSE;
 
 #define parse_arg(reg,des,func,priority) \
 {\
-	parse_and_perform(task,data,reg,des,func,is_use_ssl,priority);\
+	parse_and_perform(task,list,data,reg,des,func,is_use_ssl,priority);\
 	free(data);\
 	continue;\
 }
@@ -176,6 +176,7 @@ int main(int argc,char **argv)
 {
 	TASK_FACTORY *task;
 	SMBOT_CONF *conf;
+	LIST *list;
 	struct sigaction act;
 	char *data;
 
@@ -213,6 +214,9 @@ int main(int argc,char **argv)
 
 	task_factory_add(task,time_keeping,&is_use_ssl,1);
 	smbot_conf_close(conf);
+	printf("init list . . .\n");
+	list=list_init();
+	printf("list init successed . . .\n");
 
 	while(1)
 	{

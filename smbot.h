@@ -3,6 +3,7 @@
 
 #include "TaskFactory/taskfactory.h"
 #include "mysock/mysock.h"
+#include "flood.h"
 #include <signal.h>
 #include <time.h>
 
@@ -40,11 +41,15 @@ void notice(char *data,bool is_use_ssl);
 
 char *get_channel(char *msg);
 
+char *get_ip(char *msg);
+
+void flood_send(int flood,char *nick,char *channel,bool is_use_ssl);
+
 void smbot_list(const char *msg,bool is_use_ssl);
 
 void smbot_help(const char *msg,bool is_use_ssl);
 
-void parse_and_perform(TASK_FACTORY *task,char *msg,char *reg,
+void parse_and_perform(TASK_FACTORY *task,LIST *list,char *msg,char *reg,
 		char *des,task_callback func,bool is_use_ssl,
 		unsigned int priority);
 

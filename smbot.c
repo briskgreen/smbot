@@ -336,6 +336,46 @@ char *get_channel(char *msg)
 	return buf;
 }
 
+char *get_ip(char *msg)
+{
+	int i=0;
+	int start;
+	char *buf=NULL;
+
+	while((msg[i] != '@') && (msg[i]))
+		++i;
+	start=i;
+
+	while((msg[i] != ' ') && (msg[i]))
+		++i;
+
+	buf=malloc(sizeof(char)*(i-start));
+	snprintf(buf,sizeof(char)*(i-start),"%s",msg+start+1);
+
+	return buf;
+}
+
+void flood_send(int flood,char *nick,char *channel,bool is_use_ssl)
+{
+	char msg[512]={0};
+
+	if((flood > 1) && (flood % 5 == 0))
+	{
+		snprintf(msg,512,"恭喜你，你已被加入防洪套餐%d分钟",flood);
+		if(is_use_ssl)
+			ssl_msgto(ssl,channel,nick,msg);
+		else
+			msgto(sockfd,channel,nick,msg);
+	}
+	else if(flood == 1)
+	{
+		if(is_use_ssl)
+			ssl_msgto(ssl,channel,nick,"恭喜你，你已被加入防洪套餐1分钟");
+		else
+			msgto(sockfd,channel,nick,"恭喜你，你已被加入防洪套餐1分钟");
+	}
+}
+
 void smbot_list(const char *msg,bool is_use_ssl)
 {
 	char *list="man、ip、time、dict、youku、yt、bt、zip、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、image、list、baidu、bimg、news、air、website、wifi、train、sm、help smbot";
@@ -370,16 +410,32 @@ void smbot_help(const char *msg,bool is_use_ssl)
 	free(nick);
 }
 
-void parse_and_perform(TASK_FACTORY *task,char *msg,char *reg,
+void parse_and_perform(TASK_FACTORY *task,LIST *list,char *msg,char *reg,
 		char *des,task_callback func,bool is_use_ssl,
 		unsigned int priority)
 {
 	SMBOT_DATA *data;
+	char *ip;
+	int t;
 
 	data=malloc(sizeof(SMBOT_DATA));
 	data->nick=get_nick(msg);
 	data->channel=get_channel(msg);
 	data->arg=get_arg(msg,reg,des,&data->have_arg);
+
+	if(data->arg)
+	{
+		ip=get_ip(msg);
+		t=flood_test(list,ip,data->nick);
+		if(t)
+		{
+			flood_send(t,data->nick,data->channel,is_use_ssl);
+			smbot_destory(data);
+			free(ip);
+			return;
+		}
+	}
+
 	data->is_use_ssl=is_use_ssl;
 	task_factory_add(task,func,data,priority);
 }

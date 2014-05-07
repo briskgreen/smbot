@@ -1,4 +1,4 @@
-LIBS=main.o config.o command.o parse.o smbot.o taskfactory.o mysock.o
+LIBS=main.o config.o command.o parse.o smbot.o taskfactory.o mysock.o flood.o
 
 smbot:$(LIBS)
 	gcc -o smbot $(LIBS) -lssl -lpthread -lcurl -ljson
@@ -23,6 +23,9 @@ taskfactory.o:TaskFactory/taskfactory.h TaskFactory/taskfactory.c
 
 mysock.o:mysock/mysock.h mysock/mysock.c 
 	gcc -c mysock/mysock.c
+
+flood.o:flood.h flood.c
+	gcc -c flood.c
 
 clean:
 	rm smbot *.o
