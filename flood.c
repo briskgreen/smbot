@@ -267,6 +267,9 @@ int flood(LIST *list,FD *data)
 			++data->flood;
 	}
 
+	if(data->count % 65535 == 0)
+		data->count=6;
+
 	if(list->hash == -1)
 	{
 		index=index_in_list(list,data->ip);
