@@ -7,8 +7,8 @@
 #include <time.h>
 #include <unistd.h>
 
-#define HASH_TO_STR(hash) #hash 
-#define FD_PATH(hash) "flood_data/" HASH_TO_STR(hash)
+//#define FD_PATH(hash) "flood_data/" HASH_TO_STR(hash)
+#define FD_PATH "flood_data/"
 #define FD_OVERFLOW "flood_data/overflow"
 
 #define HASH_LEN 5000

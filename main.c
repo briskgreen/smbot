@@ -194,6 +194,9 @@ int main(int argc,char **argv)
 	smbot_conf_open(conf);
 	smbot_conf_read(conf);
 	printf("read config successed . . .\n");
+	printf("init list . . .\n");
+	list=list_init();
+	printf("list init successed . . .\n");
 	printf("connect irc . . .\n");
 	if(strstr(conf->use_ssl,"true"))
 	{
@@ -214,9 +217,6 @@ int main(int argc,char **argv)
 
 	task_factory_add(task,time_keeping,&is_use_ssl,1);
 	smbot_conf_close(conf);
-	printf("init list . . .\n");
-	list=list_init();
-	printf("list init successed . . .\n");
 
 	while(1)
 	{

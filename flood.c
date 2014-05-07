@@ -11,14 +11,16 @@ int fd_insert(LIST *list,FD *data)
 	FILE *fp;
 	int h;
 	int len;
+	char path[256];
 
 	if(fd_get(list,data->ip))
 		return -1;
 
 	h=hash_fun(data->ip)%HASH_LEN;
-	if(access(FD_PATH(h),R_OK) != 0)
+	snprintf(path,256,"%s%u",FD_PATH,h);
+	if(access(path,R_OK) != 0)
 	{
-		if((fp=fopen(FD_PATH(h),"wb")) == NULL)
+		if((fp=fopen(path,"wb")) == NULL)
 			return -2;
 		len=1;
 		fwrite(&len,sizeof(int),1,fp);
@@ -27,7 +29,7 @@ int fd_insert(LIST *list,FD *data)
 	}
 	else
 	{
-		if((fp=fopen(FD_PATH(h),"r+")) == NULL)
+		if((fp=fopen(path,"r+")) == NULL)
 			return -2;
 		fread(&len,sizeof(int),1,fp);
 		if(len >= DATA_MAX)
@@ -56,15 +58,17 @@ FD *fd_get(LIST *list,char *ip)
 	FD *node;
 	int len;
 	int i;
+	char path[256];
 
 	if((res=list_get(list,ip)))
 		return res;
 
 	h=hash_fun(ip)%HASH_LEN;
-	if(access(FD_PATH(h),R_OK) != 0)
+	snprintf(path,256,"%s%u",FD_PATH,h);
+	if(access(path,R_OK) != 0)
 		return NULL;
 
-	if((fp=fopen(FD_PATH(h),"rb")) == NULL)
+	if((fp=fopen(path,"rb")) == NULL)
 		return NULL;
 	fread(&len,sizeof(int),1,fp);
 	list_cleanup(list);
@@ -240,6 +244,7 @@ int flood(LIST *list,FD *data)
 	time_t now;
 	FILE *fp;
 	int index;
+	char path[256];
 
 	now=time(NULL);
 	if(data->flood > 0)
@@ -257,6 +262,9 @@ int flood(LIST *list,FD *data)
 	{
 		if(now-data->time < 7)
 			++data->flood;
+
+		if(data->count/5 > 1)
+			++data->flood;
 	}
 
 	if(list->hash == -1)
@@ -269,10 +277,11 @@ int flood(LIST *list,FD *data)
 	}
 	else
 	{
+		snprintf(path,256,"%s%u",FD_PATH,list->hash);
 		index=index_in_list(list,data->ip);
 		if(index == -1)
 			return -1;
-		if((fp=fopen(FD_PATH(list->h),"r+")) == NULL)
+		if((fp=fopen(path,"r+")) == NULL)
 			return -1;
 	}
 
