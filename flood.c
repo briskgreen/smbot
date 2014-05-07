@@ -261,7 +261,10 @@ int flood(LIST *list,FD *data)
 	if(data->count%5 == 0)
 	{
 		if(now-data->time < 7)
+		{
+			data->time=now;
 			++data->flood;
+		}
 
 		if(data->count/5 > 1)
 			++data->flood;
