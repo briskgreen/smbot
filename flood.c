@@ -170,6 +170,7 @@ int flood_test(LIST *list,char *ip,char *nick)
 	node->time=time(NULL);
 	node->count=0;
 	node->flood=0;
+	node->blacklist=0;
 	fd_insert(list,node);
 
 	return 0;
@@ -246,6 +247,9 @@ int flood(LIST *list,FD *data)
 	int index;
 	char path[256];
 
+	if(data->blacklist)
+		return BLACKLIST;
+
 	now=time(NULL);
 	if(data->flood > 0)
 	{
@@ -275,6 +279,12 @@ int flood(LIST *list,FD *data)
 end:
 	if(data->count % 65535 == 0)
 		data->count=6;
+
+	if(data->flood > 30)
+	{
+		data->flood=30;
+		data->blacklist=1;
+	}
 
 	if(list->hash == -1)
 	{

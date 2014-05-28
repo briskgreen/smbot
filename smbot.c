@@ -361,7 +361,10 @@ void flood_send(int flood,char *nick,char *channel,bool is_use_ssl)
 
 	if((flood > 1) && (flood % 5 == 0))
 	{
-		snprintf(msg,512,"恭喜你，你已被加入防洪套餐%d分钟",flood);
+		if(flood == 30)
+			snprintf(msg,512,"恭喜你，你已被永久加入防洪套餐");
+		else
+			snprintf(msg,512,"恭喜你，你已被加入防洪套餐%d分钟",flood);
 		if(is_use_ssl)
 			ssl_msgto(ssl,channel,nick,msg);
 		else

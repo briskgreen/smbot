@@ -13,6 +13,7 @@
 
 #define HASH_LEN 5000
 #define DATA_MAX 50
+#define BLACKLIST 30
 
 typedef struct
 {
@@ -21,6 +22,7 @@ typedef struct
 	time_t time;
 	int count;
 	int flood;
+	int blacklist;
 }__attribute__((packed))FD;
 
 typedef struct list_node
