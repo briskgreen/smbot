@@ -21,4 +21,10 @@ char *baidu_parse(char *str);
 
 char *news_parse(char *str);
 
+char *word_parse(char *str);
+
+char *term_parse(char *str);
+
+char *idiom_parse(char *str);
+
 #endif

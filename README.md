@@ -9,7 +9,7 @@ stack、id、checkid、url、deurl、joke、dream、song、bing、
 
 google、image、list、baidu、bimg、air、news、website、wifi、 
 
-train、sm、smbot 
+train、sm、word、term、idiom、b64、deb64、smbot 
 
 
 其中使用了Google Custom Search API、Bing Search API、Bing Translate API 

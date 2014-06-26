@@ -1419,6 +1419,134 @@ void get_sm_message(SMBOT_DATA *data)
 	free(data->arg);
 }
 
+void get_word(SMBOT_DATA *data)
+{
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://brisk.eu.org/api/xhzd.php?word=%s",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("啊哦，淫家连接远程服务器失败了!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=word_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+void get_term(SMBOT_DATA *data)
+{
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://brisk.eu.org/api/hycd.php?word=%s",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("啊哦，淫家连接远程服务器失败了!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=term_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+void get_idiom(SMBOT_DATA *data)
+{
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://brisk.eu.org/api/cycd.php?word=%s",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("啊哦，淫家连接远程服务器失败了!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=idiom_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+void get_base64_encode(SMBOT_DATA *data)
+{
+	char *buf;
+
+	null_and_help();
+	buf=base64_encode(data->arg,strlen(data->arg));
+	msg_send(buf,data);
+
+	smbot_destory(data);
+	free(buf);
+	free(data->arg);
+}
+
+void get_base64_decode(SMBOT_DATA *data)
+{
+	char *buf;
+
+	null_and_help();
+	buf=base64_decode(data->arg,strlen(data->arg));
+	msg_send(buf,data);
+
+	smbot_destory(data);
+	free(buf);
+	free(data->arg);
+}
+
 void msg_send(const char *msg,SMBOT_DATA *data)
 {
 	if(data->is_use_ssl)

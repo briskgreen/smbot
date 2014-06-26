@@ -4,6 +4,7 @@
 #include <curl/curl.h>
 #include "smbot.h"
 #include "parse.h"
+#include "base64.h"
 
 #define BING_AU "your bing key"
 #define GOOGLE_KEY "your google key"
@@ -61,5 +62,15 @@ void get_wifi(SMBOT_DATA *data);
 void get_train(SMBOT_DATA *data);
 
 void get_sm_message(SMBOT_DATA *data);
+
+void get_word(SMBOT_DATA *data);
+
+void get_term(SMBOT_DATA *data);
+
+void get_idiom(SMBOT_DATA *data);
+
+void get_base64_encode(SMBOT_DATA *data);
+
+void get_base64_decode(SMBOT_DATA *data);
 
 #endif

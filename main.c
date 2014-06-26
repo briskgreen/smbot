@@ -246,6 +246,9 @@ int main(int argc,char **argv)
 			continue;
 		}
 
+		if(strstr(data,"!idiom"))
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!idiom","!idiom <成语词典> 功能:成语词典查询",get_idiom,1);
+
 		if(strstr(data,"!dict"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!dict","!dict <目标语言> <要查询的内容> 功能:bing翻译",bing_dict,3);
 
@@ -320,6 +323,20 @@ int main(int argc,char **argv)
 
 		if(strstr(data,"!sm"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!sm","!sm <你想要说的话> 功能:与机器人对话，使用\'问题%答案\'方式可调教机器人",get_sm_message,1);
+		if(strstr(data,"!word"))
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!word","!word <新华字典> 功能:新华字典查询",get_word,1);
+
+		if(strstr(data,"!term"))
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!term","!term <汉语词典> 功能:汉语词典查询",get_term,1);
+
+/*		if(strstr(data,"!idiom"))
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!idiom","!idiom <成语词典> 功能:成语词典查询",get_idiom,1);*/
+
+		if(strstr(data,"!b64"))
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!b64","!b64 <base64编码> 功能:base64编码",get_base64_encode,1);
+
+		if(strstr(data,"!deb64"))
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!deb64","!deb64 <base64解码> 功能:base64解码",get_base64_decode,1);
 
 		if(strstr(data,"!list") && strstr(data,"PRIVMSG"))
 		{

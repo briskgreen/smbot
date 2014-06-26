@@ -1,4 +1,4 @@
-LIBS=main.o config.o command.o parse.o smbot.o taskfactory.o mysock.o flood.o
+LIBS=main.o config.o command.o parse.o smbot.o taskfactory.o mysock.o flood.o base64.c
 
 smbot:$(LIBS)
 	gcc -o smbot $(LIBS) -lssl -lpthread -lcurl -ljson

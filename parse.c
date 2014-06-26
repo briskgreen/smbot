@@ -308,6 +308,120 @@ char *news_parse(char *str)
 	return res;
 }
 
+char *word_parse(char *str)
+{
+	json_object *obj;
+	json_object *res;
+	json_object *item;
+	int len;
+	int i;
+	char *text=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data(str);
+	res=json_object_object_get(obj,"res");
+	if(res == NULL)
+	{
+		json_object_put(obj);
+		return error_data("查询出错了哦!");
+	}
+	
+	len=json_object_array_length(res);
+	if(len == 0)
+	{
+		json_object_put(res);
+		json_object_put(obj);
+		return error_data("查询出错了哦!");
+	}
+
+	for(i=0;i < len;++i)
+	{
+		item=json_object_array_get_idx(res,i);
+
+		object_stradd(&text," 字:","word",item);
+		object_stradd(&text," 解释:","text",item);
+
+		json_object_put(item);
+	}
+
+	json_object_put(res);
+	json_object_put(obj);
+
+	return text;
+}
+
+char *term_parse(char *str)
+{
+	json_object *obj;
+	json_object *res;
+	json_object *item;
+	int len;
+	int i;
+	char *text=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data(str);
+	res=json_object_object_get(obj,"res");
+	if(res == NULL)
+	{
+		json_object_put(obj);
+		return error_data("查询出错了哦!");
+	}
+
+	len=json_object_array_length(res);
+	if(len == 0)
+	{
+		json_object_put(res);
+		json_object_put(obj);
+		return error_data("查询出错了哦!");
+	}
+
+	for(i=0;i < len;++i)
+	{
+		item=json_object_array_get_idx(res,i);
+
+		object_stradd(&text," 词:","word",item);
+		object_stradd(&text," 解释:","text",item);
+
+		json_object_put(item);
+	}
+
+	json_object_put(res);
+	json_object_put(obj);
+
+	return text;
+}
+
+char *idiom_parse(char *str)
+{
+	json_object *obj;
+	json_object *res;
+	json_object *item;
+	char *text=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data(str);
+	res=json_object_object_get(obj,"res");
+	if(res == NULL)
+	{
+		json_object_put(obj);
+		return error_data("查询出错了哦!");
+	}
+
+	item=json_object_array_get_idx(res,0);
+	object_stradd(&text,"成语:","word",item);
+	object_stradd(&text," 解释:","text",item);
+	json_object_put(item);
+
+	json_object_put(res);
+	json_object_put(obj);
+
+	return text;
+}
+
 char *error_data(char *msg)
 {
 	char *res;
