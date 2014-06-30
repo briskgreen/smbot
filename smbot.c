@@ -243,11 +243,23 @@ char *get_arg(char *buf,char *prg,char *des,bool *have_arg)
 		return NULL;
 	}
 
+	while((buf[index] == ' ' || buf[index] == '\t') && buf[index])
+		++index;
+
+	if(buf[index] == '\r' || buf[index] == '\n' || buf[index] == '\0')
+	{
+		*have_arg=FALSE;
+		return des;
+	}
+
 	*have_arg=TRUE;
 	for(index+=2,len=1;buf[index];++len,++index);
-	res=malloc(len);
-	strncpy(res,buf+pmatch[0].rm_eo+1,len-1);
-	res[len-1]='\0';
+	res=malloc(len+1);
+	index=pmatch[0].rm_eo;
+	while(buf[index] == ' ' || buf[index] == '\t')
+		++index;
+	strncpy(res,buf+index,len);
+	res[len]='\0';
 
 	return res;
 }

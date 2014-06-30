@@ -1536,14 +1536,21 @@ void get_base64_encode(SMBOT_DATA *data)
 
 void get_base64_decode(SMBOT_DATA *data)
 {
-	char *buf;
+	char *buf=NULL;
 
 	null_and_help();
-	buf=base64_decode(data->arg,strlen(data->arg));
-	msg_send(buf,data);
+	if(strlen(data->arg)%4 != 0)
+		msg_send("你输入的可能不是base64字符串哦!",data);
+	else if(strstr(data->arg,"=") && data->arg[strlen(data->arg)-1] != '=')
+		msg_send("你输入的可能不是base64字符串哦!",data);
+	else
+	{
+		buf=base64_decode(data->arg,strlen(data->arg));
+		msg_send(buf,data);
+	}
 
 	smbot_destory(data);
-	free(buf);
+	null_no_free(buf);
 	free(data->arg);
 }
 
