@@ -756,7 +756,7 @@ send:
 	free(data->arg);
 }
 
-void get_dream(SMBOT_DATA *data)
+/*void get_dream(SMBOT_DATA *data)
 {
 	char *res;
 	char *url;
@@ -792,6 +792,41 @@ void get_dream(SMBOT_DATA *data)
 
 	msg_send(res,data);
 	free(res);
+	smbot_destory(data);
+	free(data->arg);
+}*/
+
+void get_dream(SMBOT_DATA *data)
+{
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://brisk.eu.org/api/dream.php?dream=%s",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+
+	if(curl_easy_perform(curl) != 0)
+		msg_send("哎呀，连接网络出现错误了哦!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=dream_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
 	smbot_destory(data);
 	free(data->arg);
 }

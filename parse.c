@@ -422,6 +422,36 @@ char *idiom_parse(char *str)
 	return text;
 }
 
+char *dream_parse(char *str)
+{
+	json_object *obj;
+	json_object *res;
+	json_object *item;
+	json_object *dream;
+	char *text=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data("返回了错误的数据!");
+	res=json_object_object_get(obj,"dreams");
+	if(res == NULL)
+	{
+		json_object_put(obj);
+		return error_data("查询出错了哦!");
+	}
+	
+	item=json_object_array_get_idx(res,0);
+	dream=json_object_object_get(item,"description");
+	text=strdup(json_object_get_string(dream));
+
+	json_object_put(dream);
+	json_object_put(item);
+	json_object_put(res);
+	json_object_put(obj);
+
+	return text;
+}
+
 char *error_data(char *msg)
 {
 	char *res;

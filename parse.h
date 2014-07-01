@@ -27,4 +27,6 @@ char *term_parse(char *str);
 
 char *idiom_parse(char *str);
 
+char *dream_parse(char *str);
+
 #endif
