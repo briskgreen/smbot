@@ -27,17 +27,21 @@ size_t get_data(char *ptr,size_t size,size_t nmemb,retdata *data);
 
 void get_man_url(SMBOT_DATA *data)
 {
+	CURL *curl;
 	char *buf;
-	char *res;
+//	char *res;
+	retdata ret;
 
 	null_and_help();
 
 	if((data->arg[0] <= '8' && data->arg[0] >= '1') && data->arg[1] == ' ')
-		buf=string_add("term=%s&section=%c&submitted=1\n\n",
-				data->arg+2,data->arg[0]);
+		buf=string_add("http://brisk.eu.org/api/man.php?q=%s&n=%c",data->arg+2,data->arg[0]);
+		//buf=string_add("term=%s&section=%c&submitted=1\n\n",
+		//		data->arg+2,data->arg[0]);
 	else if((data->arg[0] > '8' || data->arg[0] < '0') && data->arg[1] != ' ')
-		buf=string_add("term=%s&section=-1&submitted=1\n\n",
-				data->arg);
+		buf=string_add("http://brisk.eu.org/api/man.php?q=%s",data->arg);
+		//buf=string_add("term=%s&section=-1&submitted=1\n\n",
+		//		data->arg);
         else /*if((data->arg[1] == '\0') || (data->arg[3] == ' '))*/
         {
                 msg_send("你一定是输入方式不对!",data);
@@ -47,7 +51,26 @@ void get_man_url(SMBOT_DATA *data)
                 return;
         }
 
-	res=http_post_simple("http://www.linuxmanpages.com/search.php",
+	ret.len=0;
+	ret.data=NULL;
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("啊哦，淫家连接远程服务器失败了〇。〇",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=man_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+
+/*	res=http_post_simple("http://www.linuxmanpages.com/search.php",
 			80,buf);
 	null_no_free(buf);
 	if(res == NULL)
@@ -72,10 +95,10 @@ void get_man_url(SMBOT_DATA *data)
 
 	free(res);
 	res=string_add("http://www.linuxmanpages.com%s",buf+10);
-	free(buf);
+	free(buf);*/
 
-	msg_send(res,data);
-	null_no_free(res);
+	//msg_send(res,data);
+	null_no_free(buf);
 	smbot_destory(data);
 	free(data->arg);
 }
@@ -1586,6 +1609,40 @@ void get_base64_decode(SMBOT_DATA *data)
 
 	smbot_destory(data);
 	null_no_free(buf);
+	free(data->arg);
+}
+
+void get_baike(SMBOT_DATA *data)
+{
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://brisk.eu.org/api/baike.php?q=%s",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("啊哦，淫家连接远程服务器失败了!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=baike_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
 	free(data->arg);
 }
 

@@ -393,7 +393,7 @@ void flood_send(int flood,char *nick,char *channel,bool is_use_ssl)
 
 void smbot_list(const char *msg,bool is_use_ssl)
 {
-	char *list="man、ip、time、dict、youku、yt、bt、zip、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、image、list、baidu、bimg、news、air、website、wifi、train、sm、word、term、idiom、b64、deb64、help smbot";
+	char *list="man、ip、time、dict、youku、yt、bt、zip、weather、stack、id、checkid、url、deurl、joke、dream、song、bing、google、image、list、baidu、bimg、news、air、website、wifi、train、sm、word、term、idiom、b64、deb64、baike、help smbot";
 	char *nick;
 	char *channel;
 

@@ -234,7 +234,7 @@ int main(int argc,char **argv)
 		printf("%s\n",data);
 
 		if(strstr(data,"!man"))
-			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!man","!man [1-8] <要查询的内容> 功能:返回linuxmanpages连接",get_man_url,5);
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!man","!man [1-8] <要查询的内容> 功能:linux manpages查询",get_man_url,5);
 
 		if(strstr(data,"!ip"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!ip","!ip <ipv4/6地址或域名> 功能:返回ipv4/6或者域名的物理位置",get_ip_addr,5);
@@ -337,6 +337,9 @@ int main(int argc,char **argv)
 
 		if(strstr(data,"!deb64"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!deb64","!deb64 <base64解码> 功能:base64解码",get_base64_decode,1);
+
+		if(strstr(data,"!baike"))
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!baike","!baike <百度百科> 功能:百度百科查询",get_baike,1);
 
 		if(strstr(data,"!list") && strstr(data,"PRIVMSG"))
 		{

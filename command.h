@@ -73,4 +73,6 @@ void get_base64_encode(SMBOT_DATA *data);
 
 void get_base64_decode(SMBOT_DATA *data);
 
+void get_baike(SMBOT_DATA *data);
+
 #endif

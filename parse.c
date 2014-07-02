@@ -452,6 +452,59 @@ char *dream_parse(char *str)
 	return text;
 }
 
+char *man_parse(char *str)
+{
+	json_object *obj;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data("查询出错了哦!");
+
+	if(object_stradd(&res," ","url",obj))
+	{
+		json_object_put(obj);
+		return res;
+	}
+	object_stradd(&res," <--> ","name",obj);
+	object_stradd(&res," <-> synopsis: ","synopsis",obj);
+	object_stradd(&res," <----- ","description",obj);
+
+	json_object_put(obj);
+
+	return res;
+}
+
+char *baike_parse(char *str)
+{
+	json_object *obj;
+	json_object *baike;
+	json_object *items;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data("查询出错了哦!");
+
+	baike=json_object_object_get(obj,"baike");
+	if(baike == NULL)
+	{
+		json_object_put(obj);
+		return error_data("没有查询到任何结果肿么办!");
+	}
+
+	items=json_object_array_get_idx(baike,0);
+	object_stradd(&res," ","url",items);
+	object_stradd(&res," <-> ","title",items);
+	object_stradd(&res," ----- ","des",items);
+
+	json_object_put(items);
+	json_object_put(baike);
+	json_object_put(obj);
+
+	return res;
+}
+
 char *error_data(char *msg)
 {
 	char *res;
