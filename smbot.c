@@ -325,25 +325,26 @@ char *get_channel(char *msg)
 {
 	char *buf;
 	regex_t reg;
-	regmatch_t pmatch[1];
+	regmatch_t pmatch[2];
 	int len;
 
-	if(regcomp(&reg,"#.[^ ]*",0) != 0)
+	if(regcomp(&reg,"^:.[^ ]* PRIVMSG \\(#[^ ]*\\)",0) != 0)
 	{
 		regfree(&reg);
 		return NULL;
 	}
-	if(regexec(&reg,msg,1,pmatch,0) != 0)
+	if(regexec(&reg,msg,2,pmatch,0) != 0)
 	{
 		regfree(&reg);
 		return NULL;
 	}
 	regfree(&reg);
 
-	len=pmatch[0].rm_eo-pmatch[0].rm_so+1;
-	buf=malloc(len);
-	strncpy(buf,msg+pmatch[0].rm_so,len-1);
-	buf[len-1]='\0';
+	len=pmatch[1].rm_eo-pmatch[1].rm_so+1;
+	buf=malloc(sizeof(char)*len);
+	if(buf == NULL)
+		return NULL;
+	snprintf(buf,sizeof(char)*len,"%s",msg+pmatch[1].rm_so);
 
 	return buf;
 }
