@@ -45,7 +45,7 @@ char *google_parse(char *str)
 		return error_data("返回了错误的数据!");
 	obj=json_object_object_get(obj,"items");
 	if(obj == NULL)
-		return error_data("啊哦，查询出错了哦!");
+		return error_data("啊哦，查询出错了哦!(可能是当日使用量已过百，请明日再试，具体事宜请联系brisk)");
 
 	obj=json_object_array_get_idx(obj,0);
 	if(obj == NULL)
