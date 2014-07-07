@@ -368,27 +368,24 @@ char *get_ip(char *msg)
 	return buf;
 }
 
-void flood_send(int flood,char *nick,char *channel,bool is_use_ssl)
+void flood_send(FD_RES *res,char *nick,char *channel,bool is_use_ssl)
 {
 	char msg[512]={0};
 
-	if((flood > 1) && (flood % 5 == 0))
+	if(!res->new)
+		return;
+
+	if(res->black)
+		snprintf(msg,512,"恭喜你，你已被永久加入防洪套餐(此消息只提醒一次)");
+	else if(res->flood)
+		snprintf(msg,512,"恭喜你，你已被加入防洪套餐%d分钟(此消息只提醒一次)",res->flood);
+
+	if(res->black || res->flood)
 	{
-		if(flood == 30)
-			snprintf(msg,512,"恭喜你，你已被永久加入防洪套餐");
-		else
-			snprintf(msg,512,"恭喜你，你已被加入防洪套餐%d分钟",flood);
 		if(is_use_ssl)
 			ssl_msgto(ssl,channel,nick,msg);
 		else
 			msgto(sockfd,channel,nick,msg);
-	}
-	else if(flood == 1)
-	{
-		if(is_use_ssl)
-			ssl_msgto(ssl,channel,nick,"恭喜你，你已被加入防洪套餐1分钟");
-		else
-			msgto(sockfd,channel,nick,"恭喜你，你已被加入防洪套餐1分钟");
 	}
 }
 
@@ -431,8 +428,8 @@ void parse_and_perform(TASK_FACTORY *task,LIST *list,char *msg,char *reg,
 		unsigned int priority)
 {
 	SMBOT_DATA *data;
+	FD_RES res;
 	char *ip;
-	int t;
 
 	data=malloc(sizeof(SMBOT_DATA));
 	data->nick=get_nick(msg);
@@ -442,10 +439,13 @@ void parse_and_perform(TASK_FACTORY *task,LIST *list,char *msg,char *reg,
 	if(data->arg)
 	{
 		ip=get_ip(msg);
-		t=flood_test(list,ip,data->nick);
-		if(t)
+		res.new=0;
+		res.flood=0;
+		res.black=0;
+
+		if(flood_test(list,ip,data->nick,&res))
 		{
-			flood_send(t,data->nick,data->channel,is_use_ssl);
+			flood_send(&res,data->nick,data->channel,is_use_ssl);
 			smbot_destory(data);
 			free(ip);
 			return;

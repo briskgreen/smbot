@@ -43,7 +43,7 @@ char *get_channel(char *msg);
 
 char *get_ip(char *msg);
 
-void flood_send(int flood,char *nick,char *channel,bool is_use_ssl);
+void flood_send(FD_RES *res,char *nick,char *channel,bool is_use_ssl);
 
 void smbot_list(const char *msg,bool is_use_ssl);
 

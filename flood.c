@@ -3,7 +3,7 @@
 unsigned int hash_fun(char *key);
 void fd_insert_to_overflow(LIST *list,FD *data);
 FD *fd_get_in_overflow(LIST *list,char *ip);
-int flood(LIST *list,FD *DATA);
+int flood(LIST *list,FD *DATA,FD_RES *res);
 int index_in_list(LIST *list,char *ip);
 
 int fd_insert(LIST *list,FD *data)
@@ -157,12 +157,12 @@ void list_cleanup(LIST *list)
 	head->next=NULL;
 }
 
-int flood_test(LIST *list,char *ip,char *nick)
+int flood_test(LIST *list,char *ip,char *nick,FD_RES *res)
 {
 	FD *node;
 
 	if(node=fd_get(list,ip))
-		return flood(list,node);
+		return flood(list,node,res);
 
 	node=malloc(sizeof(FD));
 	snprintf(node->ip,100,"%s",ip);
@@ -240,7 +240,7 @@ FD *fd_get_in_overflow(LIST *list,char *ip)
 	return res;
 }
 
-int flood(LIST *list,FD *data)
+int flood(LIST *list,FD *data,FD_RES *res)
 {
 	time_t now;
 	FILE *fp;
@@ -248,7 +248,13 @@ int flood(LIST *list,FD *data)
 	char path[256];
 
 	if(data->blacklist)
-		return BLACKLIST;
+	{
+		res->black=1;
+		res->new=0;
+		res->flood=BLACKLIST;
+
+		return 1;
+	}
 
 	now=time(NULL);
 	if(data->flood > 0)
@@ -268,22 +274,31 @@ int flood(LIST *list,FD *data)
 		{
 			data->time=now;
 			++data->flood;
+			res->flood=data->flood;
+			res->new=1;
 			goto end;
 		}
 
 		data->time=now;
 		if((data->flood) && (data->count/5 > 1))
+		{
 			++data->flood;
+			res->flood=data->flood;
+			res->new=1;
+		}
 	}
 
 end:
 	if(data->count % 65535 == 0)
 		data->count=6;
 
-	if(data->flood > 30)
+	if(data->flood >= BLACKLIST)
 	{
-		data->flood=30;
+		data->flood=BLACKLIST;
 		data->blacklist=1;
+		res->black=1;
+		res->flood=data->flood;
+		res->new=1;
 	}
 
 	if(list->hash == -1)
@@ -308,7 +323,10 @@ end:
 	fwrite(data,sizeof(FD),1,fp);
 	fclose(fp);
 
-	return data->flood;
+	if(data->flood)
+		return 1;
+	else
+		return 0;
 }
 
 int index_in_list(LIST *list,char *ip)

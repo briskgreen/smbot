@@ -33,6 +33,13 @@ typedef struct list_node
 	struct list_node *next;
 }LIST;
 
+typedef struct
+{
+	int new;
+	int flood;
+	int black;
+}FD_RES;
+
 int fd_insert(LIST *list,FD *data);
 
 FD *fd_get(LIST *list,char *ip);
@@ -45,6 +52,6 @@ FD *list_get(LIST *list,char *ip);
 
 void list_cleanup(LIST *list);
 
-int flood_test(LIST *list,char *ip,char *nick);
+int flood_test(LIST *list,char *ip,char *nick,FD_RES *res);
 
 #endif
