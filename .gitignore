@@ -20,5 +20,6 @@ smbot
 .config
 TaskFactory
 mysock
+flood_data
 exec/query_ip_addr
 exec/id_card_test
