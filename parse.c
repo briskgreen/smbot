@@ -34,7 +34,7 @@ char *youku_parse(char *str)
 	return res;
 }
 
-char *google_parse(char *str)
+/*char *google_parse(char *str)
 {
 	char *res=NULL;
 	json_object *obj;
@@ -68,6 +68,31 @@ char *google_parse(char *str)
 
 	json_object_put(obj);
 
+	return res;
+}*/
+char *google_parse(char *str)
+{
+	json_object *obj;
+	json_object *items;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL)
+		return error_data("返回的数据是错误的!");
+
+	items=json_object_array_get_idx(obj,0);
+	if(items == NULL)
+	{
+		json_object_put(obj);
+		return error_data("没有查询到结果!");
+	}
+
+	object_stradd(&res,"","title",items);
+	object_stradd(&res," <-> ","url",items);
+	object_stradd(&res," ----","descrition",items);
+
+	json_object_put(items);
+	json_object_put(obj);
 	return res;
 }
 

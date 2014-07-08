@@ -1051,7 +1051,8 @@ void get_google(SMBOT_DATA *data)
 	url=url_encode(data->arg);
 	ret.len=0;
 	ret.data=NULL;
-	buf=string_add("https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s",GOOGLE_KEY,url);
+//	buf=string_add("https://www.googleapis.com/customsearch/v1?key=%s&cx=006431901905483214390:i3yxhoqkzo0&num=1&q=%s",GOOGLE_KEY,url);
+	buf=string_add("http://brisk.eu.org/api/google.php?q=%s",url);
 	free(url);
 
 	curl=curl_easy_init();
