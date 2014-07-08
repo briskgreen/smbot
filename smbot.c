@@ -363,6 +363,8 @@ char *get_ip(char *msg)
 		++i;
 
 	buf=malloc(sizeof(char)*(i-start));
+	if(buf == NULL)
+		return NULL;
 	snprintf(buf,sizeof(char)*(i-start),"%s",msg+start+1);
 
 	return buf;
@@ -432,6 +434,9 @@ void parse_and_perform(TASK_FACTORY *task,LIST *list,char *msg,char *reg,
 	char *ip;
 
 	data=malloc(sizeof(SMBOT_DATA));
+	if(data == NULL)
+		return;
+
 	data->nick=get_nick(msg);
 	data->channel=get_channel(msg);
 	data->arg=get_arg(msg,reg,des,&data->have_arg);
@@ -446,8 +451,10 @@ void parse_and_perform(TASK_FACTORY *task,LIST *list,char *msg,char *reg,
 		if(flood_test(list,ip,data->nick,&res))
 		{
 			flood_send(&res,data->nick,data->channel,is_use_ssl);
+			if(data->have_arg)
+				free(data->arg);
 			smbot_destory(data);
-			free(ip);
+			null_no_free(ip);
 			return;
 		}
 	}
