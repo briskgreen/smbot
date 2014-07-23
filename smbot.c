@@ -457,6 +457,8 @@ void parse_and_perform(TASK_FACTORY *task,LIST *list,char *msg,char *reg,
 			null_no_free(ip);
 			return;
 		}
+
+		null_no_free(ip);
 	}
 
 	data->is_use_ssl=is_use_ssl;
