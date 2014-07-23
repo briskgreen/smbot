@@ -232,12 +232,12 @@ char *get_arg(char *buf,char *prg,char *des,bool *have_arg)
 
 	index=pmatch[0].rm_eo;
 	temp=buf[index];
-	if(temp != ' ' && temp == '\r')
+	if(temp != ' ' && (temp == '\r' || temp == '\n'))
 	{
 		*have_arg=FALSE;
 		return des;
 	}
-	else if(temp != ' ' && temp != '\r')
+	else if(temp != ' ' && (temp != '\r' || temp != '\n'))
 	{
 		*have_arg=FALSE;
 		return NULL;
@@ -253,7 +253,8 @@ char *get_arg(char *buf,char *prg,char *des,bool *have_arg)
 	}
 
 	*have_arg=TRUE;
-	for(index+=2,len=1;buf[index];++len,++index);
+	//for(index+=2,len=1;buf[index];++len,++index);
+	len=strlen(buf)-index-2;
 	res=malloc(len+1);
 	index=pmatch[0].rm_eo;
 	while(buf[index] == ' ' || buf[index] == '\t')
