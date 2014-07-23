@@ -44,11 +44,11 @@ unsigned char *base64_decode(unsigned char *code,long len)
 	unsigned char *res;
 	int i,j;
 
-	if(strstr(code,"=="))
+	/*if(strstr(code,"=="))
 		str_len=len/4*3-2;
 	else if(strstr(code,"="))
 		str_len=len/4*3-1;
-	else
+	else*/
 		str_len=len/4*3;
 
 	res=malloc(sizeof(unsigned char)*(str_len+1));
