@@ -56,6 +56,7 @@ void get_man_url(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
@@ -160,6 +161,7 @@ void bing_dict(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,res);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
@@ -264,6 +266,7 @@ void get_youku_url(SMBOT_DATA *data)
 	ret.len=0;
 
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
@@ -363,6 +366,7 @@ void get_bt(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
@@ -487,6 +491,7 @@ void get_weather(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
@@ -835,6 +840,7 @@ void get_dream(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 
@@ -911,6 +917,7 @@ void get_bing(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
@@ -1057,6 +1064,7 @@ void get_google(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	curl_easy_setopt(curl,CURLOPT_SSL_VERIFYPEER,0);
@@ -1093,6 +1101,7 @@ void get_baidu(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
@@ -1227,6 +1236,7 @@ void get_news(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
@@ -1328,6 +1338,7 @@ void get_wifi(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
@@ -1494,6 +1505,7 @@ void get_word(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
@@ -1528,6 +1540,7 @@ void get_term(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
@@ -1562,6 +1575,7 @@ void get_idiom(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
@@ -1629,6 +1643,7 @@ void get_baike(SMBOT_DATA *data)
 
 	curl=curl_easy_init();
 	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
 	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
 	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
 	if(curl_easy_perform(curl) != 0)
