@@ -178,7 +178,6 @@ int main(int argc,char **argv)
 	SMBOT_CONF *conf;
 	LIST *list;
 	struct sigaction act;
-	char buf[1024];
 	char *data;
 
 	printf("init task factory . . .\n");
@@ -224,21 +223,14 @@ int main(int argc,char **argv)
 		if(smbot_select(sockfd,ssl,is_use_ssl) <= 0)
 			break;
 
-		bzero(buf,sizeof(buf));
 		if(is_use_ssl)
-			SSL_read(ssl,buf,sizeof(buf));
-			//data=ssl_read_line(ssl);
+			data=ssl_read_line(ssl);
 		else
-			recv(sockfd,buf,sizeof(buf),0);
-			//data=read_line(sockfd);
+			data=read_line(sockfd);
 
-		data=malloc(sizeof(char)*(strlen(buf)+1));
-		if(data == NULL)
-			break;
-		snprintf(data,sizeof(char)*(strlen(buf)+1),"%s",buf);
-		//data[strlen(data)-1]='\0';
+		if(data == NULL) break;
 
-		printf("%s",data);
+		printf("%s\n",data);
 
 		if(strstr(data,"!man"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!man","!man [1-8] <要查询的内容> 功能:linux manpages查询",get_man_url,5);
