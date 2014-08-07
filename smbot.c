@@ -254,7 +254,7 @@ char *get_arg(char *buf,char *prg,char *des,bool *have_arg)
 
 	*have_arg=TRUE;
 	//for(index+=2,len=1;buf[index];++len,++index);
-	len=strlen(buf)-index-2;
+	len=strlen(buf)-index-1;
 	res=malloc(len+1);
 	index=pmatch[0].rm_eo;
 	while(buf[index] == ' ' || buf[index] == '\t')
