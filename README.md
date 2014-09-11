@@ -14,7 +14,7 @@ train、sm、word、term、idiom、b64、deb64、baike、help smbot
 
 其中使用了Google Custom Search API、Bing Search API、Bing Translate API 
 
-以及聚合数据网络提供的一些api，除baidu、news、bimg外其它指令均是采用模拟浏览器 
+以及网络提供的一些api，除baidu、news、bimg外其它指令均是采用模拟浏览器 
 
 方式使用GET或POST请求将得到的网页源码进行正则匹配。
 
