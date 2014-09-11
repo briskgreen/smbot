@@ -486,7 +486,7 @@ void get_weather(SMBOT_DATA *data)
 	url=url_encode(data->arg);
 	ret.len=0;
 	ret.data=NULL;
-	buf=string_add("http://v.juhe.cn/weather/index?key=your key&cityname=%s",url);
+	buf=string_add("http://api.map.baidu.com/telematics/v3/weather?location=%s&output=json&ak=your key",url);
 	free(url);
 
 	curl=curl_easy_init();
@@ -609,7 +609,7 @@ void get_stack(SMBOT_DATA *data)
 	free(data->arg);
 }
 
-void get_id_information(SMBOT_DATA *data)
+/*void get_id_information(SMBOT_DATA *data)
 {
 	char *res;
 	char *buf;
@@ -638,6 +638,43 @@ void get_id_information(SMBOT_DATA *data)
 
 	msg_send(buf,data);
 	free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}*/
+
+void get_id_information(SMBOT_DATA *data)
+{
+	CURL *curl;
+	char *buf;
+	char *id;
+	retdata ret;
+
+	null_and_help();
+	
+	ret.len=0;
+	ret.data=NULL;
+	curl=curl_easy_init();
+	id=url_encode(data->arg);
+	buf=string_add("http://api.uihoo.com/idcard/idcard.http.php?idnumber=%s&format=json",id);
+	free(id);
+
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("啊哦，淫家连接远程服务器失败了!",data);
+	curl_easy_cleanup(curl);
+
+	if(ret.len)
+	{
+		free(buf);
+		buf=id_information_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	null_no_free(buf);
 	smbot_destory(data);
 	free(data->arg);
 }
@@ -730,7 +767,7 @@ void get_joke(SMBOT_DATA *data)
 	}
 
 	title=match_string("title=\".[^\"]*",buf);
-	url=match_string("\] <a href=\".[^\"]*",buf);
+	url=match_string("\\] <a href=\".[^\"]*",buf);
 	
 	if(title == NULL || url == NULL)
 	{
@@ -776,7 +813,7 @@ void get_joke(SMBOT_DATA *data)
 
 send:
 	buf=string_add("%s -->http://www.xiao688.com%s <--%s\n",title+strlen("title=\""),
-			url+strlen("\] <a href=\""),temp);
+			url+strlen("\\] <a href=\""),temp);
 
 	msg_send(buf,data);
 	free(buf);
@@ -1289,7 +1326,7 @@ void get_air(SMBOT_DATA *data)
 	free(data->arg);
 }
 
-void get_website_testing(SMBOT_DATA *data)
+/*void get_website_testing(SMBOT_DATA *data)
 {
 	char *res;
 	char *buf;
@@ -1314,10 +1351,93 @@ void get_website_testing(SMBOT_DATA *data)
 		free(data->arg);
 		return;
 	}
-	buf=match_string("{\"state\":.[^\)]*",res);
+	buf=match_string("{\"state\":.[^\\)]*",res);
 	free(res);
 	msg_send(buf,data);
 	free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}*/
+
+void get_website_testing(SMBOT_DATA *data)
+{
+	CURL *curl;
+	char *URL="http://open.pc120.com";
+	char *APPKEY="k-33356";
+	char *SECRET="a176201e188a0969cd7b7fa2ef3c8d14";
+	char *url;
+	char sign[33];
+	unsigned char md[16];
+	char *buf;
+	char *res;
+	int i;
+	retdata ret;
+
+	null_and_help();
+
+	curl=curl_easy_init();
+	ret.data=NULL;
+	ret.len=0;
+
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
+
+	url=base64_encode(data->arg,strlen(data->arg));
+	for(i=0;url[i];++i)
+	{
+		if(url[i] == '+')
+			url[i]='-';
+		else if(url[i] == '/')
+			url[i]='_';
+	}
+	buf=string_add("/phish/?appkey=%s&q=%s&timestamp=%d",
+			APPKEY,url,time(NULL));
+	res=string_add("%s%s",buf,SECRET);
+	MD5(res,strlen(res),md);
+	for(i=0;i < 16;++i)
+		sprintf(sign+i*2,"%02x",md[i]);
+	free(res);
+	res=string_add("%s%s&sign=%s",URL,buf,sign);
+	curl_easy_setopt(curl,CURLOPT_URL,res);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("检测钓鱼: 哎呀呀，淫家连接远程服务器失败了!",data);
+	if(ret.len)
+	{
+		free(res);
+		res=website_parse1(ret.data);
+		msg_send(res,data);
+		free(ret.data);
+	}
+
+	null_no_free(res);
+	free(buf);
+	ret.len=0;
+	ret.data=NULL;
+
+	buf=string_add("/download/?appkey=%s&q=%s&timestamp=%d",
+			APPKEY,url,time(NULL));
+	res=string_add("%s%s",buf,SECRET);
+	MD5(res,strlen(res),md);
+	for(i=0;i < 16;++i)
+		sprintf(sign+i*2,"%02x",md[i]);
+	free(res);
+	res=string_add("%s%s&sign=%s",URL,buf,sign);
+	curl_easy_setopt(curl,CURLOPT_URL,res);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("检测下载链接: 哎呀呀，淫家连接远程服务器失败了!",data);
+	if(ret.len)
+	{
+		free(res);
+		res=website_parse2(ret.data);
+		msg_send(res,data);
+		free(ret.data);
+	}
+
+	null_no_free(res);
+	free(buf);
+	free(url);
+	curl_easy_cleanup(curl);
 	smbot_destory(data);
 	free(data->arg);
 }
@@ -1395,6 +1515,40 @@ void get_wifi(SMBOT_DATA *data)
 
 void get_train(SMBOT_DATA *data)
 {
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://train.qunar.com/qunar/checiInfo.jsp?method_name=buy&ex_track=&q=%s&format=json",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("啊哦，淫家连接远程服务器失败了!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=train_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}
+/*void get_train(SMBOT_DATA *data)
+{
 	char *res;
 	char *buf;
 
@@ -1423,7 +1577,7 @@ void get_train(SMBOT_DATA *data)
 	msg_send(buf,data);
 	smbot_destory(data);
 	free(data->arg);
-}
+}*/
 
 void get_sm_message(SMBOT_DATA *data)
 {

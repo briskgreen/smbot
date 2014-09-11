@@ -6,6 +6,7 @@
 char *error_data(char *msg);
 char *stradd(char *from,char *sub);
 int object_stradd(char **res,char *str,char *key,json_object *obj);
+char *website_error(int code);
 
 char *youku_parse(char *str)
 {
@@ -161,47 +162,63 @@ char *weather_parse(char *str)
 {
 	json_object *obj;
 	json_object *item;
+	json_object *weather;
+	json_object *weather_temp;
+	json_object *temp;
+	int i,len;
 	char *res=NULL;
 
 	obj=json_tokener_parse(str);
 	if(obj == NULL)
 		return error_data("返回的数据是错误的!");
 
-	item=json_object_object_get(obj,"resultcode");
-	if(strcmp("200",json_object_get_string(item)))
+	item=json_object_object_get(obj,"error");
+	if(json_object_get_int(item) != 0)
 	{
 		json_object_put(item);
+		object_stradd(&res,"查询出错:","status",obj);
 		json_object_put(obj);
-		return error_data("啊哦，查询出错了哦!");
+		
+		return res;
 	}
 	json_object_put(item);
-	obj=json_object_object_get(obj,"result");
 
-	item=json_object_object_get(obj,"sk");
-	res=stradd(res,"实况天气: ");
-	object_stradd(&res,"温度:","temp",item);
-	object_stradd(&res," 风向:","wind_direction",item);
-	object_stradd(&res," 风力:","wind_strength",item);
-	object_stradd(&res," 湿度:","humidity",item);
-	object_stradd(&res," 更新时间:","time",item);
+	object_stradd(&res,"日期:","date",obj);
+	weather=json_object_object_get(obj,"results");
+	item=json_object_array_get_idx(weather,0);
+	object_stradd(&res," 城市:","currentCity",item);
+	object_stradd(&res," pm25:","pm25",item);
+
+	weather_temp=json_object_object_get(item,"weather_data");
+	len=json_object_array_length(weather_temp);
+	for(i=0;i < len;++i)
+	{
+		temp=json_object_array_get_idx(weather_temp,i);
+
+		object_stradd(&res," 日期:","date",temp);
+		object_stradd(&res," 天气:","weather",temp);
+		object_stradd(&res," 风力:","wind",temp);
+		object_stradd(&res," 温度:","temperature",temp);
+
+		json_object_put(temp);
+	}
+	json_object_put(weather_temp);
+
+	weather_temp=json_object_object_get(item,"index");
+	len=json_object_array_length(weather_temp);
+	for(i=0;i < len;++i)
+	{
+		temp=json_object_array_get_idx(weather_temp,i);
+
+		object_stradd(&res," ","tipt",temp);
+		object_stradd(&res,":","des",temp);
+
+		//json_object_put(temp);
+	}
+	json_object_put(weather_temp);
+
 	json_object_put(item);
-
-	item=json_object_object_get(obj,"today");
-	res=stradd(res,"  今日天气: ");
-	object_stradd(&res,"城市:","city",item);
-	object_stradd(&res," 日期:","date_y",item);
-	object_stradd(&res," ","week",item);
-	object_stradd(&res," 温度:","temperature",item);
-	object_stradd(&res," 天气:","weather",item);
-	object_stradd(&res," ","wind",item);
-	object_stradd(&res," 穿衣指数:","dressing_index",item);
-	object_stradd(&res," 穿衣建议:","dressing_advice",item);
-	object_stradd(&res," 紫外线强度:","uv_index",item);
-	object_stradd(&res," 洗车指数:","wash_index",item);
-	object_stradd(&res," 旅游指数:","travel_index",item);
-	object_stradd(&res," 晨练指数:","exercise_index",item);
-
-	json_object_put(item);
+	json_object_put(weather);
 	json_object_put(obj);
 
 	return res;
@@ -530,6 +547,186 @@ char *baike_parse(char *str)
 	return res;
 }
 
+char *train_parse(char *str)
+{
+	json_object *obj;
+	json_object *item;
+	json_object *train;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(obj == NULL) return error_data("查询出错了哦!");
+
+	item=json_object_object_get(obj,"trainInfo");
+	if(!item)
+	{
+		json_object_put(obj);
+		return error_data("无法查询到该车次的信息!");
+	}
+
+	train=(json_object *)(json_object_get_object(item)->head)->v;
+	object_stradd(&res," 车次:","code",train);
+	object_stradd(&res," 起始站:","deptCity",train);
+	object_stradd(&res," 终点站:","arriCity",train);
+	object_stradd(&res," 列车类型:","trainType",train);
+	object_stradd(&res," 开车时间:","deptTime",train);
+	object_stradd(&res," 到站时间:","arriTime",train);
+	object_stradd(&res," 全程时间:","interval",train);
+	json_object_put(train);
+	json_object_put(item);
+
+	item=json_object_object_get(obj,"extInfo");
+	object_stradd(&res," 全程长度:","allMileage",item);
+	json_object_put(item);
+
+	json_object_put(obj);
+	return res;
+}
+
+char *website_parse1(char *str)
+{
+	json_object *obj;
+	json_object *item;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(!obj)
+		return error_data("检测钓鱼: 查询出错!");
+	item=json_object_object_get(obj,"success");
+	if(json_object_get_int(item) == 0)
+	{
+		json_object_put(item);
+		item=json_object_object_get(obj,"errno");
+		res=website_error(json_object_get_int(item));
+
+		json_object_put(item);
+		json_object_put(obj);
+		return res;
+	}
+	json_object_put(item);
+
+	item=json_object_object_get(obj,"phish");
+	switch(json_object_get_int(item))
+	{
+		case -1:
+			res="钓鱼: 未知";
+			break;
+		case 0:
+			res="钓鱼: 非钓鱼";
+			break;
+		case 1:
+			res="钓鱼: 钓鱼";
+			break;
+		case 2:
+			res="钓鱼: 高风险，有钓鱼嫌疑";
+			break;
+		default:
+			res="钓鱼: 不可测";
+	}
+
+	json_object_put(item);
+	json_object_put(obj);
+
+	return error_data(res);
+}
+
+char *website_parse2(char *str)
+{
+	json_object *obj;
+	json_object *item;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(!obj)
+		return error_data("检测下载连接: 查询出错!");
+	item=json_object_object_get(obj,"success");
+	if(json_object_get_int(item) == 0)
+	{
+		json_object_put(item);
+		item=json_object_object_get(obj,"errno");
+		res=website_error(json_object_get_int(item));
+
+		json_object_put(item);
+		json_object_put(obj);
+		return res;
+	}
+	json_object_put(item);
+
+	item=json_object_object_get(obj,"down_type");
+	switch(json_object_get_int(item))
+	{
+		case 1:
+			res="链接安全: 未知";
+			break;
+		case 2:
+			res="链接安全: 安全";
+			break;
+		case 3:
+			res="链接安全: 危险";
+			break;
+		case 6:
+			res="链接安全: 非PE文件";
+			break;
+		default:
+			res="链接安全: 不可测";
+	}
+
+	json_object_put(item);
+	json_object_put(obj);
+	return error_data(res);
+}
+
+char *id_information_parse(char *str)
+{
+	json_object *obj;
+	json_object *item;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(!obj)
+		return error_data("查询出错了哦!");
+	item=json_object_object_get(obj,"error");
+	if(json_object_get_int(item) != 0)
+	{
+		switch(json_object_get_int(item))
+		{
+			case 1:
+				res="身份证号码错误!";
+				break;
+			case 2:
+				res="地区校验错误!";
+				break;
+			case 3:
+				res="生日校验错误!";
+				break;
+			case 4:
+				res="校验码校验错误!";
+				break;
+			default:
+				res="未知错误，请联系brisk!";
+		}
+
+		json_object_put(item);
+		json_object_put(obj);
+		return error_data(res);
+	}
+	json_object_put(item);
+
+	res=stradd(res,"性别:");
+	item=json_object_object_get(obj,"sex");
+	if(json_object_get_int(item) == 1)
+		res=stradd(res,"男");
+	else
+		res=stradd(res,"女");
+	json_object_put(item);
+
+	object_stradd(&res," 生日:","birthday",obj);
+	object_stradd(&res," 住址:","region",obj);
+
+	json_object_put(obj);
+	return res;
+}
+
 char *error_data(char *msg)
 {
 	char *res;
@@ -577,4 +774,44 @@ int object_stradd(char **res,char *str,char *key,json_object *obj)
 	json_object_put(item);
 
 	return 0;
+}
+
+char *website_error(int code)
+{
+	char *error;
+
+	switch(code)
+	{
+		case -1:
+			error="应用的key不存在或者key已经失效，请联系brisk!";
+			break;
+		case -2:
+			error="无效的签名，请联系brisk!";
+			break;
+		case -3:
+			error="无效的时间戳，请联系brisk!";
+			break;
+		case -4:
+			error="超过当天查询次数限制!";
+			break;
+		case -5:
+			error="查询过于频繁!";
+			break;
+		case -6:
+			error="查询参数格式错误，例如某些API我们要求对参数进行base64编码，如果base64编码错误，服务器将返回此错误提示。请联系brisk！";
+			break;
+		case -7:
+			error="缺少必需的查询参数。请联系brisk！";
+			break;
+		case -8:
+			error="服务器繁忙";
+			break;
+		case -9:
+			error="重复的时间戳，请联系brisk!";
+			break;
+		default:
+			error="未知错误，请联系brisk！";
+	}
+
+	return error_data(error);
 }

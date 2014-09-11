@@ -33,4 +33,12 @@ char *man_parse(char *str);
 
 char *baike_parse(char *str);
 
+char *train_parse(char *str);
+
+char *website_parse1(char *str);
+
+char *website_parse2(char *str);
+
+char *id_information_parse(char *str);
+
 #endif
