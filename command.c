@@ -1294,6 +1294,41 @@ void get_news(SMBOT_DATA *data)
 
 void get_air(SMBOT_DATA *data)
 {
+	CURL *curl;
+	char *buf;
+	char *url;
+	retdata ret;
+
+	null_and_help();
+	url=url_encode(data->arg);
+	ret.len=0;
+	ret.data=NULL;
+	buf=string_add("http://brisk.eu.org/api/pm.php?city=%s",url);
+	free(url);
+
+	curl=curl_easy_init();
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	if(curl_easy_perform(curl) != 0)
+		msg_send("啊哦，淫家连接远程服务器失败了!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=air_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
+	smbot_destory(data);
+	free(data->arg);
+}
+
+/*void get_air(SMBOT_DATA *data)
+{
 	char *buf;
 	char *res;
 
@@ -1324,7 +1359,7 @@ void get_air(SMBOT_DATA *data)
 	free(buf);
 	smbot_destory(data);
 	free(data->arg);
-}
+}*/
 
 /*void get_website_testing(SMBOT_DATA *data)
 {

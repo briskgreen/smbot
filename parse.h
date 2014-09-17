@@ -41,4 +41,6 @@ char *website_parse2(char *str);
 
 char *id_information_parse(char *str);
 
+char *air_parse(char *str);
+
 #endif

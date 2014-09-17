@@ -309,7 +309,7 @@ int main(int argc,char **argv)
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!news","!news <关键词> 功能:根据关键词返回百度新闻第一条结果",get_news,1);
 
 		if(strstr(data,"!air"))
-			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!air","!air <城市名称> 功能:查询城市空气质量，城市名称使用拼音",get_air,1);
+			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!air","!air <城市名称> 功能:查询城市空气质量",get_air,1);
 
 		if(strstr(data,"!website"))
 			parse_arg("^:.[^ ]* PRIVMSG .[^ ]* :!website","!website <域名> 功能:网址安全检测，检测结果由金山云盾提供",get_website_testing,1);

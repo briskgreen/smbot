@@ -727,6 +727,46 @@ char *id_information_parse(char *str)
 	return res;
 }
 
+char *air_parse(char *str)
+{
+	json_object *obj;
+	json_object *item;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(!obj) return error_data("查询出错，请联系brisk报告bug！");
+	item=json_object_object_get(obj,"error");
+	if(json_object_get_int(item) != 0)
+	{
+		json_object_put(item);
+		item=json_object_object_get(obj,"errmsg");
+		res=error_data(json_object_get_string(item));
+		json_object_put(item);
+		json_object_put(obj);
+
+		return res;
+	}
+	json_object_put(item);
+
+	object_stradd(&res,"城市:","city",obj);
+	object_stradd(&res," 级别:","level",obj);
+	object_stradd(&res," 更新时间:","update_time",obj);
+	object_stradd(&res," AQI:","aqi",obj);
+	object_stradd(&res," PM2.5/1h:","pm25",obj);
+	object_stradd(&res," PM10/1h:","pm10",obj);
+	object_stradd(&res," CO:","co",obj);
+	object_stradd(&res," NO2:","no2",obj);
+	object_stradd(&res," O3","o3",obj);
+	object_stradd(&res," O3/8h","o3_8h",obj);
+	object_stradd(&res," SO2","so2",obj);
+	object_stradd(&res," 主要污染物:","primary_pollutant",obj);
+	object_stradd(&res," 影响:","affect",obj);
+	object_stradd(&res," 建议:","action",obj);
+
+	json_object_put(obj);
+	return res;
+}
+
 char *error_data(char *msg)
 {
 	char *res;
