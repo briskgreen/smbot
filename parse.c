@@ -479,7 +479,7 @@ char *dream_parse(char *str)
 	if(res == NULL)
 	{
 		json_object_put(obj);
-		return error_data("查询出错了哦!");
+		return error_data("周公无法解此梦!");
 	}
 	
 	item=json_object_array_get_idx(res,0);
