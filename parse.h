@@ -43,4 +43,6 @@ char *id_information_parse(char *str);
 
 char *air_parse(char *str);
 
+char *stack_parse(char *str);
+
 #endif

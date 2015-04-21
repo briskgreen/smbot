@@ -557,54 +557,35 @@ void get_weather(SMBOT_DATA *data)
 void get_stack(SMBOT_DATA *data)
 {
 	char *url;
-	char *des;
-	char *res;
 	char *buf;
-	int i;
+	CURL *curl;
+	retdata ret;
 
 	null_and_help();
-	for(i=0;data->arg[i];++i)
-		if(data->arg[i] == ' ')
-			data->arg[i]='+';
-	buf=string_add("http://stackoverflow.com/search?q=%s",data->arg);
-	res=http_get_simple(buf,80);
-	free(buf);
-	if(res == NULL)
-	{
-		msg_send("俺连啊连连啊连，对不起俺没连上!",data);
-		smbot_destory(data);
-		free(data->arg);
-		return;
-	}
-
-	buf=strstr(res,"<div class=\"result-link\">");
-	if(buf == NULL)
-	{
-		msg_send("淫家木有发现目标了啦!",data);
-		smbot_destory(data);
-		free(data->arg);
-		return;
-	}
-
-	url=match_string("/questions.[^\"]*",buf);
-	des=match_string("Q: .[^<]*",buf);
-	free(res);
-
-	if(url == NULL || des == NULL)
-	{
-		msg_send("啊哦，出了点小问题哦!",data);
-		smbot_destory(data);
-		null_no_free(url);
-		null_no_free(des);
-		free(data->arg);
-		return;
-	}
-
-	res=string_add("%s <-- http://stackoverflow.com%s",des,url);
+	url=url_encode(data->arg);
+	buf=string_add("https://api.stackexchange.com/2.2/search?order=desc&sort=activity&intitle=%s&site=stackoverflow",url);
 	free(url);
-	free(des);
-	msg_send(res,data);
-	free(res);
+	ret.len=0;
+	ret.data=NULL;
+	curl=curl_easy_init();
+
+	curl_easy_setopt(curl,CURLOPT_URL,buf);
+	curl_easy_setopt(curl,CURLOPT_NOSIGNAL,1);
+	curl_easy_setopt(curl,CURLOPT_WRITEFUNCTION,get_data);
+	curl_easy_setopt(curl,CURLOPT_WRITEDATA,&ret);
+	curl_easy_setopt(curl,CURLOPT_ENCODING,"gzip");
+	if(curl_easy_perform(curl) != 0)
+		msg_send("啊哦，淫家连接远程服务器失败了!",data);
+	else if(ret.len)
+	{
+		free(buf);
+		buf=stack_parse(ret.data);
+		msg_send(buf,data);
+		free(ret.data);
+	}
+
+	curl_easy_cleanup(curl);
+	null_no_free(buf);
 	smbot_destory(data);
 	free(data->arg);
 }

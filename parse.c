@@ -767,6 +767,33 @@ char *air_parse(char *str)
 	return res;
 }
 
+char *stack_parse(char *str)
+{
+	json_object *obj;
+	json_object *item;
+	json_object *temp;
+	char *res=NULL;
+
+	obj=json_tokener_parse(str);
+	if(!obj)
+		return error_data("查询出错了哦!");
+	item=json_object_object_get(obj,"items");
+	if(!item)
+	{
+		json_object_put(obj);
+		return error_data("没有查询到结果!");
+	}
+	temp=json_object_array_get_idx(item,0);
+	object_stradd(&res," ","title",temp);
+	object_stradd(&res," <--> ","link",temp);
+
+	json_object_put(temp);
+	json_object_put(item);
+	json_object_put(obj);
+
+	return res;
+}
+
 char *error_data(char *msg)
 {
 	char *res;
